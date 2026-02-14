@@ -1,0 +1,225 @@
+[
+  {
+    "id": "women-ivory-cable-cardigan",
+    "handle": "ivory-cable-knit-cardigan",
+    "title": "Ivory Cable Knit Cardigan",
+    "description": "Embrace timeless elegance with our Ivory Cable Knit Cardigan, a masterpiece of artisanal craftsmanship. Hand-finished with intricate cable patterns that whisper tales of heritage knitting techniques, this cardigan is more than just a layer—it's an heirloom in the making. The sumptuous cream-colored yarn feels like a gentle embrace against your skin, while the carefully selected wooden buttons add an organic touch that speaks to our commitment to sustainable luxury. Perfect for crisp autumn mornings or cozy evenings by the fire, this versatile piece transitions effortlessly from casual weekends to polished office settings.",
+    "descriptionHtml": "<p>Embrace timeless elegance with our <strong>Ivory Cable Knit Cardigan</strong>, a masterpiece of artisanal craftsmanship.</p><p>Hand-finished with intricate cable patterns that whisper tales of heritage knitting techniques, this cardigan is more than just a layer—it's an heirloom in the making. The sumptuous cream-colored yarn feels like a gentle embrace against your skin, while the carefully selected wooden buttons add an organic touch that speaks to our commitment to sustainable luxury.</p><p>Perfect for crisp autumn mornings or cozy evenings by the fire, this versatile piece transitions effortlessly from casual weekends to polished office settings.</p>",
+    "vendor": "Snug&Knot",
+    "productType": "Cardigan",
+    "tags": ["women", "knitwear", "cardigan", "premium", "cable-knit", "autumn", "winter", "sustainable"],
+    "images": [
+      {
+        "id": "img-ivory-cable-1",
+        "src": "/images/products/women/ivory-cable-cardigan-1.jpg",
+        "alt": "Woman wearing ivory cable knit cardigan - front view",
+        "width": 800,
+        "height": 1200
+      },
+      {
+        "id": "img-ivory-cable-2",
+        "src": "/images/products/women/ivory-cable-cardigan-2.jpg",
+        "alt": "Ivory cable knit cardigan - detail view",
+        "width": 800,
+        "height": 1200
+      },
+      {
+        "id": "img-ivory-cable-3",
+        "src": "/images/products/women/ivory-cable-cardigan-3.jpg",
+        "alt": "Ivory cable knit cardigan - lifestyle view",
+        "width": 800,
+        "height": 1200
+      }
+    ],
+    "variants": [
+      {
+        "id": "ivory-cable-xs",
+        "title": "XS / Ivory",
+        "price": 189.00,
+        "compareAtPrice": 249.00,
+        "available": true,
+        "sku": "SNK-WOM-IVC-XS",
+        "color": "Ivory",
+        "size": "XS"
+      },
+      {
+        "id": "ivory-cable-s",
+        "title": "S / Ivory",
+        "price": 189.00,
+        "compareAtPrice": 249.00,
+        "available": true,
+        "sku": "SNK-WOM-IVC-S",
+        "color": "Ivory",
+        "size": "S"
+      },
+      {
+        "id": "ivory-cable-m",
+        "title": "M / Ivory",
+        "price": 189.00,
+        "compareAtPrice": 249.00,
+        "available": true,
+        "sku": "SNK-WOM-IVC-M",
+        "color": "Ivory",
+        "size": "M"
+      },
+      {
+        "id": "ivory-cable-l",
+        "title": "L / Ivory",
+        "price": 189.00,
+        "compareAtPrice": 249.00,
+        "available": true,
+        "sku": "SNK-WOM-IVC-L",
+        "color": "Ivory",
+        "size": "L"
+      },
+      {
+        "id": "ivory-cable-xl",
+        "title": "XL / Ivory",
+        "price": 189.00,
+        "compareAtPrice": 249.00,
+        "available": true,
+        "sku": "SNK-WOM-IVC-XL",
+        "color": "Ivory",
+        "size": "XL"
+      }
+    ],
+    "price": 189.00,
+    "compareAtPrice": 249.00,
+    "gender": "women",
+    "category": "tops",
+    "subcategory": "cardigans",
+    "colors": ["Ivory", "Cream", "Natural"],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "featured": true,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.9,
+    "reviewCount": 127,
+    "createdAt": "2024-11-15T10:00:00Z",
+    "details": {
+      "fabric": "100% Premium Merino Wool",
+      "care": "Hand wash cold, lay flat to dry. Dry clean for best results.",
+      "fit": "Relaxed fit with classic V-neckline",
+      "features": [
+        "Intricate cable knit pattern",
+        "Natural wooden button closure",
+        "Ribbed cuffs and hem for shape retention",
+        "Soft, breathable merino wool",
+        "Ethically sourced materials"
+      ],
+      "sustainability": "Made with certified organic wool from family-owned farms"
+    }
+  },
+  {
+    "id": "women-terracotta-textured-cardigan",
+    "handle": "terracotta-textured-cardigan",
+    "title": "Terracotta Textured Cardigan",
+    "description": "Discover the perfect fusion of warmth and sophistication in our Terracotta Textured Cardigan. This stunning piece captures the essence of autumn with its rich, earthy terracotta hue—a color that flatters every skin tone and pairs beautifully with your existing wardrobe. The subtle diamond-textured knit creates visual interest without overwhelming, while the premium cotton-blend yarn ensures breathability and comfort throughout the day. Featuring our signature wooden button detailing, this cardigan is designed for the modern woman who values quality craftsmanship and understated elegance. Layer it over everything from crisp white shirts to flowing dresses, and watch it become your most-reached-for piece season after season.",
+    "descriptionHtml": "<p>Discover the perfect fusion of warmth and sophistication in our <strong>Terracotta Textured Cardigan</strong>.</p><p>This stunning piece captures the essence of autumn with its rich, earthy terracotta hue—a color that flatters every skin tone and pairs beautifully with your existing wardrobe. The subtle diamond-textured knit creates visual interest without overwhelming, while the premium cotton-blend yarn ensures breathability and comfort throughout the day.</p><p>Featuring our signature wooden button detailing, this cardigan is designed for the modern woman who values quality craftsmanship and understated elegance. Layer it over everything from crisp white shirts to flowing dresses, and watch it become your most-reached-for piece season after season.</p>",
+    "vendor": "Snug&Knot",
+    "productType": "Cardigan",
+    "tags": ["women", "knitwear", "cardigan", "premium", "terracotta", "autumn", "textured", "sustainable"],
+    "images": [
+      {
+        "id": "img-terracotta-1",
+        "src": "/images/products/women/terracotta-textured-cardigan-1.jpg",
+        "alt": "Woman wearing terracotta textured cardigan - front view",
+        "width": 800,
+        "height": 1200
+      },
+      {
+        "id": "img-terracotta-2",
+        "src": "/images/products/women/terracotta-textured-cardigan-2.jpg",
+        "alt": "Terracotta textured cardigan - detail view",
+        "width": 800,
+        "height": 1200
+      },
+      {
+        "id": "img-terracotta-3",
+        "src": "/images/products/women/terracotta-textured-cardigan-3.jpg",
+        "alt": "Terracotta textured cardigan - lifestyle view",
+        "width": 800,
+        "height": 1200
+      }
+    ],
+    "variants": [
+      {
+        "id": "terracotta-xs",
+        "title": "XS / Terracotta",
+        "price": 169.00,
+        "compareAtPrice": 229.00,
+        "available": true,
+        "sku": "SNK-WOM-TTC-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "terracotta-s",
+        "title": "S / Terracotta",
+        "price": 169.00,
+        "compareAtPrice": 229.00,
+        "available": true,
+        "sku": "SNK-WOM-TTC-S",
+        "color": "Terracotta",
+        "size": "S"
+      },
+      {
+        "id": "terracotta-m",
+        "title": "M / Terracotta",
+        "price": 169.00,
+        "compareAtPrice": 229.00,
+        "available": true,
+        "sku": "SNK-WOM-TTC-M",
+        "color": "Terracotta",
+        "size": "M"
+      },
+      {
+        "id": "terracotta-l",
+        "title": "L / Terracotta",
+        "price": 169.00,
+        "compareAtPrice": 229.00,
+        "available": true,
+        "sku": "SNK-WOM-TTC-L",
+        "color": "Terracotta",
+        "size": "L"
+      },
+      {
+        "id": "terracotta-xl",
+        "title": "XL / Terracotta",
+        "price": 169.00,
+        "compareAtPrice": 229.00,
+        "available": true,
+        "sku": "SNK-WOM-TTC-XL",
+        "color": "Terracotta",
+        "size": "XL"
+      }
+    ],
+    "price": 169.00,
+    "compareAtPrice": 229.00,
+    "gender": "women",
+    "category": "tops",
+    "subcategory": "cardigans",
+    "colors": ["Terracotta", "Rust", "Auburn"],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "featured": true,
+    "new": true,
+    "bestseller": true,
+    "rating": 4.8,
+    "reviewCount": 203,
+    "createdAt": "2024-11-10T10:00:00Z",
+    "details": {
+      "fabric": "70% Premium Cotton, 30% Cashmere Blend",
+      "care": "Machine wash gentle cycle, cold water. Reshape and dry flat.",
+      "fit": "Classic fit with round neckline",
+      "features": [
+        "Diamond-textured knit pattern",
+        "Natural wooden button closure",
+        "Soft cotton-cashmere blend",
+        "Breathable and comfortable",
+        "Versatile layering piece",
+        "Wrinkle-resistant finish"
+      ],
+      "sustainability": "Crafted using eco-friendly dyeing processes and sustainable cotton"
+    }
+  }
+]

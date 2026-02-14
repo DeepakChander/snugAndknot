@@ -1,0 +1,160 @@
+[
+  {
+    "id": "col-1",
+    "handle": "winter-warmth",
+    "title": "Winter Warmth Edit",
+    "description": "Cozy essentials to see you through the coldest months. Plush knits, sumptuous wools, and layering pieces designed to cocoon you in comfort without sacrificing an ounce of style.",
+    "image": "/images/collections/winter-warmth.jpg",
+    "products": [
+      "essential-modal-wool-coat",
+      "heritage-linen-blazer",
+      "signature-french-terry-puffer-jacket",
+      "coastal-cable-knit-trench-coat",
+      "classic-ribbed-sweater",
+      "organic-flannel-blouse",
+      "everyday-cashmere-blend-t-shirt",
+      "vintage-organic-cotton-scarf",
+      "tailored-ponte-belt",
+      "luxe-waffle-knit-tote-bag"
+    ],
+    "featured": true
+  },
+  {
+    "id": "col-2",
+    "handle": "the-essentials-edit",
+    "title": "The Essentials Edit",
+    "description": "The building blocks of a timeless wardrobe. These are the pieces you'll reach for every day -- versatile, perfectly fitted, and endlessly wearable. Invest once, wear forever.",
+    "image": "/images/collections/the-essentials-edit.jpg",
+    "products": [
+      "artisan-twill-cardigan",
+      "refined-brushed-tank-top",
+      "classic-ribbed-crop-top",
+      "organic-flannel-polo",
+      "vintage-organic-cotton-jeans",
+      "tailored-ponte-trousers",
+      "luxe-waffle-knit-skirt",
+      "effortless-velvet-shorts",
+      "effortless-velvet-sunglasses",
+      "studio-chambray-beanie"
+    ],
+    "featured": true
+  },
+  {
+    "id": "col-3",
+    "handle": "date-night",
+    "title": "Date Night",
+    "description": "Set the mood with pieces that captivate. From sultry silhouettes to delicate details, this collection is your guide to unforgettable evenings and lingering glances.",
+    "image": "/images/collections/date-night.jpg",
+    "products": [
+      "essential-modal-maxi-dress",
+      "heritage-linen-midi-dress",
+      "signature-french-terry-mini-dress",
+      "coastal-cable-knit-wrap-dress",
+      "everyday-cashmere-blend-turtleneck",
+      "artisan-twill-henley",
+      "refined-brushed-tunic",
+      "vintage-organic-cotton-socks",
+      "tailored-ponte-gloves"
+    ],
+    "featured": false
+  },
+  {
+    "id": "col-4",
+    "handle": "weekend-wanderer",
+    "title": "Weekend Wanderer",
+    "description": "For lazy Saturdays, long brunches, and spontaneous road trips. Easy-wearing pieces that look as good at the farmers' market as they do on the couch.",
+    "image": "/images/collections/weekend-wanderer.jpg",
+    "products": [
+      "classic-ribbed-sweater",
+      "organic-flannel-blouse",
+      "everyday-cashmere-blend-t-shirt",
+      "artisan-twill-cardigan",
+      "studio-chambray-joggers",
+      "vintage-organic-cotton-wide-leg-pants",
+      "tailored-ponte-leggings",
+      "luxe-waffle-knit-cargo-pants",
+      "luxe-waffle-knit-crossbody-bag",
+      "effortless-velvet-watch"
+    ],
+    "featured": true
+  },
+  {
+    "id": "col-5",
+    "handle": "office-elegance",
+    "title": "Office Elegance",
+    "description": "Command the room with polished sophistication. These are the power pieces for the modern professional -- sharp tailoring, refined fabrics, and a quiet confidence that speaks volumes.",
+    "image": "/images/collections/office-elegance.jpg",
+    "products": [
+      "effortless-velvet-culottes",
+      "studio-chambray-chinos",
+      "vintage-organic-cotton-jeans",
+      "tailored-ponte-trousers",
+      "refined-brushed-tank-top",
+      "classic-ribbed-crop-top",
+      "organic-flannel-polo",
+      "oversized-merino-denim-jacket",
+      "essential-modal-vest",
+      "heritage-linen-poncho"
+    ],
+    "featured": false
+  },
+  {
+    "id": "col-6",
+    "handle": "coastal-escape",
+    "title": "Coastal Escape",
+    "description": "Sun-drenched days and salt-kissed breezes. Airy linens, breezy silhouettes, and sun-faded hues inspired by endless coastlines and golden hour moments.",
+    "image": "/images/collections/coastal-escape.jpg",
+    "products": [
+      "oversized-merino-shirt-dress",
+      "essential-modal-slip-dress",
+      "heritage-linen-bodycon-dress",
+      "signature-french-terry-a-line-dress",
+      "everyday-cashmere-blend-turtleneck",
+      "artisan-twill-henley",
+      "refined-brushed-tunic",
+      "studio-chambray-jewelry-set",
+      "vintage-organic-cotton-scarf",
+      "tailored-ponte-belt"
+    ],
+    "featured": false
+  },
+  {
+    "id": "col-7",
+    "handle": "the-minimalist",
+    "title": "The Minimalist",
+    "description": "Less, but better. A pared-back palette of clean lines, neutral tones, and impeccable construction. For those who believe true luxury lies in simplicity.",
+    "image": "/images/collections/the-minimalist.jpg",
+    "products": [
+      "classic-ribbed-sweater",
+      "organic-flannel-blouse",
+      "everyday-cashmere-blend-t-shirt",
+      "luxe-waffle-knit-skirt",
+      "effortless-velvet-shorts",
+      "studio-chambray-joggers",
+      "vintage-organic-cotton-wide-leg-pants",
+      "coastal-cable-knit-sweater-dress",
+      "oversized-merino-knit-dress"
+    ],
+    "featured": true
+  },
+  {
+    "id": "col-8",
+    "handle": "new-season-preview",
+    "title": "New Season Preview",
+    "description": "A first look at what's next. These are the pieces defining the season ahead -- fresh silhouettes, unexpected textures, and colours that set the tone for the months to come.",
+    "image": "/images/collections/new-season-preview.jpg",
+    "products": [
+      "vintage-organic-cotton-wide-leg-pants",
+      "tailored-ponte-leggings",
+      "luxe-waffle-knit-cargo-pants",
+      "effortless-velvet-culottes",
+      "studio-chambray-chinos",
+      "vintage-organic-cotton-jeans",
+      "tailored-ponte-trousers",
+      "essential-modal-maxi-dress",
+      "heritage-linen-midi-dress",
+      "signature-french-terry-mini-dress"
+    ],
+    "featured": true
+  }
+]

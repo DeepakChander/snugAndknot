@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "tops",
+    "title": "Tops",
+    "description": "From everyday essentials to statement pieces -- discover our curated collection of tops crafted for comfort and style. Each silhouette is designed to drape beautifully, blending luxurious fabrics with effortless sophistication.",
+    "image": "/images/categories/tops.jpg",
+    "productCount": 25
+  },
+  {
+    "slug": "bottoms",
+    "title": "Bottoms",
+    "description": "Tailored to move with you -- explore trousers, skirts, and more that marry impeccable fit with everyday ease. From relaxed wide-legs to sculpted silhouettes, each piece is crafted to flatter and elevate.",
+    "image": "/images/categories/bottoms.jpg",
+    "productCount": 22
+  },
+  {
+    "slug": "dresses",
+    "title": "Dresses",
+    "description": "One piece, endless possibilities. Our dresses are designed for the moments that matter -- whether it's a quiet morning or an unforgettable evening. Sumptuous textures and timeless cuts you'll reach for again and again.",
+    "image": "/images/categories/dresses.jpg",
+    "productCount": 20
+  },
+  {
+    "slug": "outerwear",
+    "title": "Outerwear",
+    "description": "Make every entrance count. Our outerwear collection wraps you in warmth without compromising on elegance -- from structured coats to buttery-soft leather jackets, each layer tells a story of refined craftsmanship.",
+    "image": "/images/categories/outerwear.jpg",
+    "productCount": 18
+  },
+  {
+    "slug": "accessories",
+    "title": "Accessories",
+    "description": "The finishing touches that define your look. Discover hand-selected scarves, belts, bags, and jewellery -- thoughtfully designed details that transform the everyday into something extraordinary.",
+    "image": "/images/categories/accessories.jpg",
+    "productCount": 20
+  }
+]

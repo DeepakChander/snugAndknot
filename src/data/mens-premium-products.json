@@ -1,0 +1,99 @@
+[
+  {
+    "id": "men-black-red-contrast-tee",
+    "handle": "black-red-contrast-knit-tee",
+    "title": "Noir & Crimson Contrast Knit Tee",
+    "description": "Command attention without saying a word. Our Noir & Crimson Contrast Knit Tee is engineered for the man who refuses to blend in. The jet-black body delivers a clean, powerful silhouette, while the bold crimson shoulder panels and ribbed neckline inject a confident edge that elevates this far beyond your ordinary tee. Crafted from our signature superfine merino-cotton blend, this knit tee drapes with a refined weight that feels effortlessly premium against the skin. The precision-cut contrast panelling draws the eye across the shoulders, creating a naturally broader, more athletic frame. Whether you're heading to a rooftop dinner or a weekend gallery visit, this is the piece that bridges the gap between casual comfort and understated sophistication.",
+    "vendor": "Snug&Knot",
+    "productType": "Knit Tee",
+    "tags": ["men", "knitwear", "tee", "premium", "contrast", "black", "red", "athletic"],
+    "images": [
+      {
+        "id": "img-noir-crimson-1",
+        "src": "/images/products/men/black-red-contrast-tee-1.jpg",
+        "alt": "Man wearing black and red contrast knit tee - front view",
+        "width": 800,
+        "height": 1200
+      },
+      {
+        "id": "img-noir-crimson-2",
+        "src": "/images/products/men/black-red-contrast-tee-2.jpg",
+        "alt": "Black and red contrast knit tee - detail view",
+        "width": 800,
+        "height": 1200
+      },
+      {
+        "id": "img-noir-crimson-3",
+        "src": "/images/products/men/black-red-contrast-tee-3.jpg",
+        "alt": "Black and red contrast knit tee - lifestyle view",
+        "width": 800,
+        "height": 1200
+      }
+    ],
+    "variants": [
+      { "id": "noir-crimson-s", "title": "S / Black-Red", "price": 129.00, "compareAtPrice": 179.00, "available": true, "sku": "SNK-MEN-NRC-S", "color": "Black/Red", "size": "S" },
+      { "id": "noir-crimson-m", "title": "M / Black-Red", "price": 129.00, "compareAtPrice": 179.00, "available": true, "sku": "SNK-MEN-NRC-M", "color": "Black/Red", "size": "M" },
+      { "id": "noir-crimson-l", "title": "L / Black-Red", "price": 129.00, "compareAtPrice": 179.00, "available": true, "sku": "SNK-MEN-NRC-L", "color": "Black/Red", "size": "L" },
+      { "id": "noir-crimson-xl", "title": "XL / Black-Red", "price": 129.00, "compareAtPrice": 179.00, "available": true, "sku": "SNK-MEN-NRC-XL", "color": "Black/Red", "size": "XL" },
+      { "id": "noir-crimson-xxl", "title": "XXL / Black-Red", "price": 129.00, "compareAtPrice": 179.00, "available": true, "sku": "SNK-MEN-NRC-XXL", "color": "Black/Red", "size": "XXL" }
+    ],
+    "price": 129.00,
+    "compareAtPrice": 179.00,
+    "gender": "men",
+    "category": "tops",
+    "subcategory": "knit-tees",
+    "colors": ["Black/Red"],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "featured": true,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.8,
+    "reviewCount": 89,
+    "createdAt": "2024-12-01T10:00:00Z"
+  },
+  {
+    "id": "men-navy-tan-colorblock-tee",
+    "handle": "navy-tan-colorblock-knit-tee",
+    "title": "Dusk & Sand Colorblock Knit Tee",
+    "description": "Where modern minimalism meets artisanal warmth. Our Dusk & Sand Colorblock Knit Tee pairs a deep midnight navy with rich sand tones in a striking vertical panel design that's as considered as it is effortless. Every stitch is intentional — the tonal interplay between the two fabrics creates a visual depth that catches light differently as you move, making this far more than a simple colour-blocked piece. Knitted from a breathable long-staple cotton with a touch of silk for subtle sheen, it sits beautifully untucked over tailored trousers or dressed down with your favourite denim. This is slow fashion at its finest: a piece built to outlast trends and grow more characterful with every wear.",
+    "vendor": "Snug&Knot",
+    "productType": "Knit Tee",
+    "tags": ["men", "knitwear", "tee", "premium", "colorblock", "navy", "tan", "minimal"],
+    "images": [
+      {
+        "id": "img-dusk-sand-1",
+        "src": "/images/products/men/navy-tan-colorblock-tee-1.jpg",
+        "alt": "Man wearing navy and tan colorblock knit tee - front view",
+        "width": 800,
+        "height": 1200
+      },
+      {
+        "id": "img-dusk-sand-2",
+        "src": "/images/products/men/navy-tan-colorblock-tee-2.jpg",
+        "alt": "Navy and tan colorblock knit tee - detail view",
+        "width": 800,
+        "height": 1200
+      }
+    ],
+    "variants": [
+      { "id": "dusk-sand-s", "title": "S / Navy-Tan", "price": 139.00, "compareAtPrice": 189.00, "available": true, "sku": "SNK-MEN-DSC-S", "color": "Navy/Tan", "size": "S" },
+      { "id": "dusk-sand-m", "title": "M / Navy-Tan", "price": 139.00, "compareAtPrice": 189.00, "available": true, "sku": "SNK-MEN-DSC-M", "color": "Navy/Tan", "size": "M" },
+      { "id": "dusk-sand-l", "title": "L / Navy-Tan", "price": 139.00, "compareAtPrice": 189.00, "available": true, "sku": "SNK-MEN-DSC-L", "color": "Navy/Tan", "size": "L" },
+      { "id": "dusk-sand-xl", "title": "XL / Navy-Tan", "price": 139.00, "compareAtPrice": 189.00, "available": true, "sku": "SNK-MEN-DSC-XL", "color": "Navy/Tan", "size": "XL" },
+      { "id": "dusk-sand-xxl", "title": "XXL / Navy-Tan", "price": 139.00, "compareAtPrice": 189.00, "available": true, "sku": "SNK-MEN-DSC-XXL", "color": "Navy/Tan", "size": "XXL" }
+    ],
+    "price": 139.00,
+    "compareAtPrice": 189.00,
+    "gender": "men",
+    "category": "tops",
+    "subcategory": "knit-tees",
+    "colors": ["Navy/Tan"],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "featured": true,
+    "new": true,
+    "bestseller": true,
+    "rating": 4.9,
+    "reviewCount": 156,
+    "createdAt": "2024-11-25T10:00:00Z"
+  }
+]

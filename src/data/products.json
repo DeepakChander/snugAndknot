@@ -1,0 +1,7170 @@
+[
+  {
+    "id": "prod-1",
+    "handle": "classic-ribbed-sweater",
+    "title": "Classic Ribbed Sweater",
+    "description": "A beautifully crafted sweater made from premium ribbed fabric. Designed for comfort and style, this classic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Sweater",
+    "tags": [
+      "ribbed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-1-1",
+        "src": "/images/products/classic-ribbed-sweater-1.jpg",
+        "alt": "Classic Ribbed Sweater front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-1-2",
+        "src": "/images/products/classic-ribbed-sweater-2.jpg",
+        "alt": "Classic Ribbed Sweater back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-1-1",
+        "title": "XS / Charcoal",
+        "price": 71.41,
+        "available": true,
+        "sku": "SWE-CHA-XS",
+        "color": "Charcoal",
+        "size": "XS"
+      },
+      {
+        "id": "var-1-2",
+        "title": "S / Charcoal",
+        "price": 71.41,
+        "available": true,
+        "sku": "SWE-CHA-S",
+        "color": "Charcoal",
+        "size": "S"
+      }
+    ],
+    "price": 71.41,
+    "category": "tops",
+    "subcategory": "sweater",
+    "colors": [
+      "Charcoal",
+      "Cream"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": true,
+    "rating": 5,
+    "reviewCount": 80,
+    "createdAt": "2025-09-28"
+  },
+  {
+    "id": "prod-2",
+    "handle": "organic-flannel-blouse",
+    "title": "Organic Flannel Blouse",
+    "description": "A beautifully crafted blouse made from premium flannel fabric. Designed for comfort and style, this organic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Blouse",
+    "tags": [
+      "flannel",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-2-1",
+        "src": "/images/products/organic-flannel-blouse-1.jpg",
+        "alt": "Organic Flannel Blouse front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-2-2",
+        "src": "/images/products/organic-flannel-blouse-2.jpg",
+        "alt": "Organic Flannel Blouse back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-2-1",
+        "title": "XS / Dusty Rose",
+        "price": 122.57,
+        "available": true,
+        "sku": "BLO-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-2-2",
+        "title": "S / Dusty Rose",
+        "price": 122.57,
+        "available": true,
+        "sku": "BLO-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 122.57,
+    "category": "tops",
+    "subcategory": "blouse",
+    "colors": [
+      "Dusty Rose",
+      "Olive",
+      "Charcoal"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.1,
+    "reviewCount": 191,
+    "createdAt": "2025-08-10"
+  },
+  {
+    "id": "prod-3",
+    "handle": "everyday-cashmere-blend-t-shirt",
+    "title": "Everyday Cashmere Blend T-Shirt",
+    "description": "A beautifully crafted t-shirt made from premium cashmere blend fabric. Designed for comfort and style, this everyday piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "T-Shirt",
+    "tags": [
+      "cashmere",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-3-1",
+        "src": "/images/products/everyday-cashmere-blend-t-shirt-1.jpg",
+        "alt": "Everyday Cashmere Blend T-Shirt front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-3-2",
+        "src": "/images/products/everyday-cashmere-blend-t-shirt-2.jpg",
+        "alt": "Everyday Cashmere Blend T-Shirt back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-3-1",
+        "title": "XS / Navy",
+        "price": 121.83,
+        "available": true,
+        "sku": "T-S-NAV-XS",
+        "color": "Navy",
+        "size": "XS"
+      },
+      {
+        "id": "var-3-2",
+        "title": "S / Navy",
+        "price": 121.83,
+        "available": true,
+        "sku": "T-S-NAV-S",
+        "color": "Navy",
+        "size": "S"
+      }
+    ],
+    "price": 121.83,
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "colors": [
+      "Navy",
+      "Forest Green",
+      "Mauve"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": true,
+    "rating": 3.9,
+    "reviewCount": 198,
+    "createdAt": "2025-10-22"
+  },
+  {
+    "id": "prod-4",
+    "handle": "artisan-twill-cardigan",
+    "title": "Artisan Twill Cardigan",
+    "description": "A beautifully crafted cardigan made from premium twill fabric. Designed for comfort and style, this artisan piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Cardigan",
+    "tags": [
+      "twill",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-4-1",
+        "src": "/images/products/artisan-twill-cardigan-1.jpg",
+        "alt": "Artisan Twill Cardigan front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-4-2",
+        "src": "/images/products/artisan-twill-cardigan-2.jpg",
+        "alt": "Artisan Twill Cardigan back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-4-1",
+        "title": "XS / Terracotta",
+        "price": 121.08,
+        "available": true,
+        "sku": "CAR-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-4-2",
+        "title": "S / Terracotta",
+        "price": 121.08,
+        "available": true,
+        "sku": "CAR-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 121.08,
+    "category": "tops",
+    "subcategory": "cardigan",
+    "colors": [
+      "Terracotta",
+      "Burgundy",
+      "Sage"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.5,
+    "reviewCount": 95,
+    "createdAt": "2025-08-23"
+  },
+  {
+    "id": "prod-5",
+    "handle": "refined-brushed-tank-top",
+    "title": "Refined Brushed Tank Top",
+    "description": "A beautifully crafted tank top made from premium brushed fabric. Designed for comfort and style, this refined piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Tank Top",
+    "tags": [
+      "brushed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-5-1",
+        "src": "/images/products/refined-brushed-tank-top-1.jpg",
+        "alt": "Refined Brushed Tank Top front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-5-2",
+        "src": "/images/products/refined-brushed-tank-top-2.jpg",
+        "alt": "Refined Brushed Tank Top back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-5-1",
+        "title": "XS / Terracotta",
+        "price": 124.08,
+        "available": true,
+        "sku": "TAN-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-5-2",
+        "title": "S / Terracotta",
+        "price": 124.08,
+        "available": true,
+        "sku": "TAN-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 124.08,
+    "category": "tops",
+    "subcategory": "tank-top",
+    "colors": [
+      "Terracotta",
+      "Charcoal",
+      "Forest Green"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": true,
+    "rating": 4.6,
+    "reviewCount": 84,
+    "createdAt": "2025-07-23"
+  },
+  {
+    "id": "prod-6",
+    "handle": "classic-ribbed-crop-top",
+    "title": "Classic Ribbed Crop Top",
+    "description": "A beautifully crafted crop top made from premium ribbed fabric. Designed for comfort and style, this classic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Crop Top",
+    "tags": [
+      "ribbed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-6-1",
+        "src": "/images/products/classic-ribbed-crop-top-1.jpg",
+        "alt": "Classic Ribbed Crop Top front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-6-2",
+        "src": "/images/products/classic-ribbed-crop-top-2.jpg",
+        "alt": "Classic Ribbed Crop Top back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-6-1",
+        "title": "XS / Terracotta",
+        "price": 86.89,
+        "available": true,
+        "sku": "CRO-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-6-2",
+        "title": "S / Terracotta",
+        "price": 86.89,
+        "available": true,
+        "sku": "CRO-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 86.89,
+    "category": "tops",
+    "subcategory": "crop-top",
+    "colors": [
+      "Terracotta",
+      "Sage",
+      "Olive"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 115,
+    "createdAt": "2025-09-28"
+  },
+  {
+    "id": "prod-7",
+    "handle": "organic-flannel-polo",
+    "title": "Organic Flannel Polo",
+    "description": "A beautifully crafted polo made from premium flannel fabric. Designed for comfort and style, this organic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Polo",
+    "tags": [
+      "flannel",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-7-1",
+        "src": "/images/products/organic-flannel-polo-1.jpg",
+        "alt": "Organic Flannel Polo front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-7-2",
+        "src": "/images/products/organic-flannel-polo-2.jpg",
+        "alt": "Organic Flannel Polo back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-7-1",
+        "title": "XS / Cream",
+        "price": 52.67,
+        "available": true,
+        "sku": "POL-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-7-2",
+        "title": "S / Cream",
+        "price": 52.67,
+        "available": true,
+        "sku": "POL-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 52.67,
+    "category": "tops",
+    "subcategory": "polo",
+    "colors": [
+      "Cream",
+      "Indigo",
+      "Olive"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 17,
+    "createdAt": "2025-11-19"
+  },
+  {
+    "id": "prod-8",
+    "handle": "everyday-cashmere-blend-turtleneck",
+    "title": "Everyday Cashmere Blend Turtleneck",
+    "description": "A beautifully crafted turtleneck made from premium cashmere blend fabric. Designed for comfort and style, this everyday piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Turtleneck",
+    "tags": [
+      "cashmere",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-8-1",
+        "src": "/images/products/everyday-cashmere-blend-turtleneck-1.jpg",
+        "alt": "Everyday Cashmere Blend Turtleneck front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-8-2",
+        "src": "/images/products/everyday-cashmere-blend-turtleneck-2.jpg",
+        "alt": "Everyday Cashmere Blend Turtleneck back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-8-1",
+        "title": "XS / Black",
+        "price": 65.62,
+        "available": true,
+        "sku": "TUR-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-8-2",
+        "title": "S / Black",
+        "price": 65.62,
+        "available": true,
+        "sku": "TUR-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 65.62,
+    "category": "tops",
+    "subcategory": "turtleneck",
+    "colors": [
+      "Black",
+      "Olive"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.7,
+    "reviewCount": 27,
+    "createdAt": "2025-10-06"
+  },
+  {
+    "id": "prod-9",
+    "handle": "artisan-twill-henley",
+    "title": "Artisan Twill Henley",
+    "description": "A beautifully crafted henley made from premium twill fabric. Designed for comfort and style, this artisan piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Henley",
+    "tags": [
+      "twill",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-9-1",
+        "src": "/images/products/artisan-twill-henley-1.jpg",
+        "alt": "Artisan Twill Henley front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-9-2",
+        "src": "/images/products/artisan-twill-henley-2.jpg",
+        "alt": "Artisan Twill Henley back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-9-1",
+        "title": "XS / Indigo",
+        "price": 94.84,
+        "available": true,
+        "sku": "HEN-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-9-2",
+        "title": "S / Indigo",
+        "price": 94.84,
+        "available": true,
+        "sku": "HEN-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 94.84,
+    "category": "tops",
+    "subcategory": "henley",
+    "colors": [
+      "Indigo",
+      "Terracotta",
+      "Dusty Rose"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 147,
+    "createdAt": "2025-07-11"
+  },
+  {
+    "id": "prod-10",
+    "handle": "refined-brushed-tunic",
+    "title": "Refined Brushed Tunic",
+    "description": "A beautifully crafted tunic made from premium brushed fabric. Designed for comfort and style, this refined piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Tunic",
+    "tags": [
+      "brushed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-10-1",
+        "src": "/images/products/refined-brushed-tunic-1.jpg",
+        "alt": "Refined Brushed Tunic front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-10-2",
+        "src": "/images/products/refined-brushed-tunic-2.jpg",
+        "alt": "Refined Brushed Tunic back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-10-1",
+        "title": "XS / Black",
+        "price": 79.89,
+        "available": true,
+        "sku": "TUN-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-10-2",
+        "title": "S / Black",
+        "price": 79.89,
+        "available": true,
+        "sku": "TUN-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 79.89,
+    "category": "tops",
+    "subcategory": "tunic",
+    "colors": [
+      "Black",
+      "Olive"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": true,
+    "rating": 3.9,
+    "reviewCount": 124,
+    "createdAt": "2025-08-22"
+  },
+  {
+    "id": "prod-11",
+    "handle": "classic-ribbed-sweater",
+    "title": "Classic Ribbed Sweater",
+    "description": "A beautifully crafted sweater made from premium ribbed fabric. Designed for comfort and style, this classic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Sweater",
+    "tags": [
+      "ribbed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-11-1",
+        "src": "/images/products/classic-ribbed-sweater-1.jpg",
+        "alt": "Classic Ribbed Sweater front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-11-2",
+        "src": "/images/products/classic-ribbed-sweater-2.jpg",
+        "alt": "Classic Ribbed Sweater back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-11-1",
+        "title": "XS / Black",
+        "price": 102.26,
+        "available": true,
+        "sku": "SWE-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-11-2",
+        "title": "S / Black",
+        "price": 102.26,
+        "available": true,
+        "sku": "SWE-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 102.26,
+    "category": "tops",
+    "subcategory": "sweater",
+    "colors": [
+      "Black",
+      "Indigo",
+      "Dusty Rose"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.5,
+    "reviewCount": 118,
+    "createdAt": "2025-08-08"
+  },
+  {
+    "id": "prod-12",
+    "handle": "organic-flannel-blouse",
+    "title": "Organic Flannel Blouse",
+    "description": "A beautifully crafted blouse made from premium flannel fabric. Designed for comfort and style, this organic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Blouse",
+    "tags": [
+      "flannel",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-12-1",
+        "src": "/images/products/organic-flannel-blouse-1.jpg",
+        "alt": "Organic Flannel Blouse front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-12-2",
+        "src": "/images/products/organic-flannel-blouse-2.jpg",
+        "alt": "Organic Flannel Blouse back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-12-1",
+        "title": "XS / Olive",
+        "price": 61.86,
+        "available": true,
+        "sku": "BLO-OLI-XS",
+        "color": "Olive",
+        "size": "XS"
+      },
+      {
+        "id": "var-12-2",
+        "title": "S / Olive",
+        "price": 61.86,
+        "available": true,
+        "sku": "BLO-OLI-S",
+        "color": "Olive",
+        "size": "S"
+      }
+    ],
+    "price": 61.86,
+    "category": "tops",
+    "subcategory": "blouse",
+    "colors": [
+      "Olive",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.9,
+    "reviewCount": 165,
+    "createdAt": "2025-10-10"
+  },
+  {
+    "id": "prod-13",
+    "handle": "everyday-cashmere-blend-t-shirt",
+    "title": "Everyday Cashmere Blend T-Shirt",
+    "description": "A beautifully crafted t-shirt made from premium cashmere blend fabric. Designed for comfort and style, this everyday piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "T-Shirt",
+    "tags": [
+      "cashmere",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-13-1",
+        "src": "/images/products/everyday-cashmere-blend-t-shirt-1.jpg",
+        "alt": "Everyday Cashmere Blend T-Shirt front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-13-2",
+        "src": "/images/products/everyday-cashmere-blend-t-shirt-2.jpg",
+        "alt": "Everyday Cashmere Blend T-Shirt back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-13-1",
+        "title": "XS / Black",
+        "price": 114.09,
+        "available": true,
+        "sku": "T-S-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-13-2",
+        "title": "S / Black",
+        "price": 114.09,
+        "available": true,
+        "sku": "T-S-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 114.09,
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "colors": [
+      "Black",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 151,
+    "createdAt": "2025-12-16"
+  },
+  {
+    "id": "prod-14",
+    "handle": "artisan-twill-cardigan",
+    "title": "Artisan Twill Cardigan",
+    "description": "A beautifully crafted cardigan made from premium twill fabric. Designed for comfort and style, this artisan piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Cardigan",
+    "tags": [
+      "twill",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-14-1",
+        "src": "/images/products/artisan-twill-cardigan-1.jpg",
+        "alt": "Artisan Twill Cardigan front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-14-2",
+        "src": "/images/products/artisan-twill-cardigan-2.jpg",
+        "alt": "Artisan Twill Cardigan back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-14-1",
+        "title": "XS / Olive",
+        "price": 109.22,
+        "available": true,
+        "sku": "CAR-OLI-XS",
+        "color": "Olive",
+        "size": "XS"
+      },
+      {
+        "id": "var-14-2",
+        "title": "S / Olive",
+        "price": 109.22,
+        "available": true,
+        "sku": "CAR-OLI-S",
+        "color": "Olive",
+        "size": "S"
+      }
+    ],
+    "price": 109.22,
+    "compareAtPrice": 163.72,
+    "category": "tops",
+    "subcategory": "cardigan",
+    "colors": [
+      "Olive",
+      "Terracotta"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.5,
+    "reviewCount": 9,
+    "createdAt": "2025-11-09"
+  },
+  {
+    "id": "prod-15",
+    "handle": "refined-brushed-tank-top",
+    "title": "Refined Brushed Tank Top",
+    "description": "A beautifully crafted tank top made from premium brushed fabric. Designed for comfort and style, this refined piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Tank Top",
+    "tags": [
+      "brushed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-15-1",
+        "src": "/images/products/refined-brushed-tank-top-1.jpg",
+        "alt": "Refined Brushed Tank Top front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-15-2",
+        "src": "/images/products/refined-brushed-tank-top-2.jpg",
+        "alt": "Refined Brushed Tank Top back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-15-1",
+        "title": "XS / Indigo",
+        "price": 124.93,
+        "available": true,
+        "sku": "TAN-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-15-2",
+        "title": "S / Indigo",
+        "price": 124.93,
+        "available": true,
+        "sku": "TAN-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 124.93,
+    "compareAtPrice": 158.94,
+    "category": "tops",
+    "subcategory": "tank-top",
+    "colors": [
+      "Indigo",
+      "Dusty Rose",
+      "Terracotta"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": true,
+    "new": false,
+    "bestseller": true,
+    "rating": 4.3,
+    "reviewCount": 194,
+    "createdAt": "2025-09-03"
+  },
+  {
+    "id": "prod-16",
+    "handle": "classic-ribbed-crop-top",
+    "title": "Classic Ribbed Crop Top",
+    "description": "A beautifully crafted crop top made from premium ribbed fabric. Designed for comfort and style, this classic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Crop Top",
+    "tags": [
+      "ribbed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-16-1",
+        "src": "/images/products/classic-ribbed-crop-top-1.jpg",
+        "alt": "Classic Ribbed Crop Top front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-16-2",
+        "src": "/images/products/classic-ribbed-crop-top-2.jpg",
+        "alt": "Classic Ribbed Crop Top back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-16-1",
+        "title": "XS / Camel",
+        "price": 81.78,
+        "available": true,
+        "sku": "CRO-CAM-XS",
+        "color": "Camel",
+        "size": "XS"
+      },
+      {
+        "id": "var-16-2",
+        "title": "S / Camel",
+        "price": 81.78,
+        "available": true,
+        "sku": "CRO-CAM-S",
+        "color": "Camel",
+        "size": "S"
+      }
+    ],
+    "price": 81.78,
+    "compareAtPrice": 121.06,
+    "category": "tops",
+    "subcategory": "crop-top",
+    "colors": [
+      "Camel",
+      "Sage"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.9,
+    "reviewCount": 96,
+    "createdAt": "2025-08-25"
+  },
+  {
+    "id": "prod-17",
+    "handle": "organic-flannel-polo",
+    "title": "Organic Flannel Polo",
+    "description": "A beautifully crafted polo made from premium flannel fabric. Designed for comfort and style, this organic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Polo",
+    "tags": [
+      "flannel",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-17-1",
+        "src": "/images/products/organic-flannel-polo-1.jpg",
+        "alt": "Organic Flannel Polo front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-17-2",
+        "src": "/images/products/organic-flannel-polo-2.jpg",
+        "alt": "Organic Flannel Polo back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-17-1",
+        "title": "XS / Indigo",
+        "price": 108.23,
+        "available": true,
+        "sku": "POL-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-17-2",
+        "title": "S / Indigo",
+        "price": 108.23,
+        "available": true,
+        "sku": "POL-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 108.23,
+    "compareAtPrice": 149.98,
+    "category": "tops",
+    "subcategory": "polo",
+    "colors": [
+      "Indigo",
+      "Forest Green",
+      "Mauve"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 143,
+    "createdAt": "2025-10-27"
+  },
+  {
+    "id": "prod-18",
+    "handle": "everyday-cashmere-blend-turtleneck",
+    "title": "Everyday Cashmere Blend Turtleneck",
+    "description": "A beautifully crafted turtleneck made from premium cashmere blend fabric. Designed for comfort and style, this everyday piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Turtleneck",
+    "tags": [
+      "cashmere",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-18-1",
+        "src": "/images/products/everyday-cashmere-blend-turtleneck-1.jpg",
+        "alt": "Everyday Cashmere Blend Turtleneck front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-18-2",
+        "src": "/images/products/everyday-cashmere-blend-turtleneck-2.jpg",
+        "alt": "Everyday Cashmere Blend Turtleneck back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-18-1",
+        "title": "XS / Mauve",
+        "price": 95.26,
+        "available": true,
+        "sku": "TUR-MAU-XS",
+        "color": "Mauve",
+        "size": "XS"
+      },
+      {
+        "id": "var-18-2",
+        "title": "S / Mauve",
+        "price": 95.26,
+        "available": true,
+        "sku": "TUR-MAU-S",
+        "color": "Mauve",
+        "size": "S"
+      }
+    ],
+    "price": 95.26,
+    "category": "tops",
+    "subcategory": "turtleneck",
+    "colors": [
+      "Mauve",
+      "Navy",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.5,
+    "reviewCount": 186,
+    "createdAt": "2025-11-18"
+  },
+  {
+    "id": "prod-19",
+    "handle": "artisan-twill-henley",
+    "title": "Artisan Twill Henley",
+    "description": "A beautifully crafted henley made from premium twill fabric. Designed for comfort and style, this artisan piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Henley",
+    "tags": [
+      "twill",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-19-1",
+        "src": "/images/products/artisan-twill-henley-1.jpg",
+        "alt": "Artisan Twill Henley front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-19-2",
+        "src": "/images/products/artisan-twill-henley-2.jpg",
+        "alt": "Artisan Twill Henley back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-19-1",
+        "title": "XS / Black",
+        "price": 40.82,
+        "available": true,
+        "sku": "HEN-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-19-2",
+        "title": "S / Black",
+        "price": 40.82,
+        "available": true,
+        "sku": "HEN-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 40.82,
+    "category": "tops",
+    "subcategory": "henley",
+    "colors": [
+      "Black",
+      "Forest Green"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.3,
+    "reviewCount": 133,
+    "createdAt": "2025-09-12"
+  },
+  {
+    "id": "prod-20",
+    "handle": "refined-brushed-tunic",
+    "title": "Refined Brushed Tunic",
+    "description": "A beautifully crafted tunic made from premium brushed fabric. Designed for comfort and style, this refined piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Tunic",
+    "tags": [
+      "brushed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-20-1",
+        "src": "/images/products/refined-brushed-tunic-1.jpg",
+        "alt": "Refined Brushed Tunic front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-20-2",
+        "src": "/images/products/refined-brushed-tunic-2.jpg",
+        "alt": "Refined Brushed Tunic back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-20-1",
+        "title": "XS / Stone",
+        "price": 64.8,
+        "available": true,
+        "sku": "TUN-STO-XS",
+        "color": "Stone",
+        "size": "XS"
+      },
+      {
+        "id": "var-20-2",
+        "title": "S / Stone",
+        "price": 64.8,
+        "available": true,
+        "sku": "TUN-STO-S",
+        "color": "Stone",
+        "size": "S"
+      }
+    ],
+    "price": 64.8,
+    "category": "tops",
+    "subcategory": "tunic",
+    "colors": [
+      "Stone",
+      "White",
+      "Cream"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 78,
+    "createdAt": "2025-12-16"
+  },
+  {
+    "id": "prod-21",
+    "handle": "classic-ribbed-sweater",
+    "title": "Classic Ribbed Sweater",
+    "description": "A beautifully crafted sweater made from premium ribbed fabric. Designed for comfort and style, this classic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Sweater",
+    "tags": [
+      "ribbed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-21-1",
+        "src": "/images/products/classic-ribbed-sweater-1.jpg",
+        "alt": "Classic Ribbed Sweater front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-21-2",
+        "src": "/images/products/classic-ribbed-sweater-2.jpg",
+        "alt": "Classic Ribbed Sweater back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-21-1",
+        "title": "XS / Black",
+        "price": 103.74,
+        "available": true,
+        "sku": "SWE-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-21-2",
+        "title": "S / Black",
+        "price": 103.74,
+        "available": true,
+        "sku": "SWE-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 103.74,
+    "category": "tops",
+    "subcategory": "sweater",
+    "colors": [
+      "Black",
+      "Indigo",
+      "White"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 5,
+    "reviewCount": 11,
+    "createdAt": "2025-07-01"
+  },
+  {
+    "id": "prod-22",
+    "handle": "organic-flannel-blouse",
+    "title": "Organic Flannel Blouse",
+    "description": "A beautifully crafted blouse made from premium flannel fabric. Designed for comfort and style, this organic piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Blouse",
+    "tags": [
+      "flannel",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-22-1",
+        "src": "/images/products/organic-flannel-blouse-1.jpg",
+        "alt": "Organic Flannel Blouse front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-22-2",
+        "src": "/images/products/organic-flannel-blouse-2.jpg",
+        "alt": "Organic Flannel Blouse back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-22-1",
+        "title": "XS / Forest Green",
+        "price": 98.14,
+        "available": true,
+        "sku": "BLO-FOR-XS",
+        "color": "Forest Green",
+        "size": "XS"
+      },
+      {
+        "id": "var-22-2",
+        "title": "S / Forest Green",
+        "price": 98.14,
+        "available": true,
+        "sku": "BLO-FOR-S",
+        "color": "Forest Green",
+        "size": "S"
+      }
+    ],
+    "price": 98.14,
+    "compareAtPrice": 126.13,
+    "category": "tops",
+    "subcategory": "blouse",
+    "colors": [
+      "Forest Green",
+      "Black",
+      "White"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 33,
+    "createdAt": "2025-12-28"
+  },
+  {
+    "id": "prod-23",
+    "handle": "everyday-cashmere-blend-t-shirt",
+    "title": "Everyday Cashmere Blend T-Shirt",
+    "description": "A beautifully crafted t-shirt made from premium cashmere blend fabric. Designed for comfort and style, this everyday piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "T-Shirt",
+    "tags": [
+      "cashmere",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-23-1",
+        "src": "/images/products/everyday-cashmere-blend-t-shirt-1.jpg",
+        "alt": "Everyday Cashmere Blend T-Shirt front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-23-2",
+        "src": "/images/products/everyday-cashmere-blend-t-shirt-2.jpg",
+        "alt": "Everyday Cashmere Blend T-Shirt back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-23-1",
+        "title": "XS / White",
+        "price": 55.41,
+        "available": true,
+        "sku": "T-S-WHI-XS",
+        "color": "White",
+        "size": "XS"
+      },
+      {
+        "id": "var-23-2",
+        "title": "S / White",
+        "price": 55.41,
+        "available": true,
+        "sku": "T-S-WHI-S",
+        "color": "White",
+        "size": "S"
+      }
+    ],
+    "price": 55.41,
+    "category": "tops",
+    "subcategory": "t-shirt",
+    "colors": [
+      "White",
+      "Burgundy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.5,
+    "reviewCount": 72,
+    "createdAt": "2025-11-22"
+  },
+  {
+    "id": "prod-24",
+    "handle": "artisan-twill-cardigan",
+    "title": "Artisan Twill Cardigan",
+    "description": "A beautifully crafted cardigan made from premium twill fabric. Designed for comfort and style, this artisan piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Cardigan",
+    "tags": [
+      "twill",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-24-1",
+        "src": "/images/products/artisan-twill-cardigan-1.jpg",
+        "alt": "Artisan Twill Cardigan front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-24-2",
+        "src": "/images/products/artisan-twill-cardigan-2.jpg",
+        "alt": "Artisan Twill Cardigan back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-24-1",
+        "title": "XS / Terracotta",
+        "price": 94.46,
+        "available": true,
+        "sku": "CAR-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-24-2",
+        "title": "S / Terracotta",
+        "price": 94.46,
+        "available": true,
+        "sku": "CAR-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 94.46,
+    "category": "tops",
+    "subcategory": "cardigan",
+    "colors": [
+      "Terracotta",
+      "Navy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.9,
+    "reviewCount": 192,
+    "createdAt": "2025-08-03"
+  },
+  {
+    "id": "prod-25",
+    "handle": "refined-brushed-tank-top",
+    "title": "Refined Brushed Tank Top",
+    "description": "A beautifully crafted tank top made from premium brushed fabric. Designed for comfort and style, this refined piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Tank Top",
+    "tags": [
+      "brushed",
+      "tops",
+      "layering",
+      "essentials"
+    ],
+    "images": [
+      {
+        "id": "img-25-1",
+        "src": "/images/products/refined-brushed-tank-top-1.jpg",
+        "alt": "Refined Brushed Tank Top front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-25-2",
+        "src": "/images/products/refined-brushed-tank-top-2.jpg",
+        "alt": "Refined Brushed Tank Top back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-25-1",
+        "title": "XS / Black",
+        "price": 65.78,
+        "available": true,
+        "sku": "TAN-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-25-2",
+        "title": "S / Black",
+        "price": 65.78,
+        "available": true,
+        "sku": "TAN-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 65.78,
+    "category": "tops",
+    "subcategory": "tank-top",
+    "colors": [
+      "Black",
+      "Dusty Rose",
+      "Mauve"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.5,
+    "reviewCount": 36,
+    "createdAt": "2025-10-18"
+  },
+  {
+    "id": "prod-26",
+    "handle": "vintage-organic-cotton-jeans",
+    "title": "Vintage Organic Cotton Jeans",
+    "description": "A beautifully crafted jeans made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Jeans",
+    "tags": [
+      "organic",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-26-1",
+        "src": "/images/products/vintage-organic-cotton-jeans-1.jpg",
+        "alt": "Vintage Organic Cotton Jeans front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-26-2",
+        "src": "/images/products/vintage-organic-cotton-jeans-2.jpg",
+        "alt": "Vintage Organic Cotton Jeans back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-26-1",
+        "title": "XS / Navy",
+        "price": 53.15,
+        "available": true,
+        "sku": "JEA-NAV-XS",
+        "color": "Navy",
+        "size": "XS"
+      },
+      {
+        "id": "var-26-2",
+        "title": "S / Navy",
+        "price": 53.15,
+        "available": true,
+        "sku": "JEA-NAV-S",
+        "color": "Navy",
+        "size": "S"
+      }
+    ],
+    "price": 53.15,
+    "category": "bottoms",
+    "subcategory": "jeans",
+    "colors": [
+      "Navy",
+      "Cream",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": true,
+    "rating": 4.9,
+    "reviewCount": 195,
+    "createdAt": "2025-12-19"
+  },
+  {
+    "id": "prod-27",
+    "handle": "tailored-ponte-trousers",
+    "title": "Tailored Ponte Trousers",
+    "description": "A beautifully crafted trousers made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Trousers",
+    "tags": [
+      "ponte",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-27-1",
+        "src": "/images/products/tailored-ponte-trousers-1.jpg",
+        "alt": "Tailored Ponte Trousers front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-27-2",
+        "src": "/images/products/tailored-ponte-trousers-2.jpg",
+        "alt": "Tailored Ponte Trousers back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-27-1",
+        "title": "XS / Mauve",
+        "price": 97.18,
+        "available": true,
+        "sku": "TRO-MAU-XS",
+        "color": "Mauve",
+        "size": "XS"
+      },
+      {
+        "id": "var-27-2",
+        "title": "S / Mauve",
+        "price": 97.18,
+        "available": true,
+        "sku": "TRO-MAU-S",
+        "color": "Mauve",
+        "size": "S"
+      }
+    ],
+    "price": 97.18,
+    "compareAtPrice": 122.43,
+    "category": "bottoms",
+    "subcategory": "trousers",
+    "colors": [
+      "Mauve",
+      "Cream",
+      "Stone"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 87,
+    "createdAt": "2025-10-26"
+  },
+  {
+    "id": "prod-28",
+    "handle": "luxe-waffle-knit-skirt",
+    "title": "Luxe Waffle Knit Skirt",
+    "description": "A beautifully crafted skirt made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Skirt",
+    "tags": [
+      "waffle",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-28-1",
+        "src": "/images/products/luxe-waffle-knit-skirt-1.jpg",
+        "alt": "Luxe Waffle Knit Skirt front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-28-2",
+        "src": "/images/products/luxe-waffle-knit-skirt-2.jpg",
+        "alt": "Luxe Waffle Knit Skirt back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-28-1",
+        "title": "XS / Burgundy",
+        "price": 94.51,
+        "available": true,
+        "sku": "SKI-BUR-XS",
+        "color": "Burgundy",
+        "size": "XS"
+      },
+      {
+        "id": "var-28-2",
+        "title": "S / Burgundy",
+        "price": 94.51,
+        "available": true,
+        "sku": "SKI-BUR-S",
+        "color": "Burgundy",
+        "size": "S"
+      }
+    ],
+    "price": 94.51,
+    "category": "bottoms",
+    "subcategory": "skirt",
+    "colors": [
+      "Burgundy",
+      "Cream"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": true,
+    "rating": 3.5,
+    "reviewCount": 30,
+    "createdAt": "2025-07-08"
+  },
+  {
+    "id": "prod-29",
+    "handle": "effortless-velvet-shorts",
+    "title": "Effortless Velvet Shorts",
+    "description": "A beautifully crafted shorts made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Shorts",
+    "tags": [
+      "velvet",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-29-1",
+        "src": "/images/products/effortless-velvet-shorts-1.jpg",
+        "alt": "Effortless Velvet Shorts front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-29-2",
+        "src": "/images/products/effortless-velvet-shorts-2.jpg",
+        "alt": "Effortless Velvet Shorts back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-29-1",
+        "title": "XS / Cream",
+        "price": 63.7,
+        "available": true,
+        "sku": "SHO-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-29-2",
+        "title": "S / Cream",
+        "price": 63.7,
+        "available": true,
+        "sku": "SHO-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 63.7,
+    "category": "bottoms",
+    "subcategory": "shorts",
+    "colors": [
+      "Cream",
+      "Stone",
+      "Indigo"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 28,
+    "createdAt": "2025-07-23"
+  },
+  {
+    "id": "prod-30",
+    "handle": "studio-chambray-joggers",
+    "title": "Studio Chambray Joggers",
+    "description": "A beautifully crafted joggers made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Joggers",
+    "tags": [
+      "chambray",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-30-1",
+        "src": "/images/products/studio-chambray-joggers-1.jpg",
+        "alt": "Studio Chambray Joggers front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-30-2",
+        "src": "/images/products/studio-chambray-joggers-2.jpg",
+        "alt": "Studio Chambray Joggers back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-30-1",
+        "title": "XS / Dusty Rose",
+        "price": 84.43,
+        "available": true,
+        "sku": "JOG-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-30-2",
+        "title": "S / Dusty Rose",
+        "price": 84.43,
+        "available": true,
+        "sku": "JOG-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 84.43,
+    "category": "bottoms",
+    "subcategory": "joggers",
+    "colors": [
+      "Dusty Rose",
+      "Terracotta",
+      "Forest Green"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.9,
+    "reviewCount": 186,
+    "createdAt": "2025-10-19"
+  },
+  {
+    "id": "prod-31",
+    "handle": "vintage-organic-cotton-wide-leg-pants",
+    "title": "Vintage Organic Cotton Wide-Leg Pants",
+    "description": "A beautifully crafted wide-leg pants made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Wide-Leg Pants",
+    "tags": [
+      "organic",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-31-1",
+        "src": "/images/products/vintage-organic-cotton-wide-leg-pants-1.jpg",
+        "alt": "Vintage Organic Cotton Wide-Leg Pants front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-31-2",
+        "src": "/images/products/vintage-organic-cotton-wide-leg-pants-2.jpg",
+        "alt": "Vintage Organic Cotton Wide-Leg Pants back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-31-1",
+        "title": "XS / Sage",
+        "price": 106.7,
+        "available": true,
+        "sku": "WID-SAG-XS",
+        "color": "Sage",
+        "size": "XS"
+      },
+      {
+        "id": "var-31-2",
+        "title": "S / Sage",
+        "price": 106.7,
+        "available": true,
+        "sku": "WID-SAG-S",
+        "color": "Sage",
+        "size": "S"
+      }
+    ],
+    "price": 106.7,
+    "compareAtPrice": 159.86,
+    "category": "bottoms",
+    "subcategory": "wide-leg-pants",
+    "colors": [
+      "Sage",
+      "Cream"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 56,
+    "createdAt": "2025-11-26"
+  },
+  {
+    "id": "prod-32",
+    "handle": "tailored-ponte-leggings",
+    "title": "Tailored Ponte Leggings",
+    "description": "A beautifully crafted leggings made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Leggings",
+    "tags": [
+      "ponte",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-32-1",
+        "src": "/images/products/tailored-ponte-leggings-1.jpg",
+        "alt": "Tailored Ponte Leggings front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-32-2",
+        "src": "/images/products/tailored-ponte-leggings-2.jpg",
+        "alt": "Tailored Ponte Leggings back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-32-1",
+        "title": "XS / Cream",
+        "price": 141.6,
+        "available": true,
+        "sku": "LEG-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-32-2",
+        "title": "S / Cream",
+        "price": 141.6,
+        "available": true,
+        "sku": "LEG-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 141.6,
+    "category": "bottoms",
+    "subcategory": "leggings",
+    "colors": [
+      "Cream",
+      "Camel",
+      "Indigo"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 101,
+    "createdAt": "2025-10-04"
+  },
+  {
+    "id": "prod-33",
+    "handle": "luxe-waffle-knit-cargo-pants",
+    "title": "Luxe Waffle Knit Cargo Pants",
+    "description": "A beautifully crafted cargo pants made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Cargo Pants",
+    "tags": [
+      "waffle",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-33-1",
+        "src": "/images/products/luxe-waffle-knit-cargo-pants-1.jpg",
+        "alt": "Luxe Waffle Knit Cargo Pants front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-33-2",
+        "src": "/images/products/luxe-waffle-knit-cargo-pants-2.jpg",
+        "alt": "Luxe Waffle Knit Cargo Pants back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-33-1",
+        "title": "XS / Cream",
+        "price": 121.31,
+        "available": true,
+        "sku": "CAR-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-33-2",
+        "title": "S / Cream",
+        "price": 121.31,
+        "available": true,
+        "sku": "CAR-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 121.31,
+    "compareAtPrice": 155.76,
+    "category": "bottoms",
+    "subcategory": "cargo-pants",
+    "colors": [
+      "Cream",
+      "Dusty Rose"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.8,
+    "reviewCount": 165,
+    "createdAt": "2025-12-20"
+  },
+  {
+    "id": "prod-34",
+    "handle": "effortless-velvet-culottes",
+    "title": "Effortless Velvet Culottes",
+    "description": "A beautifully crafted culottes made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Culottes",
+    "tags": [
+      "velvet",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-34-1",
+        "src": "/images/products/effortless-velvet-culottes-1.jpg",
+        "alt": "Effortless Velvet Culottes front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-34-2",
+        "src": "/images/products/effortless-velvet-culottes-2.jpg",
+        "alt": "Effortless Velvet Culottes back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-34-1",
+        "title": "XS / Burgundy",
+        "price": 53.84,
+        "available": true,
+        "sku": "CUL-BUR-XS",
+        "color": "Burgundy",
+        "size": "XS"
+      },
+      {
+        "id": "var-34-2",
+        "title": "S / Burgundy",
+        "price": 53.84,
+        "available": true,
+        "sku": "CUL-BUR-S",
+        "color": "Burgundy",
+        "size": "S"
+      }
+    ],
+    "price": 53.84,
+    "category": "bottoms",
+    "subcategory": "culottes",
+    "colors": [
+      "Burgundy",
+      "Terracotta"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 115,
+    "createdAt": "2025-11-15"
+  },
+  {
+    "id": "prod-35",
+    "handle": "studio-chambray-chinos",
+    "title": "Studio Chambray Chinos",
+    "description": "A beautifully crafted chinos made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Chinos",
+    "tags": [
+      "chambray",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-35-1",
+        "src": "/images/products/studio-chambray-chinos-1.jpg",
+        "alt": "Studio Chambray Chinos front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-35-2",
+        "src": "/images/products/studio-chambray-chinos-2.jpg",
+        "alt": "Studio Chambray Chinos back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-35-1",
+        "title": "XS / White",
+        "price": 52.09,
+        "available": true,
+        "sku": "CHI-WHI-XS",
+        "color": "White",
+        "size": "XS"
+      },
+      {
+        "id": "var-35-2",
+        "title": "S / White",
+        "price": 52.09,
+        "available": true,
+        "sku": "CHI-WHI-S",
+        "color": "White",
+        "size": "S"
+      }
+    ],
+    "price": 52.09,
+    "category": "bottoms",
+    "subcategory": "chinos",
+    "colors": [
+      "White",
+      "Dusty Rose",
+      "Burgundy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 152,
+    "createdAt": "2025-10-13"
+  },
+  {
+    "id": "prod-36",
+    "handle": "vintage-organic-cotton-jeans",
+    "title": "Vintage Organic Cotton Jeans",
+    "description": "A beautifully crafted jeans made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Jeans",
+    "tags": [
+      "organic",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-36-1",
+        "src": "/images/products/vintage-organic-cotton-jeans-1.jpg",
+        "alt": "Vintage Organic Cotton Jeans front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-36-2",
+        "src": "/images/products/vintage-organic-cotton-jeans-2.jpg",
+        "alt": "Vintage Organic Cotton Jeans back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-36-1",
+        "title": "XS / Indigo",
+        "price": 93.57,
+        "available": true,
+        "sku": "JEA-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-36-2",
+        "title": "S / Indigo",
+        "price": 93.57,
+        "available": true,
+        "sku": "JEA-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 93.57,
+    "category": "bottoms",
+    "subcategory": "jeans",
+    "colors": [
+      "Indigo",
+      "Mauve"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 158,
+    "createdAt": "2025-09-28"
+  },
+  {
+    "id": "prod-37",
+    "handle": "tailored-ponte-trousers",
+    "title": "Tailored Ponte Trousers",
+    "description": "A beautifully crafted trousers made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Trousers",
+    "tags": [
+      "ponte",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-37-1",
+        "src": "/images/products/tailored-ponte-trousers-1.jpg",
+        "alt": "Tailored Ponte Trousers front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-37-2",
+        "src": "/images/products/tailored-ponte-trousers-2.jpg",
+        "alt": "Tailored Ponte Trousers back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-37-1",
+        "title": "XS / Forest Green",
+        "price": 93.05,
+        "available": true,
+        "sku": "TRO-FOR-XS",
+        "color": "Forest Green",
+        "size": "XS"
+      },
+      {
+        "id": "var-37-2",
+        "title": "S / Forest Green",
+        "price": 93.05,
+        "available": true,
+        "sku": "TRO-FOR-S",
+        "color": "Forest Green",
+        "size": "S"
+      }
+    ],
+    "price": 93.05,
+    "category": "bottoms",
+    "subcategory": "trousers",
+    "colors": [
+      "Forest Green",
+      "Terracotta",
+      "Cream"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 99,
+    "createdAt": "2025-09-05"
+  },
+  {
+    "id": "prod-38",
+    "handle": "luxe-waffle-knit-skirt",
+    "title": "Luxe Waffle Knit Skirt",
+    "description": "A beautifully crafted skirt made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Skirt",
+    "tags": [
+      "waffle",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-38-1",
+        "src": "/images/products/luxe-waffle-knit-skirt-1.jpg",
+        "alt": "Luxe Waffle Knit Skirt front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-38-2",
+        "src": "/images/products/luxe-waffle-knit-skirt-2.jpg",
+        "alt": "Luxe Waffle Knit Skirt back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-38-1",
+        "title": "XS / Forest Green",
+        "price": 62.38,
+        "available": true,
+        "sku": "SKI-FOR-XS",
+        "color": "Forest Green",
+        "size": "XS"
+      },
+      {
+        "id": "var-38-2",
+        "title": "S / Forest Green",
+        "price": 62.38,
+        "available": true,
+        "sku": "SKI-FOR-S",
+        "color": "Forest Green",
+        "size": "S"
+      }
+    ],
+    "price": 62.38,
+    "compareAtPrice": 89.46,
+    "category": "bottoms",
+    "subcategory": "skirt",
+    "colors": [
+      "Forest Green",
+      "Terracotta"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.9,
+    "reviewCount": 46,
+    "createdAt": "2025-10-18"
+  },
+  {
+    "id": "prod-39",
+    "handle": "effortless-velvet-shorts",
+    "title": "Effortless Velvet Shorts",
+    "description": "A beautifully crafted shorts made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Shorts",
+    "tags": [
+      "velvet",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-39-1",
+        "src": "/images/products/effortless-velvet-shorts-1.jpg",
+        "alt": "Effortless Velvet Shorts front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-39-2",
+        "src": "/images/products/effortless-velvet-shorts-2.jpg",
+        "alt": "Effortless Velvet Shorts back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-39-1",
+        "title": "XS / Dusty Rose",
+        "price": 83.17,
+        "available": true,
+        "sku": "SHO-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-39-2",
+        "title": "S / Dusty Rose",
+        "price": 83.17,
+        "available": true,
+        "sku": "SHO-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 83.17,
+    "category": "bottoms",
+    "subcategory": "shorts",
+    "colors": [
+      "Dusty Rose",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 41,
+    "createdAt": "2025-12-02"
+  },
+  {
+    "id": "prod-40",
+    "handle": "studio-chambray-joggers",
+    "title": "Studio Chambray Joggers",
+    "description": "A beautifully crafted joggers made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Joggers",
+    "tags": [
+      "chambray",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-40-1",
+        "src": "/images/products/studio-chambray-joggers-1.jpg",
+        "alt": "Studio Chambray Joggers front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-40-2",
+        "src": "/images/products/studio-chambray-joggers-2.jpg",
+        "alt": "Studio Chambray Joggers back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-40-1",
+        "title": "XS / White",
+        "price": 88.03,
+        "available": true,
+        "sku": "JOG-WHI-XS",
+        "color": "White",
+        "size": "XS"
+      },
+      {
+        "id": "var-40-2",
+        "title": "S / White",
+        "price": 88.03,
+        "available": true,
+        "sku": "JOG-WHI-S",
+        "color": "White",
+        "size": "S"
+      }
+    ],
+    "price": 88.03,
+    "category": "bottoms",
+    "subcategory": "joggers",
+    "colors": [
+      "White",
+      "Forest Green",
+      "Cream"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4,
+    "reviewCount": 192,
+    "createdAt": "2025-08-07"
+  },
+  {
+    "id": "prod-41",
+    "handle": "vintage-organic-cotton-wide-leg-pants",
+    "title": "Vintage Organic Cotton Wide-Leg Pants",
+    "description": "A beautifully crafted wide-leg pants made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Wide-Leg Pants",
+    "tags": [
+      "organic",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-41-1",
+        "src": "/images/products/vintage-organic-cotton-wide-leg-pants-1.jpg",
+        "alt": "Vintage Organic Cotton Wide-Leg Pants front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-41-2",
+        "src": "/images/products/vintage-organic-cotton-wide-leg-pants-2.jpg",
+        "alt": "Vintage Organic Cotton Wide-Leg Pants back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-41-1",
+        "title": "XS / Indigo",
+        "price": 121.72,
+        "available": true,
+        "sku": "WID-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-41-2",
+        "title": "S / Indigo",
+        "price": 121.72,
+        "available": true,
+        "sku": "WID-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 121.72,
+    "category": "bottoms",
+    "subcategory": "wide-leg-pants",
+    "colors": [
+      "Indigo",
+      "White"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 96,
+    "createdAt": "2025-08-20"
+  },
+  {
+    "id": "prod-42",
+    "handle": "tailored-ponte-leggings",
+    "title": "Tailored Ponte Leggings",
+    "description": "A beautifully crafted leggings made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Leggings",
+    "tags": [
+      "ponte",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-42-1",
+        "src": "/images/products/tailored-ponte-leggings-1.jpg",
+        "alt": "Tailored Ponte Leggings front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-42-2",
+        "src": "/images/products/tailored-ponte-leggings-2.jpg",
+        "alt": "Tailored Ponte Leggings back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-42-1",
+        "title": "XS / Cream",
+        "price": 52.42,
+        "available": true,
+        "sku": "LEG-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-42-2",
+        "title": "S / Cream",
+        "price": 52.42,
+        "available": true,
+        "sku": "LEG-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 52.42,
+    "category": "bottoms",
+    "subcategory": "leggings",
+    "colors": [
+      "Cream",
+      "Charcoal",
+      "Navy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.7,
+    "reviewCount": 155,
+    "createdAt": "2025-12-22"
+  },
+  {
+    "id": "prod-43",
+    "handle": "luxe-waffle-knit-cargo-pants",
+    "title": "Luxe Waffle Knit Cargo Pants",
+    "description": "A beautifully crafted cargo pants made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Cargo Pants",
+    "tags": [
+      "waffle",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-43-1",
+        "src": "/images/products/luxe-waffle-knit-cargo-pants-1.jpg",
+        "alt": "Luxe Waffle Knit Cargo Pants front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-43-2",
+        "src": "/images/products/luxe-waffle-knit-cargo-pants-2.jpg",
+        "alt": "Luxe Waffle Knit Cargo Pants back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-43-1",
+        "title": "XS / Stone",
+        "price": 125.66,
+        "available": true,
+        "sku": "CAR-STO-XS",
+        "color": "Stone",
+        "size": "XS"
+      },
+      {
+        "id": "var-43-2",
+        "title": "S / Stone",
+        "price": 125.66,
+        "available": true,
+        "sku": "CAR-STO-S",
+        "color": "Stone",
+        "size": "S"
+      }
+    ],
+    "price": 125.66,
+    "category": "bottoms",
+    "subcategory": "cargo-pants",
+    "colors": [
+      "Stone",
+      "Dusty Rose"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.5,
+    "reviewCount": 125,
+    "createdAt": "2025-08-03"
+  },
+  {
+    "id": "prod-44",
+    "handle": "effortless-velvet-culottes",
+    "title": "Effortless Velvet Culottes",
+    "description": "A beautifully crafted culottes made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Culottes",
+    "tags": [
+      "velvet",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-44-1",
+        "src": "/images/products/effortless-velvet-culottes-1.jpg",
+        "alt": "Effortless Velvet Culottes front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-44-2",
+        "src": "/images/products/effortless-velvet-culottes-2.jpg",
+        "alt": "Effortless Velvet Culottes back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-44-1",
+        "title": "XS / Terracotta",
+        "price": 141.02,
+        "available": true,
+        "sku": "CUL-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-44-2",
+        "title": "S / Terracotta",
+        "price": 141.02,
+        "available": true,
+        "sku": "CUL-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 141.02,
+    "compareAtPrice": 206.02,
+    "category": "bottoms",
+    "subcategory": "culottes",
+    "colors": [
+      "Terracotta",
+      "Charcoal"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 185,
+    "createdAt": "2025-09-10"
+  },
+  {
+    "id": "prod-45",
+    "handle": "studio-chambray-chinos",
+    "title": "Studio Chambray Chinos",
+    "description": "A beautifully crafted chinos made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Chinos",
+    "tags": [
+      "chambray",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-45-1",
+        "src": "/images/products/studio-chambray-chinos-1.jpg",
+        "alt": "Studio Chambray Chinos front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-45-2",
+        "src": "/images/products/studio-chambray-chinos-2.jpg",
+        "alt": "Studio Chambray Chinos back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-45-1",
+        "title": "XS / Terracotta",
+        "price": 85.77,
+        "available": true,
+        "sku": "CHI-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-45-2",
+        "title": "S / Terracotta",
+        "price": 85.77,
+        "available": true,
+        "sku": "CHI-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 85.77,
+    "category": "bottoms",
+    "subcategory": "chinos",
+    "colors": [
+      "Terracotta",
+      "Black",
+      "Burgundy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.7,
+    "reviewCount": 64,
+    "createdAt": "2025-08-05"
+  },
+  {
+    "id": "prod-46",
+    "handle": "vintage-organic-cotton-jeans",
+    "title": "Vintage Organic Cotton Jeans",
+    "description": "A beautifully crafted jeans made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Jeans",
+    "tags": [
+      "organic",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-46-1",
+        "src": "/images/products/vintage-organic-cotton-jeans-1.jpg",
+        "alt": "Vintage Organic Cotton Jeans front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-46-2",
+        "src": "/images/products/vintage-organic-cotton-jeans-2.jpg",
+        "alt": "Vintage Organic Cotton Jeans back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-46-1",
+        "title": "XS / Dusty Rose",
+        "price": 144.98,
+        "available": true,
+        "sku": "JEA-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-46-2",
+        "title": "S / Dusty Rose",
+        "price": 144.98,
+        "available": true,
+        "sku": "JEA-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 144.98,
+    "category": "bottoms",
+    "subcategory": "jeans",
+    "colors": [
+      "Dusty Rose",
+      "Olive",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4,
+    "reviewCount": 143,
+    "createdAt": "2025-12-10"
+  },
+  {
+    "id": "prod-47",
+    "handle": "tailored-ponte-trousers",
+    "title": "Tailored Ponte Trousers",
+    "description": "A beautifully crafted trousers made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Trousers",
+    "tags": [
+      "ponte",
+      "bottoms",
+      "denim",
+      "tailored"
+    ],
+    "images": [
+      {
+        "id": "img-47-1",
+        "src": "/images/products/tailored-ponte-trousers-1.jpg",
+        "alt": "Tailored Ponte Trousers front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-47-2",
+        "src": "/images/products/tailored-ponte-trousers-2.jpg",
+        "alt": "Tailored Ponte Trousers back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-47-1",
+        "title": "XS / White",
+        "price": 132.96,
+        "available": true,
+        "sku": "TRO-WHI-XS",
+        "color": "White",
+        "size": "XS"
+      },
+      {
+        "id": "var-47-2",
+        "title": "S / White",
+        "price": 132.96,
+        "available": true,
+        "sku": "TRO-WHI-S",
+        "color": "White",
+        "size": "S"
+      }
+    ],
+    "price": 132.96,
+    "category": "bottoms",
+    "subcategory": "trousers",
+    "colors": [
+      "White",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 37,
+    "createdAt": "2025-10-04"
+  },
+  {
+    "id": "prod-48",
+    "handle": "essential-modal-maxi-dress",
+    "title": "Essential Modal Maxi Dress",
+    "description": "A beautifully crafted maxi dress made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Maxi Dress",
+    "tags": [
+      "modal",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-48-1",
+        "src": "/images/products/essential-modal-maxi-dress-1.jpg",
+        "alt": "Essential Modal Maxi Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-48-2",
+        "src": "/images/products/essential-modal-maxi-dress-2.jpg",
+        "alt": "Essential Modal Maxi Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-48-1",
+        "title": "XS / Sage",
+        "price": 197.94,
+        "available": true,
+        "sku": "MAX-SAG-XS",
+        "color": "Sage",
+        "size": "XS"
+      },
+      {
+        "id": "var-48-2",
+        "title": "S / Sage",
+        "price": 197.94,
+        "available": true,
+        "sku": "MAX-SAG-S",
+        "color": "Sage",
+        "size": "S"
+      }
+    ],
+    "price": 197.94,
+    "category": "dresses",
+    "subcategory": "maxi-dress",
+    "colors": [
+      "Sage",
+      "Dusty Rose"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": true,
+    "rating": 4.4,
+    "reviewCount": 10,
+    "createdAt": "2025-10-03"
+  },
+  {
+    "id": "prod-49",
+    "handle": "heritage-linen-midi-dress",
+    "title": "Heritage Linen Midi Dress",
+    "description": "A beautifully crafted midi dress made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Midi Dress",
+    "tags": [
+      "linen",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-49-1",
+        "src": "/images/products/heritage-linen-midi-dress-1.jpg",
+        "alt": "Heritage Linen Midi Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-49-2",
+        "src": "/images/products/heritage-linen-midi-dress-2.jpg",
+        "alt": "Heritage Linen Midi Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-49-1",
+        "title": "XS / Forest Green",
+        "price": 126.12,
+        "available": true,
+        "sku": "MID-FOR-XS",
+        "color": "Forest Green",
+        "size": "XS"
+      },
+      {
+        "id": "var-49-2",
+        "title": "S / Forest Green",
+        "price": 126.12,
+        "available": true,
+        "sku": "MID-FOR-S",
+        "color": "Forest Green",
+        "size": "S"
+      }
+    ],
+    "price": 126.12,
+    "category": "dresses",
+    "subcategory": "midi-dress",
+    "colors": [
+      "Forest Green",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.8,
+    "reviewCount": 158,
+    "createdAt": "2025-09-28"
+  },
+  {
+    "id": "prod-50",
+    "handle": "signature-french-terry-mini-dress",
+    "title": "Signature French Terry Mini Dress",
+    "description": "A beautifully crafted mini dress made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Mini Dress",
+    "tags": [
+      "french",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-50-1",
+        "src": "/images/products/signature-french-terry-mini-dress-1.jpg",
+        "alt": "Signature French Terry Mini Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-50-2",
+        "src": "/images/products/signature-french-terry-mini-dress-2.jpg",
+        "alt": "Signature French Terry Mini Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-50-1",
+        "title": "XS / Terracotta",
+        "price": 187.2,
+        "available": true,
+        "sku": "MIN-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-50-2",
+        "title": "S / Terracotta",
+        "price": 187.2,
+        "available": true,
+        "sku": "MIN-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 187.2,
+    "category": "dresses",
+    "subcategory": "mini-dress",
+    "colors": [
+      "Terracotta",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": true,
+    "rating": 4.4,
+    "reviewCount": 189,
+    "createdAt": "2025-08-25"
+  },
+  {
+    "id": "prod-51",
+    "handle": "coastal-cable-knit-wrap-dress",
+    "title": "Coastal Cable Knit Wrap Dress",
+    "description": "A beautifully crafted wrap dress made from premium cable knit fabric. Designed for comfort and style, this coastal piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Wrap Dress",
+    "tags": [
+      "cable",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-51-1",
+        "src": "/images/products/coastal-cable-knit-wrap-dress-1.jpg",
+        "alt": "Coastal Cable Knit Wrap Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-51-2",
+        "src": "/images/products/coastal-cable-knit-wrap-dress-2.jpg",
+        "alt": "Coastal Cable Knit Wrap Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-51-1",
+        "title": "XS / Dusty Rose",
+        "price": 103.6,
+        "available": true,
+        "sku": "WRA-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-51-2",
+        "title": "S / Dusty Rose",
+        "price": 103.6,
+        "available": true,
+        "sku": "WRA-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 103.6,
+    "compareAtPrice": 139.15,
+    "category": "dresses",
+    "subcategory": "wrap-dress",
+    "colors": [
+      "Dusty Rose",
+      "Terracotta",
+      "Stone"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 67,
+    "createdAt": "2025-07-02"
+  },
+  {
+    "id": "prod-52",
+    "handle": "oversized-merino-shirt-dress",
+    "title": "Oversized Merino Shirt Dress",
+    "description": "A beautifully crafted shirt dress made from premium merino fabric. Designed for comfort and style, this oversized piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Shirt Dress",
+    "tags": [
+      "merino",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-52-1",
+        "src": "/images/products/oversized-merino-shirt-dress-1.jpg",
+        "alt": "Oversized Merino Shirt Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-52-2",
+        "src": "/images/products/oversized-merino-shirt-dress-2.jpg",
+        "alt": "Oversized Merino Shirt Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-52-1",
+        "title": "XS / Charcoal",
+        "price": 111.63,
+        "available": true,
+        "sku": "SHI-CHA-XS",
+        "color": "Charcoal",
+        "size": "XS"
+      },
+      {
+        "id": "var-52-2",
+        "title": "S / Charcoal",
+        "price": 111.63,
+        "available": true,
+        "sku": "SHI-CHA-S",
+        "color": "Charcoal",
+        "size": "S"
+      }
+    ],
+    "price": 111.63,
+    "category": "dresses",
+    "subcategory": "shirt-dress",
+    "colors": [
+      "Charcoal",
+      "Navy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.5,
+    "reviewCount": 146,
+    "createdAt": "2025-07-18"
+  },
+  {
+    "id": "prod-53",
+    "handle": "essential-modal-slip-dress",
+    "title": "Essential Modal Slip Dress",
+    "description": "A beautifully crafted slip dress made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Slip Dress",
+    "tags": [
+      "modal",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-53-1",
+        "src": "/images/products/essential-modal-slip-dress-1.jpg",
+        "alt": "Essential Modal Slip Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-53-2",
+        "src": "/images/products/essential-modal-slip-dress-2.jpg",
+        "alt": "Essential Modal Slip Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-53-1",
+        "title": "XS / Dusty Rose",
+        "price": 61.13,
+        "available": true,
+        "sku": "SLI-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-53-2",
+        "title": "S / Dusty Rose",
+        "price": 61.13,
+        "available": true,
+        "sku": "SLI-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 61.13,
+    "category": "dresses",
+    "subcategory": "slip-dress",
+    "colors": [
+      "Dusty Rose",
+      "Indigo"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.7,
+    "reviewCount": 16,
+    "createdAt": "2025-11-08"
+  },
+  {
+    "id": "prod-54",
+    "handle": "heritage-linen-bodycon-dress",
+    "title": "Heritage Linen Bodycon Dress",
+    "description": "A beautifully crafted bodycon dress made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Bodycon Dress",
+    "tags": [
+      "linen",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-54-1",
+        "src": "/images/products/heritage-linen-bodycon-dress-1.jpg",
+        "alt": "Heritage Linen Bodycon Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-54-2",
+        "src": "/images/products/heritage-linen-bodycon-dress-2.jpg",
+        "alt": "Heritage Linen Bodycon Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-54-1",
+        "title": "XS / Cream",
+        "price": 114.45,
+        "available": true,
+        "sku": "BOD-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-54-2",
+        "title": "S / Cream",
+        "price": 114.45,
+        "available": true,
+        "sku": "BOD-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 114.45,
+    "category": "dresses",
+    "subcategory": "bodycon-dress",
+    "colors": [
+      "Cream",
+      "Burgundy",
+      "Indigo"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4,
+    "reviewCount": 58,
+    "createdAt": "2025-09-23"
+  },
+  {
+    "id": "prod-55",
+    "handle": "signature-french-terry-a-line-dress",
+    "title": "Signature French Terry A-Line Dress",
+    "description": "A beautifully crafted a-line dress made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "A-Line Dress",
+    "tags": [
+      "french",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-55-1",
+        "src": "/images/products/signature-french-terry-a-line-dress-1.jpg",
+        "alt": "Signature French Terry A-Line Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-55-2",
+        "src": "/images/products/signature-french-terry-a-line-dress-2.jpg",
+        "alt": "Signature French Terry A-Line Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-55-1",
+        "title": "XS / Indigo",
+        "price": 94.21,
+        "available": true,
+        "sku": "A-L-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-55-2",
+        "title": "S / Indigo",
+        "price": 94.21,
+        "available": true,
+        "sku": "A-L-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 94.21,
+    "category": "dresses",
+    "subcategory": "a-line-dress",
+    "colors": [
+      "Indigo",
+      "Navy",
+      "Sage"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.5,
+    "reviewCount": 17,
+    "createdAt": "2025-08-24"
+  },
+  {
+    "id": "prod-56",
+    "handle": "coastal-cable-knit-sweater-dress",
+    "title": "Coastal Cable Knit Sweater Dress",
+    "description": "A beautifully crafted sweater dress made from premium cable knit fabric. Designed for comfort and style, this coastal piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Sweater Dress",
+    "tags": [
+      "cable",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-56-1",
+        "src": "/images/products/coastal-cable-knit-sweater-dress-1.jpg",
+        "alt": "Coastal Cable Knit Sweater Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-56-2",
+        "src": "/images/products/coastal-cable-knit-sweater-dress-2.jpg",
+        "alt": "Coastal Cable Knit Sweater Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-56-1",
+        "title": "XS / Cream",
+        "price": 103.32,
+        "available": true,
+        "sku": "SWE-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-56-2",
+        "title": "S / Cream",
+        "price": 103.32,
+        "available": true,
+        "sku": "SWE-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 103.32,
+    "category": "dresses",
+    "subcategory": "sweater-dress",
+    "colors": [
+      "Cream",
+      "Indigo",
+      "Sage"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 135,
+    "createdAt": "2025-08-01"
+  },
+  {
+    "id": "prod-57",
+    "handle": "oversized-merino-knit-dress",
+    "title": "Oversized Merino Knit Dress",
+    "description": "A beautifully crafted knit dress made from premium merino fabric. Designed for comfort and style, this oversized piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Knit Dress",
+    "tags": [
+      "merino",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-57-1",
+        "src": "/images/products/oversized-merino-knit-dress-1.jpg",
+        "alt": "Oversized Merino Knit Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-57-2",
+        "src": "/images/products/oversized-merino-knit-dress-2.jpg",
+        "alt": "Oversized Merino Knit Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-57-1",
+        "title": "XS / Dusty Rose",
+        "price": 82.03,
+        "available": true,
+        "sku": "KNI-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-57-2",
+        "title": "S / Dusty Rose",
+        "price": 82.03,
+        "available": true,
+        "sku": "KNI-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 82.03,
+    "category": "dresses",
+    "subcategory": "knit-dress",
+    "colors": [
+      "Dusty Rose",
+      "Mauve",
+      "Charcoal"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 168,
+    "createdAt": "2025-10-26"
+  },
+  {
+    "id": "prod-58",
+    "handle": "essential-modal-maxi-dress",
+    "title": "Essential Modal Maxi Dress",
+    "description": "A beautifully crafted maxi dress made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Maxi Dress",
+    "tags": [
+      "modal",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-58-1",
+        "src": "/images/products/essential-modal-maxi-dress-1.jpg",
+        "alt": "Essential Modal Maxi Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-58-2",
+        "src": "/images/products/essential-modal-maxi-dress-2.jpg",
+        "alt": "Essential Modal Maxi Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-58-1",
+        "title": "XS / Sage",
+        "price": 94.12,
+        "available": true,
+        "sku": "MAX-SAG-XS",
+        "color": "Sage",
+        "size": "XS"
+      },
+      {
+        "id": "var-58-2",
+        "title": "S / Sage",
+        "price": 94.12,
+        "available": true,
+        "sku": "MAX-SAG-S",
+        "color": "Sage",
+        "size": "S"
+      }
+    ],
+    "price": 94.12,
+    "compareAtPrice": 133.09,
+    "category": "dresses",
+    "subcategory": "maxi-dress",
+    "colors": [
+      "Sage",
+      "Cream",
+      "Indigo"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.8,
+    "reviewCount": 75,
+    "createdAt": "2025-10-19"
+  },
+  {
+    "id": "prod-59",
+    "handle": "heritage-linen-midi-dress",
+    "title": "Heritage Linen Midi Dress",
+    "description": "A beautifully crafted midi dress made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Midi Dress",
+    "tags": [
+      "linen",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-59-1",
+        "src": "/images/products/heritage-linen-midi-dress-1.jpg",
+        "alt": "Heritage Linen Midi Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-59-2",
+        "src": "/images/products/heritage-linen-midi-dress-2.jpg",
+        "alt": "Heritage Linen Midi Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-59-1",
+        "title": "XS / White",
+        "price": 112.87,
+        "available": true,
+        "sku": "MID-WHI-XS",
+        "color": "White",
+        "size": "XS"
+      },
+      {
+        "id": "var-59-2",
+        "title": "S / White",
+        "price": 112.87,
+        "available": true,
+        "sku": "MID-WHI-S",
+        "color": "White",
+        "size": "S"
+      }
+    ],
+    "price": 112.87,
+    "compareAtPrice": 146.67,
+    "category": "dresses",
+    "subcategory": "midi-dress",
+    "colors": [
+      "White",
+      "Navy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.7,
+    "reviewCount": 153,
+    "createdAt": "2025-09-09"
+  },
+  {
+    "id": "prod-60",
+    "handle": "signature-french-terry-mini-dress",
+    "title": "Signature French Terry Mini Dress",
+    "description": "A beautifully crafted mini dress made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Mini Dress",
+    "tags": [
+      "french",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-60-1",
+        "src": "/images/products/signature-french-terry-mini-dress-1.jpg",
+        "alt": "Signature French Terry Mini Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-60-2",
+        "src": "/images/products/signature-french-terry-mini-dress-2.jpg",
+        "alt": "Signature French Terry Mini Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-60-1",
+        "title": "XS / Terracotta",
+        "price": 97.3,
+        "available": true,
+        "sku": "MIN-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-60-2",
+        "title": "S / Terracotta",
+        "price": 97.3,
+        "available": true,
+        "sku": "MIN-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 97.3,
+    "category": "dresses",
+    "subcategory": "mini-dress",
+    "colors": [
+      "Terracotta",
+      "White",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 5,
+    "reviewCount": 79,
+    "createdAt": "2025-10-21"
+  },
+  {
+    "id": "prod-61",
+    "handle": "coastal-cable-knit-wrap-dress",
+    "title": "Coastal Cable Knit Wrap Dress",
+    "description": "A beautifully crafted wrap dress made from premium cable knit fabric. Designed for comfort and style, this coastal piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Wrap Dress",
+    "tags": [
+      "cable",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-61-1",
+        "src": "/images/products/coastal-cable-knit-wrap-dress-1.jpg",
+        "alt": "Coastal Cable Knit Wrap Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-61-2",
+        "src": "/images/products/coastal-cable-knit-wrap-dress-2.jpg",
+        "alt": "Coastal Cable Knit Wrap Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-61-1",
+        "title": "XS / Forest Green",
+        "price": 163.2,
+        "available": true,
+        "sku": "WRA-FOR-XS",
+        "color": "Forest Green",
+        "size": "XS"
+      },
+      {
+        "id": "var-61-2",
+        "title": "S / Forest Green",
+        "price": 163.2,
+        "available": true,
+        "sku": "WRA-FOR-S",
+        "color": "Forest Green",
+        "size": "S"
+      }
+    ],
+    "price": 163.2,
+    "compareAtPrice": 238.42,
+    "category": "dresses",
+    "subcategory": "wrap-dress",
+    "colors": [
+      "Forest Green",
+      "Black",
+      "Terracotta"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 14,
+    "createdAt": "2025-08-13"
+  },
+  {
+    "id": "prod-62",
+    "handle": "oversized-merino-shirt-dress",
+    "title": "Oversized Merino Shirt Dress",
+    "description": "A beautifully crafted shirt dress made from premium merino fabric. Designed for comfort and style, this oversized piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Shirt Dress",
+    "tags": [
+      "merino",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-62-1",
+        "src": "/images/products/oversized-merino-shirt-dress-1.jpg",
+        "alt": "Oversized Merino Shirt Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-62-2",
+        "src": "/images/products/oversized-merino-shirt-dress-2.jpg",
+        "alt": "Oversized Merino Shirt Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-62-1",
+        "title": "XS / Black",
+        "price": 152.07,
+        "available": true,
+        "sku": "SHI-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-62-2",
+        "title": "S / Black",
+        "price": 152.07,
+        "available": true,
+        "sku": "SHI-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 152.07,
+    "category": "dresses",
+    "subcategory": "shirt-dress",
+    "colors": [
+      "Black",
+      "White",
+      "Burgundy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 170,
+    "createdAt": "2025-07-02"
+  },
+  {
+    "id": "prod-63",
+    "handle": "essential-modal-slip-dress",
+    "title": "Essential Modal Slip Dress",
+    "description": "A beautifully crafted slip dress made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Slip Dress",
+    "tags": [
+      "modal",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-63-1",
+        "src": "/images/products/essential-modal-slip-dress-1.jpg",
+        "alt": "Essential Modal Slip Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-63-2",
+        "src": "/images/products/essential-modal-slip-dress-2.jpg",
+        "alt": "Essential Modal Slip Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-63-1",
+        "title": "XS / Terracotta",
+        "price": 155.89,
+        "available": true,
+        "sku": "SLI-TER-XS",
+        "color": "Terracotta",
+        "size": "XS"
+      },
+      {
+        "id": "var-63-2",
+        "title": "S / Terracotta",
+        "price": 155.89,
+        "available": true,
+        "sku": "SLI-TER-S",
+        "color": "Terracotta",
+        "size": "S"
+      }
+    ],
+    "price": 155.89,
+    "compareAtPrice": 192.9,
+    "category": "dresses",
+    "subcategory": "slip-dress",
+    "colors": [
+      "Terracotta",
+      "White"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4,
+    "reviewCount": 25,
+    "createdAt": "2025-07-26"
+  },
+  {
+    "id": "prod-64",
+    "handle": "heritage-linen-bodycon-dress",
+    "title": "Heritage Linen Bodycon Dress",
+    "description": "A beautifully crafted bodycon dress made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Bodycon Dress",
+    "tags": [
+      "linen",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-64-1",
+        "src": "/images/products/heritage-linen-bodycon-dress-1.jpg",
+        "alt": "Heritage Linen Bodycon Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-64-2",
+        "src": "/images/products/heritage-linen-bodycon-dress-2.jpg",
+        "alt": "Heritage Linen Bodycon Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-64-1",
+        "title": "XS / Charcoal",
+        "price": 62.1,
+        "available": true,
+        "sku": "BOD-CHA-XS",
+        "color": "Charcoal",
+        "size": "XS"
+      },
+      {
+        "id": "var-64-2",
+        "title": "S / Charcoal",
+        "price": 62.1,
+        "available": true,
+        "sku": "BOD-CHA-S",
+        "color": "Charcoal",
+        "size": "S"
+      }
+    ],
+    "price": 62.1,
+    "category": "dresses",
+    "subcategory": "bodycon-dress",
+    "colors": [
+      "Charcoal",
+      "White",
+      "Mauve"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 37,
+    "createdAt": "2025-12-20"
+  },
+  {
+    "id": "prod-65",
+    "handle": "signature-french-terry-a-line-dress",
+    "title": "Signature French Terry A-Line Dress",
+    "description": "A beautifully crafted a-line dress made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "A-Line Dress",
+    "tags": [
+      "french",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-65-1",
+        "src": "/images/products/signature-french-terry-a-line-dress-1.jpg",
+        "alt": "Signature French Terry A-Line Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-65-2",
+        "src": "/images/products/signature-french-terry-a-line-dress-2.jpg",
+        "alt": "Signature French Terry A-Line Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-65-1",
+        "title": "XS / Mauve",
+        "price": 115.13,
+        "available": true,
+        "sku": "A-L-MAU-XS",
+        "color": "Mauve",
+        "size": "XS"
+      },
+      {
+        "id": "var-65-2",
+        "title": "S / Mauve",
+        "price": 115.13,
+        "available": true,
+        "sku": "A-L-MAU-S",
+        "color": "Mauve",
+        "size": "S"
+      }
+    ],
+    "price": 115.13,
+    "category": "dresses",
+    "subcategory": "a-line-dress",
+    "colors": [
+      "Mauve",
+      "Terracotta"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.5,
+    "reviewCount": 147,
+    "createdAt": "2025-07-26"
+  },
+  {
+    "id": "prod-66",
+    "handle": "coastal-cable-knit-sweater-dress",
+    "title": "Coastal Cable Knit Sweater Dress",
+    "description": "A beautifully crafted sweater dress made from premium cable knit fabric. Designed for comfort and style, this coastal piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Sweater Dress",
+    "tags": [
+      "cable",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-66-1",
+        "src": "/images/products/coastal-cable-knit-sweater-dress-1.jpg",
+        "alt": "Coastal Cable Knit Sweater Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-66-2",
+        "src": "/images/products/coastal-cable-knit-sweater-dress-2.jpg",
+        "alt": "Coastal Cable Knit Sweater Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-66-1",
+        "title": "XS / Camel",
+        "price": 125.38,
+        "available": true,
+        "sku": "SWE-CAM-XS",
+        "color": "Camel",
+        "size": "XS"
+      },
+      {
+        "id": "var-66-2",
+        "title": "S / Camel",
+        "price": 125.38,
+        "available": true,
+        "sku": "SWE-CAM-S",
+        "color": "Camel",
+        "size": "S"
+      }
+    ],
+    "price": 125.38,
+    "category": "dresses",
+    "subcategory": "sweater-dress",
+    "colors": [
+      "Camel",
+      "Burgundy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.5,
+    "reviewCount": 110,
+    "createdAt": "2025-09-23"
+  },
+  {
+    "id": "prod-67",
+    "handle": "oversized-merino-knit-dress",
+    "title": "Oversized Merino Knit Dress",
+    "description": "A beautifully crafted knit dress made from premium merino fabric. Designed for comfort and style, this oversized piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Knit Dress",
+    "tags": [
+      "merino",
+      "dresses",
+      "evening",
+      "casual"
+    ],
+    "images": [
+      {
+        "id": "img-67-1",
+        "src": "/images/products/oversized-merino-knit-dress-1.jpg",
+        "alt": "Oversized Merino Knit Dress front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-67-2",
+        "src": "/images/products/oversized-merino-knit-dress-2.jpg",
+        "alt": "Oversized Merino Knit Dress back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-67-1",
+        "title": "XS / Charcoal",
+        "price": 146.51,
+        "available": true,
+        "sku": "KNI-CHA-XS",
+        "color": "Charcoal",
+        "size": "XS"
+      },
+      {
+        "id": "var-67-2",
+        "title": "S / Charcoal",
+        "price": 146.51,
+        "available": true,
+        "sku": "KNI-CHA-S",
+        "color": "Charcoal",
+        "size": "S"
+      }
+    ],
+    "price": 146.51,
+    "compareAtPrice": 189.51,
+    "category": "dresses",
+    "subcategory": "knit-dress",
+    "colors": [
+      "Charcoal",
+      "Indigo",
+      "Stone"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.7,
+    "reviewCount": 91,
+    "createdAt": "2025-09-23"
+  },
+  {
+    "id": "prod-68",
+    "handle": "essential-modal-wool-coat",
+    "title": "Essential Modal Wool Coat",
+    "description": "A beautifully crafted wool coat made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Wool Coat",
+    "tags": [
+      "modal",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-68-1",
+        "src": "/images/products/essential-modal-wool-coat-1.jpg",
+        "alt": "Essential Modal Wool Coat front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-68-2",
+        "src": "/images/products/essential-modal-wool-coat-2.jpg",
+        "alt": "Essential Modal Wool Coat back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-68-1",
+        "title": "XS / Dusty Rose",
+        "price": 218.28,
+        "available": true,
+        "sku": "WOO-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-68-2",
+        "title": "S / Dusty Rose",
+        "price": 218.28,
+        "available": true,
+        "sku": "WOO-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 218.28,
+    "compareAtPrice": 266.98,
+    "category": "outerwear",
+    "subcategory": "wool-coat",
+    "colors": [
+      "Dusty Rose",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": true,
+    "rating": 4.4,
+    "reviewCount": 107,
+    "createdAt": "2025-08-09"
+  },
+  {
+    "id": "prod-69",
+    "handle": "heritage-linen-blazer",
+    "title": "Heritage Linen Blazer",
+    "description": "A beautifully crafted blazer made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Blazer",
+    "tags": [
+      "linen",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-69-1",
+        "src": "/images/products/heritage-linen-blazer-1.jpg",
+        "alt": "Heritage Linen Blazer front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-69-2",
+        "src": "/images/products/heritage-linen-blazer-2.jpg",
+        "alt": "Heritage Linen Blazer back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-69-1",
+        "title": "XS / Indigo",
+        "price": 103.2,
+        "available": true,
+        "sku": "BLA-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-69-2",
+        "title": "S / Indigo",
+        "price": 103.2,
+        "available": true,
+        "sku": "BLA-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 103.2,
+    "category": "outerwear",
+    "subcategory": "blazer",
+    "colors": [
+      "Indigo",
+      "Dusty Rose",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 32,
+    "createdAt": "2025-10-14"
+  },
+  {
+    "id": "prod-70",
+    "handle": "signature-french-terry-puffer-jacket",
+    "title": "Signature French Terry Puffer Jacket",
+    "description": "A beautifully crafted puffer jacket made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Puffer Jacket",
+    "tags": [
+      "french",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-70-1",
+        "src": "/images/products/signature-french-terry-puffer-jacket-1.jpg",
+        "alt": "Signature French Terry Puffer Jacket front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-70-2",
+        "src": "/images/products/signature-french-terry-puffer-jacket-2.jpg",
+        "alt": "Signature French Terry Puffer Jacket back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-70-1",
+        "title": "XS / Stone",
+        "price": 137.22,
+        "available": true,
+        "sku": "PUF-STO-XS",
+        "color": "Stone",
+        "size": "XS"
+      },
+      {
+        "id": "var-70-2",
+        "title": "S / Stone",
+        "price": 137.22,
+        "available": true,
+        "sku": "PUF-STO-S",
+        "color": "Stone",
+        "size": "S"
+      }
+    ],
+    "price": 137.22,
+    "compareAtPrice": 166.92,
+    "category": "outerwear",
+    "subcategory": "puffer-jacket",
+    "colors": [
+      "Stone",
+      "Black",
+      "Olive"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": true,
+    "rating": 4.8,
+    "reviewCount": 114,
+    "createdAt": "2025-07-18"
+  },
+  {
+    "id": "prod-71",
+    "handle": "coastal-cable-knit-trench-coat",
+    "title": "Coastal Cable Knit Trench Coat",
+    "description": "A beautifully crafted trench coat made from premium cable knit fabric. Designed for comfort and style, this coastal piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Trench Coat",
+    "tags": [
+      "cable",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-71-1",
+        "src": "/images/products/coastal-cable-knit-trench-coat-1.jpg",
+        "alt": "Coastal Cable Knit Trench Coat front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-71-2",
+        "src": "/images/products/coastal-cable-knit-trench-coat-2.jpg",
+        "alt": "Coastal Cable Knit Trench Coat back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-71-1",
+        "title": "XS / Indigo",
+        "price": 234.87,
+        "available": true,
+        "sku": "TRE-IND-XS",
+        "color": "Indigo",
+        "size": "XS"
+      },
+      {
+        "id": "var-71-2",
+        "title": "S / Indigo",
+        "price": 234.87,
+        "available": true,
+        "sku": "TRE-IND-S",
+        "color": "Indigo",
+        "size": "S"
+      }
+    ],
+    "price": 234.87,
+    "category": "outerwear",
+    "subcategory": "trench-coat",
+    "colors": [
+      "Indigo",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 176,
+    "createdAt": "2025-07-06"
+  },
+  {
+    "id": "prod-72",
+    "handle": "oversized-merino-denim-jacket",
+    "title": "Oversized Merino Denim Jacket",
+    "description": "A beautifully crafted denim jacket made from premium merino fabric. Designed for comfort and style, this oversized piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Denim Jacket",
+    "tags": [
+      "merino",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-72-1",
+        "src": "/images/products/oversized-merino-denim-jacket-1.jpg",
+        "alt": "Oversized Merino Denim Jacket front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-72-2",
+        "src": "/images/products/oversized-merino-denim-jacket-2.jpg",
+        "alt": "Oversized Merino Denim Jacket back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-72-1",
+        "title": "XS / Mauve",
+        "price": 155.48,
+        "available": true,
+        "sku": "DEN-MAU-XS",
+        "color": "Mauve",
+        "size": "XS"
+      },
+      {
+        "id": "var-72-2",
+        "title": "S / Mauve",
+        "price": 155.48,
+        "available": true,
+        "sku": "DEN-MAU-S",
+        "color": "Mauve",
+        "size": "S"
+      }
+    ],
+    "price": 155.48,
+    "category": "outerwear",
+    "subcategory": "denim-jacket",
+    "colors": [
+      "Mauve",
+      "Burgundy"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 182,
+    "createdAt": "2025-12-21"
+  },
+  {
+    "id": "prod-73",
+    "handle": "essential-modal-vest",
+    "title": "Essential Modal Vest",
+    "description": "A beautifully crafted vest made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Vest",
+    "tags": [
+      "modal",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-73-1",
+        "src": "/images/products/essential-modal-vest-1.jpg",
+        "alt": "Essential Modal Vest front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-73-2",
+        "src": "/images/products/essential-modal-vest-2.jpg",
+        "alt": "Essential Modal Vest back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-73-1",
+        "title": "XS / Mauve",
+        "price": 282.4,
+        "available": true,
+        "sku": "VES-MAU-XS",
+        "color": "Mauve",
+        "size": "XS"
+      },
+      {
+        "id": "var-73-2",
+        "title": "S / Mauve",
+        "price": 282.4,
+        "available": true,
+        "sku": "VES-MAU-S",
+        "color": "Mauve",
+        "size": "S"
+      }
+    ],
+    "price": 282.4,
+    "category": "outerwear",
+    "subcategory": "vest",
+    "colors": [
+      "Mauve",
+      "Cream",
+      "Terracotta"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 177,
+    "createdAt": "2025-10-06"
+  },
+  {
+    "id": "prod-74",
+    "handle": "heritage-linen-poncho",
+    "title": "Heritage Linen Poncho",
+    "description": "A beautifully crafted poncho made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Poncho",
+    "tags": [
+      "linen",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-74-1",
+        "src": "/images/products/heritage-linen-poncho-1.jpg",
+        "alt": "Heritage Linen Poncho front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-74-2",
+        "src": "/images/products/heritage-linen-poncho-2.jpg",
+        "alt": "Heritage Linen Poncho back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-74-1",
+        "title": "XS / Dusty Rose",
+        "price": 284.49,
+        "available": true,
+        "sku": "PON-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-74-2",
+        "title": "S / Dusty Rose",
+        "price": 284.49,
+        "available": true,
+        "sku": "PON-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 284.49,
+    "category": "outerwear",
+    "subcategory": "poncho",
+    "colors": [
+      "Dusty Rose",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 97,
+    "createdAt": "2025-12-05"
+  },
+  {
+    "id": "prod-75",
+    "handle": "signature-french-terry-windbreaker",
+    "title": "Signature French Terry Windbreaker",
+    "description": "A beautifully crafted windbreaker made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Windbreaker",
+    "tags": [
+      "french",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-75-1",
+        "src": "/images/products/signature-french-terry-windbreaker-1.jpg",
+        "alt": "Signature French Terry Windbreaker front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-75-2",
+        "src": "/images/products/signature-french-terry-windbreaker-2.jpg",
+        "alt": "Signature French Terry Windbreaker back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-75-1",
+        "title": "XS / White",
+        "price": 240.11,
+        "available": true,
+        "sku": "WIN-WHI-XS",
+        "color": "White",
+        "size": "XS"
+      },
+      {
+        "id": "var-75-2",
+        "title": "S / White",
+        "price": 240.11,
+        "available": true,
+        "sku": "WIN-WHI-S",
+        "color": "White",
+        "size": "S"
+      }
+    ],
+    "price": 240.11,
+    "category": "outerwear",
+    "subcategory": "windbreaker",
+    "colors": [
+      "White",
+      "Black"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 47,
+    "createdAt": "2025-08-16"
+  },
+  {
+    "id": "prod-76",
+    "handle": "coastal-cable-knit-leather-jacket",
+    "title": "Coastal Cable Knit Leather Jacket",
+    "description": "A beautifully crafted leather jacket made from premium cable knit fabric. Designed for comfort and style, this coastal piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Leather Jacket",
+    "tags": [
+      "cable",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-76-1",
+        "src": "/images/products/coastal-cable-knit-leather-jacket-1.jpg",
+        "alt": "Coastal Cable Knit Leather Jacket front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-76-2",
+        "src": "/images/products/coastal-cable-knit-leather-jacket-2.jpg",
+        "alt": "Coastal Cable Knit Leather Jacket back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-76-1",
+        "title": "XS / Dusty Rose",
+        "price": 125.3,
+        "available": true,
+        "sku": "LEA-DUS-XS",
+        "color": "Dusty Rose",
+        "size": "XS"
+      },
+      {
+        "id": "var-76-2",
+        "title": "S / Dusty Rose",
+        "price": 125.3,
+        "available": true,
+        "sku": "LEA-DUS-S",
+        "color": "Dusty Rose",
+        "size": "S"
+      }
+    ],
+    "price": 125.3,
+    "category": "outerwear",
+    "subcategory": "leather-jacket",
+    "colors": [
+      "Dusty Rose",
+      "Charcoal"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 25,
+    "createdAt": "2025-11-02"
+  },
+  {
+    "id": "prod-77",
+    "handle": "oversized-merino-bomber-jacket",
+    "title": "Oversized Merino Bomber Jacket",
+    "description": "A beautifully crafted bomber jacket made from premium merino fabric. Designed for comfort and style, this oversized piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Bomber Jacket",
+    "tags": [
+      "merino",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-77-1",
+        "src": "/images/products/oversized-merino-bomber-jacket-1.jpg",
+        "alt": "Oversized Merino Bomber Jacket front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-77-2",
+        "src": "/images/products/oversized-merino-bomber-jacket-2.jpg",
+        "alt": "Oversized Merino Bomber Jacket back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-77-1",
+        "title": "XS / Forest Green",
+        "price": 227.13,
+        "available": true,
+        "sku": "BOM-FOR-XS",
+        "color": "Forest Green",
+        "size": "XS"
+      },
+      {
+        "id": "var-77-2",
+        "title": "S / Forest Green",
+        "price": 227.13,
+        "available": true,
+        "sku": "BOM-FOR-S",
+        "color": "Forest Green",
+        "size": "S"
+      }
+    ],
+    "price": 227.13,
+    "category": "outerwear",
+    "subcategory": "bomber-jacket",
+    "colors": [
+      "Forest Green",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.5,
+    "reviewCount": 57,
+    "createdAt": "2025-09-26"
+  },
+  {
+    "id": "prod-78",
+    "handle": "essential-modal-wool-coat",
+    "title": "Essential Modal Wool Coat",
+    "description": "A beautifully crafted wool coat made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Wool Coat",
+    "tags": [
+      "modal",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-78-1",
+        "src": "/images/products/essential-modal-wool-coat-1.jpg",
+        "alt": "Essential Modal Wool Coat front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-78-2",
+        "src": "/images/products/essential-modal-wool-coat-2.jpg",
+        "alt": "Essential Modal Wool Coat back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-78-1",
+        "title": "XS / Black",
+        "price": 111.09,
+        "available": true,
+        "sku": "WOO-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-78-2",
+        "title": "S / Black",
+        "price": 111.09,
+        "available": true,
+        "sku": "WOO-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 111.09,
+    "category": "outerwear",
+    "subcategory": "wool-coat",
+    "colors": [
+      "Black",
+      "White"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 5,
+    "reviewCount": 93,
+    "createdAt": "2025-11-24"
+  },
+  {
+    "id": "prod-79",
+    "handle": "heritage-linen-blazer",
+    "title": "Heritage Linen Blazer",
+    "description": "A beautifully crafted blazer made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Blazer",
+    "tags": [
+      "linen",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-79-1",
+        "src": "/images/products/heritage-linen-blazer-1.jpg",
+        "alt": "Heritage Linen Blazer front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-79-2",
+        "src": "/images/products/heritage-linen-blazer-2.jpg",
+        "alt": "Heritage Linen Blazer back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-79-1",
+        "title": "XS / Burgundy",
+        "price": 211.15,
+        "available": true,
+        "sku": "BLA-BUR-XS",
+        "color": "Burgundy",
+        "size": "XS"
+      },
+      {
+        "id": "var-79-2",
+        "title": "S / Burgundy",
+        "price": 211.15,
+        "available": true,
+        "sku": "BLA-BUR-S",
+        "color": "Burgundy",
+        "size": "S"
+      }
+    ],
+    "price": 211.15,
+    "compareAtPrice": 276.8,
+    "category": "outerwear",
+    "subcategory": "blazer",
+    "colors": [
+      "Burgundy",
+      "Olive",
+      "Camel"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.9,
+    "reviewCount": 52,
+    "createdAt": "2025-11-19"
+  },
+  {
+    "id": "prod-80",
+    "handle": "signature-french-terry-puffer-jacket",
+    "title": "Signature French Terry Puffer Jacket",
+    "description": "A beautifully crafted puffer jacket made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Puffer Jacket",
+    "tags": [
+      "french",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-80-1",
+        "src": "/images/products/signature-french-terry-puffer-jacket-1.jpg",
+        "alt": "Signature French Terry Puffer Jacket front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-80-2",
+        "src": "/images/products/signature-french-terry-puffer-jacket-2.jpg",
+        "alt": "Signature French Terry Puffer Jacket back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-80-1",
+        "title": "XS / Cream",
+        "price": 115.54,
+        "available": true,
+        "sku": "PUF-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-80-2",
+        "title": "S / Cream",
+        "price": 115.54,
+        "available": true,
+        "sku": "PUF-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 115.54,
+    "compareAtPrice": 155.32,
+    "category": "outerwear",
+    "subcategory": "puffer-jacket",
+    "colors": [
+      "Cream",
+      "Olive"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.8,
+    "reviewCount": 158,
+    "createdAt": "2025-11-23"
+  },
+  {
+    "id": "prod-81",
+    "handle": "coastal-cable-knit-trench-coat",
+    "title": "Coastal Cable Knit Trench Coat",
+    "description": "A beautifully crafted trench coat made from premium cable knit fabric. Designed for comfort and style, this coastal piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Trench Coat",
+    "tags": [
+      "cable",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-81-1",
+        "src": "/images/products/coastal-cable-knit-trench-coat-1.jpg",
+        "alt": "Coastal Cable Knit Trench Coat front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-81-2",
+        "src": "/images/products/coastal-cable-knit-trench-coat-2.jpg",
+        "alt": "Coastal Cable Knit Trench Coat back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-81-1",
+        "title": "XS / Camel",
+        "price": 217.02,
+        "available": true,
+        "sku": "TRE-CAM-XS",
+        "color": "Camel",
+        "size": "XS"
+      },
+      {
+        "id": "var-81-2",
+        "title": "S / Camel",
+        "price": 217.02,
+        "available": true,
+        "sku": "TRE-CAM-S",
+        "color": "Camel",
+        "size": "S"
+      }
+    ],
+    "price": 217.02,
+    "category": "outerwear",
+    "subcategory": "trench-coat",
+    "colors": [
+      "Camel",
+      "Charcoal",
+      "Indigo"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 122,
+    "createdAt": "2025-09-04"
+  },
+  {
+    "id": "prod-82",
+    "handle": "oversized-merino-denim-jacket",
+    "title": "Oversized Merino Denim Jacket",
+    "description": "A beautifully crafted denim jacket made from premium merino fabric. Designed for comfort and style, this oversized piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Denim Jacket",
+    "tags": [
+      "merino",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-82-1",
+        "src": "/images/products/oversized-merino-denim-jacket-1.jpg",
+        "alt": "Oversized Merino Denim Jacket front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-82-2",
+        "src": "/images/products/oversized-merino-denim-jacket-2.jpg",
+        "alt": "Oversized Merino Denim Jacket back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-82-1",
+        "title": "XS / Black",
+        "price": 191.87,
+        "available": true,
+        "sku": "DEN-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-82-2",
+        "title": "S / Black",
+        "price": 191.87,
+        "available": true,
+        "sku": "DEN-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 191.87,
+    "category": "outerwear",
+    "subcategory": "denim-jacket",
+    "colors": [
+      "Black",
+      "Mauve"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 51,
+    "createdAt": "2025-07-08"
+  },
+  {
+    "id": "prod-83",
+    "handle": "essential-modal-vest",
+    "title": "Essential Modal Vest",
+    "description": "A beautifully crafted vest made from premium modal fabric. Designed for comfort and style, this essential piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Vest",
+    "tags": [
+      "modal",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-83-1",
+        "src": "/images/products/essential-modal-vest-1.jpg",
+        "alt": "Essential Modal Vest front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-83-2",
+        "src": "/images/products/essential-modal-vest-2.jpg",
+        "alt": "Essential Modal Vest back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-83-1",
+        "title": "XS / Navy",
+        "price": 102.01,
+        "available": true,
+        "sku": "VES-NAV-XS",
+        "color": "Navy",
+        "size": "XS"
+      },
+      {
+        "id": "var-83-2",
+        "title": "S / Navy",
+        "price": 102.01,
+        "available": true,
+        "sku": "VES-NAV-S",
+        "color": "Navy",
+        "size": "S"
+      }
+    ],
+    "price": 102.01,
+    "category": "outerwear",
+    "subcategory": "vest",
+    "colors": [
+      "Navy",
+      "Camel",
+      "Cream"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 147,
+    "createdAt": "2025-09-22"
+  },
+  {
+    "id": "prod-84",
+    "handle": "heritage-linen-poncho",
+    "title": "Heritage Linen Poncho",
+    "description": "A beautifully crafted poncho made from premium linen fabric. Designed for comfort and style, this heritage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Poncho",
+    "tags": [
+      "linen",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-84-1",
+        "src": "/images/products/heritage-linen-poncho-1.jpg",
+        "alt": "Heritage Linen Poncho front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-84-2",
+        "src": "/images/products/heritage-linen-poncho-2.jpg",
+        "alt": "Heritage Linen Poncho back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-84-1",
+        "title": "XS / Black",
+        "price": 240.83,
+        "available": true,
+        "sku": "PON-BLA-XS",
+        "color": "Black",
+        "size": "XS"
+      },
+      {
+        "id": "var-84-2",
+        "title": "S / Black",
+        "price": 240.83,
+        "available": true,
+        "sku": "PON-BLA-S",
+        "color": "Black",
+        "size": "S"
+      }
+    ],
+    "price": 240.83,
+    "category": "outerwear",
+    "subcategory": "poncho",
+    "colors": [
+      "Black",
+      "White"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.6,
+    "reviewCount": 6,
+    "createdAt": "2025-10-22"
+  },
+  {
+    "id": "prod-85",
+    "handle": "signature-french-terry-windbreaker",
+    "title": "Signature French Terry Windbreaker",
+    "description": "A beautifully crafted windbreaker made from premium french terry fabric. Designed for comfort and style, this signature piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Windbreaker",
+    "tags": [
+      "french",
+      "outerwear",
+      "winter",
+      "layering"
+    ],
+    "images": [
+      {
+        "id": "img-85-1",
+        "src": "/images/products/signature-french-terry-windbreaker-1.jpg",
+        "alt": "Signature French Terry Windbreaker front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-85-2",
+        "src": "/images/products/signature-french-terry-windbreaker-2.jpg",
+        "alt": "Signature French Terry Windbreaker back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-85-1",
+        "title": "XS / Cream",
+        "price": 126.28,
+        "available": true,
+        "sku": "WIN-CRE-XS",
+        "color": "Cream",
+        "size": "XS"
+      },
+      {
+        "id": "var-85-2",
+        "title": "S / Cream",
+        "price": 126.28,
+        "available": true,
+        "sku": "WIN-CRE-S",
+        "color": "Cream",
+        "size": "S"
+      }
+    ],
+    "price": 126.28,
+    "category": "outerwear",
+    "subcategory": "windbreaker",
+    "colors": [
+      "Cream",
+      "Navy",
+      "Sage"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "featured": false,
+    "new": false,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 47,
+    "createdAt": "2025-08-17"
+  },
+  {
+    "id": "prod-86",
+    "handle": "vintage-organic-cotton-scarf",
+    "title": "Vintage Organic Cotton Scarf",
+    "description": "A beautifully crafted scarf made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Scarf",
+    "tags": [
+      "organic",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-86-1",
+        "src": "/images/products/vintage-organic-cotton-scarf-1.jpg",
+        "alt": "Vintage Organic Cotton Scarf front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-86-2",
+        "src": "/images/products/vintage-organic-cotton-scarf-2.jpg",
+        "alt": "Vintage Organic Cotton Scarf back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-86-1",
+        "title": "One Size / White",
+        "price": 64.75,
+        "available": true,
+        "sku": "SCA-WHI-One Size",
+        "color": "White",
+        "size": "One Size"
+      }
+    ],
+    "price": 64.75,
+    "category": "accessories",
+    "subcategory": "scarf",
+    "colors": [
+      "White",
+      "Navy"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 78,
+    "createdAt": "2025-08-21"
+  },
+  {
+    "id": "prod-87",
+    "handle": "tailored-ponte-belt",
+    "title": "Tailored Ponte Belt",
+    "description": "A beautifully crafted belt made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Belt",
+    "tags": [
+      "ponte",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-87-1",
+        "src": "/images/products/tailored-ponte-belt-1.jpg",
+        "alt": "Tailored Ponte Belt front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-87-2",
+        "src": "/images/products/tailored-ponte-belt-2.jpg",
+        "alt": "Tailored Ponte Belt back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-87-1",
+        "title": "One Size / Black",
+        "price": 56.69,
+        "available": true,
+        "sku": "BEL-BLA-One Size",
+        "color": "Black",
+        "size": "One Size"
+      }
+    ],
+    "price": 56.69,
+    "category": "accessories",
+    "subcategory": "belt",
+    "colors": [
+      "Black",
+      "Terracotta"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 190,
+    "createdAt": "2025-08-22"
+  },
+  {
+    "id": "prod-88",
+    "handle": "luxe-waffle-knit-tote-bag",
+    "title": "Luxe Waffle Knit Tote Bag",
+    "description": "A beautifully crafted tote bag made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Tote Bag",
+    "tags": [
+      "waffle",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-88-1",
+        "src": "/images/products/luxe-waffle-knit-tote-bag-1.jpg",
+        "alt": "Luxe Waffle Knit Tote Bag front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-88-2",
+        "src": "/images/products/luxe-waffle-knit-tote-bag-2.jpg",
+        "alt": "Luxe Waffle Knit Tote Bag back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-88-1",
+        "title": "One Size / Forest Green",
+        "price": 78.91,
+        "available": true,
+        "sku": "TOT-FOR-One Size",
+        "color": "Forest Green",
+        "size": "One Size"
+      }
+    ],
+    "price": 78.91,
+    "compareAtPrice": 116.51,
+    "category": "accessories",
+    "subcategory": "tote-bag",
+    "colors": [
+      "Forest Green",
+      "Black"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": true,
+    "rating": 3.8,
+    "reviewCount": 160,
+    "createdAt": "2025-10-04"
+  },
+  {
+    "id": "prod-89",
+    "handle": "effortless-velvet-sunglasses",
+    "title": "Effortless Velvet Sunglasses",
+    "description": "A beautifully crafted sunglasses made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Sunglasses",
+    "tags": [
+      "velvet",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-89-1",
+        "src": "/images/products/effortless-velvet-sunglasses-1.jpg",
+        "alt": "Effortless Velvet Sunglasses front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-89-2",
+        "src": "/images/products/effortless-velvet-sunglasses-2.jpg",
+        "alt": "Effortless Velvet Sunglasses back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-89-1",
+        "title": "One Size / White",
+        "price": 48.95,
+        "available": true,
+        "sku": "SUN-WHI-One Size",
+        "color": "White",
+        "size": "One Size"
+      }
+    ],
+    "price": 48.95,
+    "category": "accessories",
+    "subcategory": "sunglasses",
+    "colors": [
+      "White",
+      "Black",
+      "Sage"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 27,
+    "createdAt": "2025-11-10"
+  },
+  {
+    "id": "prod-90",
+    "handle": "studio-chambray-beanie",
+    "title": "Studio Chambray Beanie",
+    "description": "A beautifully crafted beanie made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Beanie",
+    "tags": [
+      "chambray",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-90-1",
+        "src": "/images/products/studio-chambray-beanie-1.jpg",
+        "alt": "Studio Chambray Beanie front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-90-2",
+        "src": "/images/products/studio-chambray-beanie-2.jpg",
+        "alt": "Studio Chambray Beanie back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-90-1",
+        "title": "One Size / Camel",
+        "price": 46.23,
+        "available": true,
+        "sku": "BEA-CAM-One Size",
+        "color": "Camel",
+        "size": "One Size"
+      }
+    ],
+    "price": 46.23,
+    "category": "accessories",
+    "subcategory": "beanie",
+    "colors": [
+      "Camel",
+      "Navy"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.9,
+    "reviewCount": 69,
+    "createdAt": "2025-11-03"
+  },
+  {
+    "id": "prod-91",
+    "handle": "vintage-organic-cotton-socks",
+    "title": "Vintage Organic Cotton Socks",
+    "description": "A beautifully crafted socks made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Socks",
+    "tags": [
+      "organic",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-91-1",
+        "src": "/images/products/vintage-organic-cotton-socks-1.jpg",
+        "alt": "Vintage Organic Cotton Socks front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-91-2",
+        "src": "/images/products/vintage-organic-cotton-socks-2.jpg",
+        "alt": "Vintage Organic Cotton Socks back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-91-1",
+        "title": "One Size / Black",
+        "price": 39.94,
+        "available": true,
+        "sku": "SOC-BLA-One Size",
+        "color": "Black",
+        "size": "One Size"
+      }
+    ],
+    "price": 39.94,
+    "category": "accessories",
+    "subcategory": "socks",
+    "colors": [
+      "Black",
+      "White",
+      "Navy"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 49,
+    "createdAt": "2025-07-23"
+  },
+  {
+    "id": "prod-92",
+    "handle": "tailored-ponte-gloves",
+    "title": "Tailored Ponte Gloves",
+    "description": "A beautifully crafted gloves made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Gloves",
+    "tags": [
+      "ponte",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-92-1",
+        "src": "/images/products/tailored-ponte-gloves-1.jpg",
+        "alt": "Tailored Ponte Gloves front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-92-2",
+        "src": "/images/products/tailored-ponte-gloves-2.jpg",
+        "alt": "Tailored Ponte Gloves back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-92-1",
+        "title": "One Size / Burgundy",
+        "price": 75.41,
+        "available": true,
+        "sku": "GLO-BUR-One Size",
+        "color": "Burgundy",
+        "size": "One Size"
+      }
+    ],
+    "price": 75.41,
+    "category": "accessories",
+    "subcategory": "gloves",
+    "colors": [
+      "Burgundy",
+      "Black",
+      "White"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 114,
+    "createdAt": "2025-08-26"
+  },
+  {
+    "id": "prod-93",
+    "handle": "luxe-waffle-knit-crossbody-bag",
+    "title": "Luxe Waffle Knit Crossbody Bag",
+    "description": "A beautifully crafted crossbody bag made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Crossbody Bag",
+    "tags": [
+      "waffle",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-93-1",
+        "src": "/images/products/luxe-waffle-knit-crossbody-bag-1.jpg",
+        "alt": "Luxe Waffle Knit Crossbody Bag front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-93-2",
+        "src": "/images/products/luxe-waffle-knit-crossbody-bag-2.jpg",
+        "alt": "Luxe Waffle Knit Crossbody Bag back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-93-1",
+        "title": "One Size / Sage",
+        "price": 43.67,
+        "available": true,
+        "sku": "CRO-SAG-One Size",
+        "color": "Sage",
+        "size": "One Size"
+      }
+    ],
+    "price": 43.67,
+    "compareAtPrice": 52.73,
+    "category": "accessories",
+    "subcategory": "crossbody-bag",
+    "colors": [
+      "Sage",
+      "Cream",
+      "Navy"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.1,
+    "reviewCount": 186,
+    "createdAt": "2025-07-17"
+  },
+  {
+    "id": "prod-94",
+    "handle": "effortless-velvet-watch",
+    "title": "Effortless Velvet Watch",
+    "description": "A beautifully crafted watch made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Watch",
+    "tags": [
+      "velvet",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-94-1",
+        "src": "/images/products/effortless-velvet-watch-1.jpg",
+        "alt": "Effortless Velvet Watch front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-94-2",
+        "src": "/images/products/effortless-velvet-watch-2.jpg",
+        "alt": "Effortless Velvet Watch back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-94-1",
+        "title": "One Size / Forest Green",
+        "price": 48.76,
+        "available": true,
+        "sku": "WAT-FOR-One Size",
+        "color": "Forest Green",
+        "size": "One Size"
+      }
+    ],
+    "price": 48.76,
+    "category": "accessories",
+    "subcategory": "watch",
+    "colors": [
+      "Forest Green",
+      "Dusty Rose",
+      "Sage"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 52,
+    "createdAt": "2025-09-12"
+  },
+  {
+    "id": "prod-95",
+    "handle": "studio-chambray-jewelry-set",
+    "title": "Studio Chambray Jewelry Set",
+    "description": "A beautifully crafted jewelry set made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Jewelry Set",
+    "tags": [
+      "chambray",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-95-1",
+        "src": "/images/products/studio-chambray-jewelry-set-1.jpg",
+        "alt": "Studio Chambray Jewelry Set front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-95-2",
+        "src": "/images/products/studio-chambray-jewelry-set-2.jpg",
+        "alt": "Studio Chambray Jewelry Set back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-95-1",
+        "title": "One Size / Indigo",
+        "price": 74.38,
+        "available": true,
+        "sku": "JEW-IND-One Size",
+        "color": "Indigo",
+        "size": "One Size"
+      }
+    ],
+    "price": 74.38,
+    "category": "accessories",
+    "subcategory": "jewelry-set",
+    "colors": [
+      "Indigo",
+      "Navy",
+      "White"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 12,
+    "createdAt": "2025-12-06"
+  },
+  {
+    "id": "prod-96",
+    "handle": "vintage-organic-cotton-scarf",
+    "title": "Vintage Organic Cotton Scarf",
+    "description": "A beautifully crafted scarf made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Scarf",
+    "tags": [
+      "organic",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-96-1",
+        "src": "/images/products/vintage-organic-cotton-scarf-1.jpg",
+        "alt": "Vintage Organic Cotton Scarf front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-96-2",
+        "src": "/images/products/vintage-organic-cotton-scarf-2.jpg",
+        "alt": "Vintage Organic Cotton Scarf back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-96-1",
+        "title": "One Size / Camel",
+        "price": 66.07,
+        "available": true,
+        "sku": "SCA-CAM-One Size",
+        "color": "Camel",
+        "size": "One Size"
+      }
+    ],
+    "price": 66.07,
+    "category": "accessories",
+    "subcategory": "scarf",
+    "colors": [
+      "Camel",
+      "Indigo",
+      "Black"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 186,
+    "createdAt": "2025-10-21"
+  },
+  {
+    "id": "prod-97",
+    "handle": "tailored-ponte-belt",
+    "title": "Tailored Ponte Belt",
+    "description": "A beautifully crafted belt made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Belt",
+    "tags": [
+      "ponte",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-97-1",
+        "src": "/images/products/tailored-ponte-belt-1.jpg",
+        "alt": "Tailored Ponte Belt front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-97-2",
+        "src": "/images/products/tailored-ponte-belt-2.jpg",
+        "alt": "Tailored Ponte Belt back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-97-1",
+        "title": "One Size / Burgundy",
+        "price": 23.05,
+        "available": true,
+        "sku": "BEL-BUR-One Size",
+        "color": "Burgundy",
+        "size": "One Size"
+      }
+    ],
+    "price": 23.05,
+    "compareAtPrice": 31.42,
+    "category": "accessories",
+    "subcategory": "belt",
+    "colors": [
+      "Burgundy",
+      "Cream"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 3.8,
+    "reviewCount": 41,
+    "createdAt": "2025-08-22"
+  },
+  {
+    "id": "prod-98",
+    "handle": "luxe-waffle-knit-tote-bag",
+    "title": "Luxe Waffle Knit Tote Bag",
+    "description": "A beautifully crafted tote bag made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Tote Bag",
+    "tags": [
+      "waffle",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-98-1",
+        "src": "/images/products/luxe-waffle-knit-tote-bag-1.jpg",
+        "alt": "Luxe Waffle Knit Tote Bag front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-98-2",
+        "src": "/images/products/luxe-waffle-knit-tote-bag-2.jpg",
+        "alt": "Luxe Waffle Knit Tote Bag back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-98-1",
+        "title": "One Size / Dusty Rose",
+        "price": 42.24,
+        "available": true,
+        "sku": "TOT-DUS-One Size",
+        "color": "Dusty Rose",
+        "size": "One Size"
+      }
+    ],
+    "price": 42.24,
+    "compareAtPrice": 52.13,
+    "category": "accessories",
+    "subcategory": "tote-bag",
+    "colors": [
+      "Dusty Rose",
+      "Mauve"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 183,
+    "createdAt": "2025-09-17"
+  },
+  {
+    "id": "prod-99",
+    "handle": "effortless-velvet-sunglasses",
+    "title": "Effortless Velvet Sunglasses",
+    "description": "A beautifully crafted sunglasses made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Sunglasses",
+    "tags": [
+      "velvet",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-99-1",
+        "src": "/images/products/effortless-velvet-sunglasses-1.jpg",
+        "alt": "Effortless Velvet Sunglasses front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-99-2",
+        "src": "/images/products/effortless-velvet-sunglasses-2.jpg",
+        "alt": "Effortless Velvet Sunglasses back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-99-1",
+        "title": "One Size / Forest Green",
+        "price": 57.26,
+        "available": true,
+        "sku": "SUN-FOR-One Size",
+        "color": "Forest Green",
+        "size": "One Size"
+      }
+    ],
+    "price": 57.26,
+    "category": "accessories",
+    "subcategory": "sunglasses",
+    "colors": [
+      "Forest Green",
+      "Stone"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.7,
+    "reviewCount": 62,
+    "createdAt": "2025-12-06"
+  },
+  {
+    "id": "prod-100",
+    "handle": "studio-chambray-beanie",
+    "title": "Studio Chambray Beanie",
+    "description": "A beautifully crafted beanie made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Beanie",
+    "tags": [
+      "chambray",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-100-1",
+        "src": "/images/products/studio-chambray-beanie-1.jpg",
+        "alt": "Studio Chambray Beanie front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-100-2",
+        "src": "/images/products/studio-chambray-beanie-2.jpg",
+        "alt": "Studio Chambray Beanie back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-100-1",
+        "title": "One Size / Mauve",
+        "price": 53.74,
+        "available": true,
+        "sku": "BEA-MAU-One Size",
+        "color": "Mauve",
+        "size": "One Size"
+      }
+    ],
+    "price": 53.74,
+    "category": "accessories",
+    "subcategory": "beanie",
+    "colors": [
+      "Mauve",
+      "Navy"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.9,
+    "reviewCount": 195,
+    "createdAt": "2025-09-04"
+  },
+  {
+    "id": "prod-101",
+    "handle": "vintage-organic-cotton-socks",
+    "title": "Vintage Organic Cotton Socks",
+    "description": "A beautifully crafted socks made from premium organic cotton fabric. Designed for comfort and style, this vintage piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Socks",
+    "tags": [
+      "organic",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-101-1",
+        "src": "/images/products/vintage-organic-cotton-socks-1.jpg",
+        "alt": "Vintage Organic Cotton Socks front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-101-2",
+        "src": "/images/products/vintage-organic-cotton-socks-2.jpg",
+        "alt": "Vintage Organic Cotton Socks back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-101-1",
+        "title": "One Size / Terracotta",
+        "price": 51.42,
+        "available": true,
+        "sku": "SOC-TER-One Size",
+        "color": "Terracotta",
+        "size": "One Size"
+      }
+    ],
+    "price": 51.42,
+    "category": "accessories",
+    "subcategory": "socks",
+    "colors": [
+      "Terracotta",
+      "Charcoal",
+      "Sage"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.2,
+    "reviewCount": 94,
+    "createdAt": "2025-09-09"
+  },
+  {
+    "id": "prod-102",
+    "handle": "tailored-ponte-gloves",
+    "title": "Tailored Ponte Gloves",
+    "description": "A beautifully crafted gloves made from premium ponte fabric. Designed for comfort and style, this tailored piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Gloves",
+    "tags": [
+      "ponte",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-102-1",
+        "src": "/images/products/tailored-ponte-gloves-1.jpg",
+        "alt": "Tailored Ponte Gloves front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-102-2",
+        "src": "/images/products/tailored-ponte-gloves-2.jpg",
+        "alt": "Tailored Ponte Gloves back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-102-1",
+        "title": "One Size / Stone",
+        "price": 46.78,
+        "available": true,
+        "sku": "GLO-STO-One Size",
+        "color": "Stone",
+        "size": "One Size"
+      }
+    ],
+    "price": 46.78,
+    "category": "accessories",
+    "subcategory": "gloves",
+    "colors": [
+      "Stone",
+      "Black"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.4,
+    "reviewCount": 174,
+    "createdAt": "2025-08-20"
+  },
+  {
+    "id": "prod-103",
+    "handle": "luxe-waffle-knit-crossbody-bag",
+    "title": "Luxe Waffle Knit Crossbody Bag",
+    "description": "A beautifully crafted crossbody bag made from premium waffle knit fabric. Designed for comfort and style, this luxe piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Crossbody Bag",
+    "tags": [
+      "waffle",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-103-1",
+        "src": "/images/products/luxe-waffle-knit-crossbody-bag-1.jpg",
+        "alt": "Luxe Waffle Knit Crossbody Bag front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-103-2",
+        "src": "/images/products/luxe-waffle-knit-crossbody-bag-2.jpg",
+        "alt": "Luxe Waffle Knit Crossbody Bag back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-103-1",
+        "title": "One Size / Cream",
+        "price": 55.47,
+        "available": true,
+        "sku": "CRO-CRE-One Size",
+        "color": "Cream",
+        "size": "One Size"
+      }
+    ],
+    "price": 55.47,
+    "category": "accessories",
+    "subcategory": "crossbody-bag",
+    "colors": [
+      "Cream",
+      "Black"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 5,
+    "reviewCount": 133,
+    "createdAt": "2025-12-06"
+  },
+  {
+    "id": "prod-104",
+    "handle": "effortless-velvet-watch",
+    "title": "Effortless Velvet Watch",
+    "description": "A beautifully crafted watch made from premium velvet fabric. Designed for comfort and style, this effortless piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Watch",
+    "tags": [
+      "velvet",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-104-1",
+        "src": "/images/products/effortless-velvet-watch-1.jpg",
+        "alt": "Effortless Velvet Watch front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-104-2",
+        "src": "/images/products/effortless-velvet-watch-2.jpg",
+        "alt": "Effortless Velvet Watch back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-104-1",
+        "title": "One Size / White",
+        "price": 29.24,
+        "available": true,
+        "sku": "WAT-WHI-One Size",
+        "color": "White",
+        "size": "One Size"
+      }
+    ],
+    "price": 29.24,
+    "category": "accessories",
+    "subcategory": "watch",
+    "colors": [
+      "White",
+      "Black",
+      "Burgundy"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 5,
+    "reviewCount": 48,
+    "createdAt": "2025-08-17"
+  },
+  {
+    "id": "prod-105",
+    "handle": "studio-chambray-jewelry-set",
+    "title": "Studio Chambray Jewelry Set",
+    "description": "A beautifully crafted jewelry set made from premium chambray fabric. Designed for comfort and style, this studio piece is perfect for any occasion.",
+    "vendor": "Snug&Knot",
+    "productType": "Jewelry Set",
+    "tags": [
+      "chambray",
+      "accessories",
+      "gifting",
+      "everyday"
+    ],
+    "images": [
+      {
+        "id": "img-105-1",
+        "src": "/images/products/studio-chambray-jewelry-set-1.jpg",
+        "alt": "Studio Chambray Jewelry Set front view",
+        "width": 800,
+        "height": 1000
+      },
+      {
+        "id": "img-105-2",
+        "src": "/images/products/studio-chambray-jewelry-set-2.jpg",
+        "alt": "Studio Chambray Jewelry Set back view",
+        "width": 800,
+        "height": 1000
+      }
+    ],
+    "variants": [
+      {
+        "id": "var-105-1",
+        "title": "One Size / Burgundy",
+        "price": 26.42,
+        "available": true,
+        "sku": "JEW-BUR-One Size",
+        "color": "Burgundy",
+        "size": "One Size"
+      }
+    ],
+    "price": 26.42,
+    "compareAtPrice": 34.54,
+    "category": "accessories",
+    "subcategory": "jewelry-set",
+    "colors": [
+      "Burgundy",
+      "Dusty Rose"
+    ],
+    "sizes": [
+      "One Size"
+    ],
+    "featured": false,
+    "new": true,
+    "bestseller": false,
+    "rating": 4.6,
+    "reviewCount": 122,
+    "createdAt": "2025-09-08"
+  }
+]

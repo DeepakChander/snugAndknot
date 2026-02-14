@@ -1,0 +1,26 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import ProductCard from './ProductCard'
+import type { Product } from '@/types'
+
+interface ProductGridProps {
+  products: Product[]
+  columns?: 2 | 3 | 4
+}
+
+export default function ProductGrid({ products, columns = 4 }: ProductGridProps) {
+  const gridCols = {
+    2: 'grid-cols-2',
+    3: 'grid-cols-2 lg:grid-cols-3',
+    4: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
+  }
+
+  return (
+    <motion.div layout className={`grid ${gridCols[columns]} gap-4 sm:gap-6`}>
+      {products.map((product, i) => (
+        <ProductCard key={product.id} product={product} index={i} priority={i < 4} />
+      ))}
+    </motion.div>
+  )
+}

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "look-1",
+    "title": "Quiet Luxury",
+    "subtitle": "AW25 Editorial",
+    "description": "A study in understated elegance. Neutral palettes, sumptuous textures, and silhouettes that whisper rather than shout. This is dressing with intention -- where every piece earns its place.",
+    "images": [
+      { "src": "/images/lookbook/quiet-luxury-1.jpg", "alt": "Model in cashmere turtleneck and tailored wide-leg trousers against a muted stone backdrop", "position": "left" },
+      { "src": "/images/lookbook/quiet-luxury-2.jpg", "alt": "Close-up detail of hand-finished stitching on a cream wool coat", "position": "right" },
+      { "src": "/images/lookbook/quiet-luxury-3.jpg", "alt": "Full look featuring layered neutrals with a structured leather tote", "position": "full" }
+    ],
+    "products": [
+      "cashmere-blend-turtleneck",
+      "tailored-wide-leg-trousers-cream",
+      "structured-leather-tote-black",
+      "classic-trench-coat",
+      "minimal-gold-hoop-earrings",
+      "fine-gauge-knit-polo"
+    ],
+    "season": "Autumn/Winter 2025"
+  },
+  {
+    "id": "look-2",
+    "title": "Golden Hour",
+    "subtitle": "Resort 2026",
+    "description": "Inspired by the amber glow of late afternoon sun on Mediterranean shores. Flowing linens, warm terracotta tones, and effortless layering for the woman who carries summer with her wherever she goes.",
+    "images": [
+      { "src": "/images/lookbook/golden-hour-1.jpg", "alt": "Model in flowing linen dress walking along a sun-drenched terrace", "position": "full" },
+      { "src": "/images/lookbook/golden-hour-2.jpg", "alt": "Close-up of raffia bag and espadrille sandals on terracotta tiles", "position": "left" },
+      { "src": "/images/lookbook/golden-hour-3.jpg", "alt": "Linen co-ord set styled with woven accessories at golden hour", "position": "right" }
+    ],
+    "products": [
+      "cotton-gauze-maxi-dress",
+      "linen-blend-palazzo-pants",
+      "raffia-woven-tote",
+      "espadrille-wedge-sandals",
+      "embroidered-tunic-top",
+      "woven-straw-sun-hat",
+      "linen-camp-collar-shirt"
+    ],
+    "season": "Spring/Summer 2026"
+  },
+  {
+    "id": "look-3",
+    "title": "After Dark",
+    "subtitle": "Evening Edit",
+    "description": "When the lights go low, let your wardrobe do the talking. Rich velvets, liquid satins, and sculptural details -- designed for the woman who commands every room she enters.",
+    "images": [
+      { "src": "/images/lookbook/after-dark-1.jpg", "alt": "Model in velvet wrap dress with statement gold jewellery under moody lighting", "position": "right" },
+      { "src": "/images/lookbook/after-dark-2.jpg", "alt": "Detail shot of satin fabric catching candlelight", "position": "left" },
+      { "src": "/images/lookbook/after-dark-3.jpg", "alt": "Full evening look with embellished clutch and strappy heels", "position": "full" }
+    ],
+    "products": [
+      "velvet-wrap-dress",
+      "high-waist-satin-trousers",
+      "statement-gold-cuff",
+      "embellished-clutch-bag",
+      "strappy-heel-sandals",
+      "silk-slip-midi-dress",
+      "lace-trim-camisole"
+    ],
+    "season": "Autumn/Winter 2025"
+  },
+  {
+    "id": "look-4",
+    "title": "New Workwear",
+    "subtitle": "The Modern Office",
+    "description": "Power dressing, reimagined. Sharp shoulders meet relaxed proportions in a collection that bridges the boardroom and the bistro. Because modern life doesn't fit neatly into dress codes.",
+    "images": [
+      { "src": "/images/lookbook/new-workwear-1.jpg", "alt": "Model in double-breasted navy blazer and slim trousers in a light-filled atelier", "position": "left" },
+      { "src": "/images/lookbook/new-workwear-2.jpg", "alt": "Overhead flat-lay of curated work wardrobe essentials", "position": "right" },
+      { "src": "/images/lookbook/new-workwear-3.jpg", "alt": "Model transitioning from office to evening with a silk blouse and leather accessories", "position": "full" }
+    ],
+    "products": [
+      "double-breasted-blazer-navy",
+      "mid-rise-slim-trousers",
+      "silk-button-front-blouse",
+      "structured-leather-satchel",
+      "ponte-cigarette-pants",
+      "pointed-toe-block-heels",
+      "wool-blend-sheath-dress"
+    ],
+    "season": "All Seasons"
+  },
+  {
+    "id": "look-5",
+    "title": "Soft Focus",
+    "subtitle": "SS26 Preview",
+    "description": "A softer lens on the season ahead. Draped jerseys, organic shapes, and a palette drawn from morning mist and wildflower fields. Gentle, grounded, and unapologetically feminine.",
+    "images": [
+      { "src": "/images/lookbook/soft-focus-1.jpg", "alt": "Model in draped jersey wrap top and pleated midi skirt in a sunlit garden", "position": "full" },
+      { "src": "/images/lookbook/soft-focus-2.jpg", "alt": "Textured knit details against a backdrop of pale wildflowers", "position": "left" },
+      { "src": "/images/lookbook/soft-focus-3.jpg", "alt": "Relaxed silhouette layering with earth-toned accessories", "position": "right" }
+    ],
+    "products": [
+      "draped-jersey-wrap-top",
+      "pleated-midi-skirt-olive",
+      "sculptural-puff-sleeve-blouse",
+      "quilted-crossbody-bag",
+      "asymmetric-hem-midi-dress",
+      "colour-block-scarf",
+      "textured-knit-co-ord-set"
+    ],
+    "season": "Spring/Summer 2026"
+  }
+]
