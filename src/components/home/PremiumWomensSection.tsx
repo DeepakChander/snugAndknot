@@ -1,10 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion, useInView } from 'framer-motion'
 import TextReveal from '@/components/animation/TextReveal'
+import FadeIn from '@/components/animation/FadeIn'
 
 const premiumProducts = [
   {
@@ -34,11 +33,8 @@ const premiumProducts = [
 ]
 
 export default function PremiumWomensSection() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: true, margin: '-100px' })
-
   return (
-    <section ref={sectionRef} className="relative py-24 lg:py-32 bg-gradient-to-b from-cream to-beige overflow-hidden">
+    <section className="relative py-24 lg:py-32 bg-gradient-to-b from-cream to-beige overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-terracotta/5 rounded-full blur-3xl" />
@@ -48,36 +44,29 @@ export default function PremiumWomensSection() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="mb-16 text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-xs font-semibold text-terracotta uppercase tracking-[0.3em] mb-4"
-          >
-            Premium Women's Collection
-          </motion.p>
+          <FadeIn variant="fade-up">
+            <p className="text-xs font-semibold text-terracotta uppercase tracking-[0.3em] mb-4">
+              Premium Women's Collection
+            </p>
+          </FadeIn>
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl text-charcoal mb-6">
             <TextReveal>Artisanal Knitwear</TextReveal>
           </h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-lg text-walnut max-w-2xl mx-auto"
-          >
-            Discover our carefully curated collection of premium cardigans,
-            crafted with intention and designed to be cherished for years to come.
-          </motion.p>
+          <FadeIn variant="fade-up" delay={0.2}>
+            <p className="text-lg text-walnut max-w-2xl mx-auto">
+              Discover our carefully curated collection of premium cardigans,
+              crafted with intention and designed to be cherished for years to come.
+            </p>
+          </FadeIn>
         </div>
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {premiumProducts.map((product, i) => (
-            <motion.div
+            <FadeIn
               key={product.id}
-              initial={{ opacity: 0, y: 40 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.3 + i * 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              variant="fade-up"
+              delay={0.3 + i * 0.2}
             >
               <Link
                 href={`/product/${product.handle}`}
@@ -152,17 +141,12 @@ export default function PremiumWomensSection() {
                   </div>
                 </div>
               </Link>
-            </motion.div>
+            </FadeIn>
           ))}
         </div>
 
         {/* View All CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.7, duration: 0.8 }}
-          className="text-center mt-16"
-        >
+        <FadeIn variant="fade-up" delay={0.7} className="text-center mt-16">
           <Link
             href="/shop/women"
             className="inline-flex items-center gap-2 px-8 py-4 border-2 border-charcoal text-charcoal text-sm font-medium rounded-full hover:bg-charcoal hover:text-cream transition-all duration-300"
@@ -172,7 +156,7 @@ export default function PremiumWomensSection() {
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </Link>
-        </motion.div>
+        </FadeIn>
 
         {/* Trust Badges */}
         <div className="mt-16 pt-16 border-t border-earth/10">
@@ -183,15 +167,10 @@ export default function PremiumWomensSection() {
               { label: 'Sustainable', value: 'Always' },
               { label: 'Customer Rating', value: '4.8★' },
             ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.8 + i * 0.1, duration: 0.6 }}
-              >
+              <FadeIn key={i} variant="fade-up" delay={0.8 + i * 0.1}>
                 <p className="font-mono text-2xl text-terracotta mb-2">{item.value}</p>
                 <p className="text-sm text-earth">{item.label}</p>
-              </motion.div>
+              </FadeIn>
             ))}
           </div>
         </div>

@@ -1,40 +1,57 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCartStore } from '@/stores/cart-store'
 import { formatPrice } from '@/lib/utils'
-import { slideInRight } from '@/lib/animations'
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, totalPrice } = useCartStore()
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  // Focus close button and handle Escape key when cart opens
+  useEffect(() => {
+    if (!isOpen) return
+
+    // Focus the close button when cart opens
+    closeButtonRef.current?.focus()
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeCart()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, closeCart])
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeCart}
-            className="fixed inset-0 bg-espresso/40 z-50"
-          />
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={closeCart}
+        className={`fixed inset-0 bg-espresso/40 z-50 transition-opacity duration-300 ${
+          isOpen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        }`}
+      />
 
-          {/* Drawer */}
-          <motion.div
-            variants={slideInRight}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-cream z-50 flex flex-col shadow-2xl"
-          >
+      {/* Drawer */}
+      <div
+        className={`fixed top-0 right-0 h-full w-full max-w-md bg-cream z-50 flex flex-col shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Shopping cart"
+      >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-beige">
               <h2 className="font-heading text-xl text-charcoal">Your Bag ({items.length})</h2>
               <button
+                ref={closeButtonRef}
                 onClick={closeCart}
                 className="p-2 text-walnut hover:text-charcoal transition-colors"
                 aria-label="Close cart"
@@ -66,12 +83,8 @@ export default function CartDrawer() {
               ) : (
                 <ul className="space-y-4">
                   {items.map((item) => (
-                    <motion.li
+                    <li
                       key={item.id}
-                      layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, x: 50 }}
                       className="flex gap-4 pb-4 border-b border-beige"
                     >
                       <div className="w-20 h-24 bg-cream-dark rounded-md overflow-hidden shrink-0">
@@ -111,7 +124,7 @@ export default function CartDrawer() {
                           </button>
                         </div>
                       </div>
-                    </motion.li>
+                    </li>
                   ))}
                 </ul>
               )}
@@ -137,9 +150,7 @@ export default function CartDrawer() {
                 </button>
               </div>
             )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+      </div>
+    </>
   )
 }

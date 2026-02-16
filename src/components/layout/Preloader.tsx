@@ -8,14 +8,15 @@ import { useReducedMotion } from '@/hooks/use-reduced-motion'
 export default function Preloader() {
   const containerRef = useRef<HTMLDivElement>(null)
   const counterRef = useRef<HTMLSpanElement>(null)
-  const logoRef = useRef<SVGSVGElement>(null)
+  const knotRef = useRef<SVGSVGElement>(null)
+  const taglineRef = useRef<HTMLParagraphElement>(null)
   const setPreloaderDone = useUIStore((s) => s.setPreloaderDone)
   const isPreloaderDone = useUIStore((s) => s.isPreloaderDone)
   const reducedMotion = useReducedMotion()
   const [hasShown, setHasShown] = useState(false)
 
   useEffect(() => {
-    // Only show on first visit
+    // Only show on first visit per session
     if (typeof window !== 'undefined') {
       const shown = sessionStorage.getItem('snk-preloader-shown')
       if (shown) {
@@ -39,39 +40,64 @@ export default function Preloader() {
       },
     })
 
-    // Counter animation
-    const counter = { value: 0 }
-    tl.to(counter, {
-      value: 100,
-      duration: 2,
-      ease: 'power1.in',
-      onUpdate: () => {
-        if (counterRef.current) {
-          counterRef.current.textContent = `${Math.round(counter.value)}%`
-        }
-      },
-    })
-
-    // Logo stroke animation
-    if (logoRef.current) {
-      const paths = logoRef.current.querySelectorAll('path')
+    // 1. Golden thread knot draws itself (stroke-dashoffset animation)
+    if (knotRef.current) {
+      const paths = knotRef.current.querySelectorAll('path')
       paths.forEach((path) => {
         const length = path.getTotalLength()
         gsap.set(path, { strokeDasharray: length, strokeDashoffset: length })
       })
       tl.to(
-        logoRef.current.querySelectorAll('path'),
-        { strokeDashoffset: 0, duration: 1.5, ease: 'power2.inOut', stagger: 0.1 },
+        paths,
+        {
+          strokeDashoffset: 0,
+          duration: 2,
+          ease: 'power2.inOut',
+          stagger: 0.15,
+        },
         0
       )
     }
 
-    // Reveal with clip-path
+    // 2. Counter 0-100% in JetBrains Mono style
+    const counter = { value: 0 }
+    tl.to(
+      counter,
+      {
+        value: 100,
+        duration: 2.2,
+        ease: 'power1.in',
+        onUpdate: () => {
+          if (counterRef.current) {
+            counterRef.current.textContent = `${Math.round(counter.value)}%`
+          }
+        },
+      },
+      0
+    )
+
+    // 3. Counter pulses gold at 100%
+    tl.to(counterRef.current, {
+      color: '#F1E194',
+      scale: 1.1,
+      duration: 0.3,
+      ease: 'back.out(2)',
+    })
+
+    // 4. Tagline fades in
+    tl.fromTo(
+      taglineRef.current,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' },
+      '-=0.2'
+    )
+
+    // 5. Exit: noise dissolve via clip-path
     tl.to(containerRef.current, {
       clipPath: 'circle(0% at 50% 50%)',
-      duration: 0.8,
+      duration: 0.6,
       ease: 'expo.in',
-      delay: 0.3,
+      delay: 0.4,
     })
 
     return () => {
@@ -84,31 +110,72 @@ export default function Preloader() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-charcoal"
-      style={{ clipPath: 'circle(150% at 50% 50%)' }}
+      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-noir"
+      style={{
+        clipPath: 'circle(150% at 50% 50%)',
+      }}
     >
-      {/* Logo SVG - simple S&K text path */}
+      {/* Subtle knit pattern overlay */}
+      <div className="absolute inset-0 knit-pattern-gold" />
+
+      {/* Golden thread knot SVG */}
       <svg
-        ref={logoRef}
-        viewBox="0 0 200 60"
-        className="w-48 mb-8"
+        ref={knotRef}
+        viewBox="0 0 200 200"
+        className="w-32 h-32 mb-8"
         fill="none"
-        stroke="#FDF6EE"
+        stroke="var(--color-gold)"
         strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       >
-        <path d="M 20 45 C 20 45 10 42 10 35 C 10 28 20 27 25 27 C 30 27 38 26 38 20 C 38 14 30 12 25 12 C 18 12 10 15 10 15" />
-        <path d="M 50 45 L 50 12 M 50 28 L 65 12 M 56 22 L 68 45" />
-        <path d="M 85 20 C 85 20 92 12 100 12 C 108 12 115 18 115 28 C 115 38 108 45 100 45 C 92 45 85 38 85 28 L 85 45 M 115 28 L 115 45" />
-        <path d="M 125 28 C 125 18 132 12 140 12 C 148 12 155 18 155 28 C 155 38 148 45 140 45 C 132 45 125 38 125 28" />
-        <path d="M 162 12 L 162 45 M 162 12 L 170 12 C 178 12 183 17 183 24 C 183 31 178 35 170 35 L 162 35" />
+        {/* Trefoil knot path — golden thread tying itself */}
+        <path
+          d="M 100 40 C 130 40 150 60 150 80 C 150 100 130 110 110 110 C 90 110 80 130 80 150 C 80 170 100 180 120 170"
+          opacity="0.9"
+        />
+        <path
+          d="M 120 170 C 140 160 150 140 140 120 C 130 100 100 95 80 105 C 60 115 50 140 60 160 C 70 175 90 180 100 170"
+          opacity="0.7"
+        />
+        <path
+          d="M 100 170 C 110 160 110 140 100 120 C 90 100 70 90 55 95 C 40 100 35 120 45 140 C 55 155 75 160 90 150"
+          opacity="0.5"
+        />
+        {/* Center crossing knot */}
+        <path
+          d="M 80 80 Q 100 100 120 80 Q 100 60 80 80 Z"
+          strokeWidth="2"
+          opacity="0.8"
+        />
       </svg>
 
+      {/* Brand wordmark */}
+      <div className="mb-6">
+        <span className="font-heading text-2xl tracking-wide">
+          <span className="text-gold-pale">Snug</span>
+          <span className="text-gold">&</span>
+          <span className="text-gold-pale">Knot</span>
+        </span>
+      </div>
+
+      {/* Counter */}
       <span
         ref={counterRef}
-        className="text-cream/60 text-sm font-mono tracking-[0.3em]"
+        className="font-mono text-sm tracking-[0.3em]"
+        style={{ color: 'rgba(250, 240, 200, 0.4)' }}
       >
         0%
       </span>
+
+      {/* Tagline */}
+      <p
+        ref={taglineRef}
+        className="font-mono text-[10px] tracking-[0.4em] uppercase mt-6 opacity-0"
+        style={{ color: 'rgba(241, 225, 148, 0.3)' }}
+      >
+        Where tension becomes tenderness
+      </p>
     </div>
   )
 }

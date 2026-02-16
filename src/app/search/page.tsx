@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { motion } from 'framer-motion'
 import { searchProducts } from '@/lib/data'
 import { debounce } from '@/lib/utils'
 import ProductCard from '@/components/product/ProductCard'
@@ -31,17 +30,22 @@ export default function SearchPage() {
   }, [query, debouncedSearch])
 
   return (
-    <div className="pt-24 pb-20">
+    <div className="min-h-screen bg-ivory pt-24 pb-20">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
-          <TextReveal as="h1" className="text-5xl sm:text-6xl lg:text-7xl text-charcoal mb-6">
+          <TextReveal as="h1" className="text-5xl sm:text-6xl lg:text-7xl text-burgundy mb-6">
             Search
           </TextReveal>
           <div className="max-w-xl">
             <div className="relative">
               <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-earth"
-                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-rosewood"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
               >
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
@@ -52,7 +56,7 @@ export default function SearchPage() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search for products, categories..."
                 autoFocus
-                className="w-full pl-12 pr-4 py-4 bg-cream-dark border border-beige rounded-full text-charcoal placeholder:text-sand focus:outline-none focus:border-charcoal transition-colors"
+                className="w-full pl-12 pr-4 py-4 bg-parchment border border-burgundy rounded-full text-wine placeholder:text-dust focus:outline-none focus:ring-2 focus:ring-gold focus:border-burgundy-light transition-all"
               />
             </div>
           </div>
@@ -60,12 +64,8 @@ export default function SearchPage() {
 
         {/* Results */}
         {hasSearched && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <p className="text-sm text-earth mb-6">
+          <div>
+            <p className="text-sm text-rosewood mb-6">
               {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{query}&rdquo;
             </p>
             {results.length > 0 ? (
@@ -76,16 +76,41 @@ export default function SearchPage() {
               </div>
             ) : (
               <div className="text-center py-20">
-                <p className="text-walnut text-lg mb-2">No products found</p>
-                <p className="text-earth">Try searching for something else</p>
+                <svg
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1"
+                  className="mx-auto mb-4 text-gold"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                  <path d="M8 11h6" />
+                </svg>
+                <p className="text-wine text-lg mb-2">No products found</p>
+                <p className="text-rosewood">Try searching for something else</p>
               </div>
             )}
-          </motion.div>
+          </div>
         )}
 
         {!hasSearched && (
-          <div className="text-center py-16 text-earth">
-            <p>Start typing to search our collection</p>
+          <div className="text-center py-16">
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              className="mx-auto mb-3 text-gold-muted"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <p className="text-wine">Start typing to search our collection</p>
           </div>
         )}
       </div>

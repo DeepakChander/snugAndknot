@@ -10,7 +10,7 @@ import BlogShowcase from '@/components/home/BlogShowcase'
 import QualityPromise from '@/components/home/QualityPromise'
 import JoinSection from '@/components/home/JoinSection'
 import SocialStrip from '@/components/home/SocialStrip'
-import ContactSection from '@/components/home/ContactSection'
+import ConnectWithUs from '@/components/home/ConnectWithUs'
 
 export default function HomePage() {
   return (
@@ -25,7 +25,7 @@ export default function HomePage() {
       <QualityPromise />
       <JoinSection />
       <SocialStrip />
-      <ContactSection />
+      <ConnectWithUs />
     </>
   )
 }

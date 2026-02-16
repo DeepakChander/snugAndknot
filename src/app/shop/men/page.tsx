@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
 import TextReveal from '@/components/animation/TextReveal'
 import FadeIn from '@/components/animation/FadeIn'
 import ProductCard from '@/components/product/ProductCard'
@@ -85,14 +84,13 @@ export default function MenShopPage() {
         <p className="text-sm text-earth mb-6">{menProducts.length} products</p>
 
         {/* Products Grid */}
-        <motion.div
-          layout
+        <div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
           {menProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
-        </motion.div>
+        </div>
 
         {/* Empty State */}
         {menProducts.length === 0 && (

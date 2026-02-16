@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useUIStore } from '@/stores/ui-store'
@@ -46,14 +45,13 @@ export default function SearchOverlay() {
   }, [closeSearch])
 
   return (
-    <AnimatePresence>
-      {isSearchOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-cream/98 backdrop-blur-sm"
-        >
+    <div
+      className={`fixed inset-0 z-50 bg-cream/98 backdrop-blur-sm transition-opacity duration-300 ${
+        isSearchOpen
+          ? 'opacity-100 pointer-events-auto'
+          : 'opacity-0 pointer-events-none'
+      }`}
+    >
           <div className="max-w-2xl mx-auto px-6 pt-24">
             {/* Close button */}
             <button
@@ -67,10 +65,13 @@ export default function SearchOverlay() {
             </button>
 
             {/* Search input */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            <div
+              className={`transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isSearchOpen
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-5'
+              }`}
+              style={{ transitionDelay: isSearchOpen ? '100ms' : '0ms' }}
             >
               <div className="relative">
                 <svg
@@ -89,7 +90,7 @@ export default function SearchOverlay() {
                   className="w-full pl-10 pr-4 py-4 bg-transparent border-b-2 border-beige focus:border-charcoal text-2xl font-heading text-charcoal placeholder:text-sand outline-none transition-colors"
                 />
               </div>
-            </motion.div>
+            </div>
 
             {/* Results */}
             <div className="mt-8">
@@ -98,11 +99,7 @@ export default function SearchOverlay() {
               )}
 
               {results.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="space-y-3"
-                >
+                <div className="space-y-3">
                   <p className="text-xs text-earth uppercase tracking-widest mb-4">
                     {results.length} result{results.length !== 1 ? 's' : ''}
                   </p>
@@ -131,12 +128,10 @@ export default function SearchOverlay() {
                       <span className="font-mono text-sm text-charcoal">{formatPrice(product.price)}</span>
                     </Link>
                   ))}
-                </motion.div>
+                </div>
               )}
             </div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    </div>
   )
 }

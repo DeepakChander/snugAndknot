@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import ProductCard from './ProductCard'
 import type { Product } from '@/types'
 
@@ -17,10 +16,10 @@ export default function ProductGrid({ products, columns = 4 }: ProductGridProps)
   }
 
   return (
-    <motion.div layout className={`grid ${gridCols[columns]} gap-4 sm:gap-6`}>
+    <div className={`grid ${gridCols[columns]} gap-4 sm:gap-6`}>
       {products.map((product, i) => (
         <ProductCard key={product.id} product={product} index={i} priority={i < 4} />
       ))}
-    </motion.div>
+    </div>
   )
 }

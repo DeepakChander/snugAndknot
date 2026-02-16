@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
 import TextReveal from '@/components/animation/TextReveal'
 import FadeIn from '@/components/animation/FadeIn'
 import { getAllCategories } from '@/lib/data'
@@ -57,13 +56,7 @@ function CategoryCard({
   index?: number
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className={className}
-    >
+    <FadeIn variant="fade-up" delay={index * 0.1} className={className}>
       <Link
         href={`/shop/${category.slug}`}
         className="group relative block w-full h-full rounded-lg overflow-hidden bg-cream-dark"
@@ -86,6 +79,6 @@ function CategoryCard({
           </span>
         </div>
       </Link>
-    </motion.div>
+    </FadeIn>
   )
 }

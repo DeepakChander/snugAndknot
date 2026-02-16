@@ -1,8 +1,9 @@
-import { DM_Serif_Display, Inter, JetBrains_Mono } from 'next/font/google'
+import { Playfair_Display, Inter, JetBrains_Mono } from 'next/font/google'
 
-export const dmSerifDisplay = DM_Serif_Display({
+export const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '700', '900'],
+  style: ['normal', 'italic'],
   variable: '--font-heading',
   display: 'swap',
 })

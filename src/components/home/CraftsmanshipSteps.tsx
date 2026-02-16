@@ -1,8 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
 import TextReveal from '@/components/animation/TextReveal'
+import FadeIn from '@/components/animation/FadeIn'
 
 const steps = [
   {
@@ -91,12 +90,8 @@ function CornerBorders({ accent }: { accent: boolean }) {
 }
 
 export default function CraftsmanshipSteps() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: true, margin: '-80px' })
-
   return (
     <section
-      ref={sectionRef}
       className="relative py-28 lg:py-40 bg-charcoal overflow-hidden"
     >
       {/* Subtle background texture */}
@@ -110,43 +105,32 @@ export default function CraftsmanshipSteps() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="mb-16 lg:mb-24 text-center max-w-3xl mx-auto">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="text-xs font-semibold uppercase tracking-[0.3em] mb-5 text-terracotta"
-          >
-            Our Craft
-          </motion.p>
+          <FadeIn variant="fade-up">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] mb-5 text-terracotta">
+              Our Craft
+            </p>
+          </FadeIn>
 
           <h2 className="font-heading text-4xl sm:text-5xl lg:text-7xl text-cream mb-6">
             <TextReveal>From Fiber to Fashion</TextReveal>
           </h2>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-base sm:text-lg text-cream/60 leading-relaxed"
-          >
-            Every Snug&Knot garment is a journey — from ethically sourced fibers
-            to the moment it becomes part of your wardrobe. Here&apos;s how we
-            bring our vision to life.
-          </motion.p>
+          <FadeIn variant="fade-up" delay={0.2}>
+            <p className="text-base sm:text-lg text-cream/60 leading-relaxed">
+              Every Snug&Knot garment is a journey — from ethically sourced fibers
+              to the moment it becomes part of your wardrobe. Here&apos;s how we
+              bring our vision to life.
+            </p>
+          </FadeIn>
         </div>
 
         {/* Steps Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
           {steps.map((step, i) => (
-            <motion.div
+            <FadeIn
               key={step.title}
-              initial={{ opacity: 0, y: 50 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                delay: 0.3 + i * 0.15,
-                duration: 0.8,
-                ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-              }}
+              variant="fade-up"
+              delay={0.3 + i * 0.15}
               className="group relative"
             >
               <div
@@ -197,21 +181,16 @@ export default function CraftsmanshipSteps() {
                   0{i + 1}
                 </div>
               </div>
-            </motion.div>
+            </FadeIn>
           ))}
         </div>
 
         {/* Bottom tagline */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 1, duration: 0.8 }}
-          className="mt-16 lg:mt-24 text-center"
-        >
+        <FadeIn variant="fade-up" delay={1} className="mt-16 lg:mt-24 text-center">
           <p className="text-sm text-cream/30 uppercase tracking-[0.25em]">
             Ethically sourced &bull; Handcrafted with care &bull; Built to last
           </p>
-        </motion.div>
+        </FadeIn>
       </div>
     </section>
   )
