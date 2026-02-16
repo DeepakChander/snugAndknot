@@ -214,7 +214,7 @@ function HeroSplit({ reducedMotion }: { reducedMotion: boolean }) {
               className="absolute inset-0 z-10 pointer-events-none border-2 border-gold m-3"
             />
             <Image
-              src="/images/about/about-hero.jpg"
+              src="/images/about/about-hero.png"
               alt="Snug&Knot founder in the studio"
               fill
               className="object-cover"
