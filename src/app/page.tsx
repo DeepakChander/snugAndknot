@@ -1,31 +1,21 @@
 'use client'
 
 import HeroSection from '@/components/home/HeroSection'
-import BrandMarquee from '@/components/home/BrandMarquee'
-import BrandPhilosophy from '@/components/home/BrandPhilosophy'
+import TrustStrip from '@/components/home/TrustStrip'
 import FeaturedCollections from '@/components/home/FeaturedCollections'
 import BrandTeaser from '@/components/home/BrandTeaser'
 import TestimonialsSection from '@/components/home/TestimonialsSection'
-import BlogShowcase from '@/components/home/BlogShowcase'
-import QualityPromise from '@/components/home/QualityPromise'
 import JoinSection from '@/components/home/JoinSection'
-import SocialStrip from '@/components/home/SocialStrip'
-import ConnectWithUs from '@/components/home/ConnectWithUs'
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <BrandMarquee />
-      <BrandPhilosophy />
+      <TrustStrip />
       <FeaturedCollections />
       <BrandTeaser />
       <TestimonialsSection />
-      <BlogShowcase />
-      <QualityPromise />
       <JoinSection />
-      <SocialStrip />
-      <ConnectWithUs />
     </>
   )
 }

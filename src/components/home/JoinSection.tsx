@@ -8,69 +8,6 @@ import { useUIStore } from '@/stores/ui-store'
 
 gsap.registerPlugin(ScrollTrigger)
 
-/**
- * Decorative SVG knot shape used as a background watermark.
- * Renders an interlocking loop motif at low opacity.
- */
-function DecorativeKnot({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 200 200"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      {/* Outer interlocking loops */}
-      <path
-        d="M100 20C60 20 30 50 30 80C30 110 55 125 80 110C95 100 95 85 85 75C75 65 60 70 55 80C50 90 60 100 70 95"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M100 180C140 180 170 150 170 120C170 90 145 75 120 90C105 100 105 115 115 125C125 135 140 130 145 120C150 110 140 100 130 105"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Cross-over threads */}
-      <path
-        d="M70 95C80 105 100 120 130 105"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M100 20C100 60 100 140 100 180"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeDasharray="4 8"
-        fill="none"
-      />
-      {/* Smaller accent loops */}
-      <path
-        d="M40 140C50 160 80 170 100 155C120 140 110 120 95 125C80 130 85 150 100 155"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M160 60C150 40 120 30 100 45C80 60 90 80 105 75C120 70 115 50 100 45"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-    </svg>
-  )
-}
-
 export default function JoinSection() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [email, setEmail] = useState('')
@@ -88,7 +25,6 @@ export default function JoinSection() {
   useEffect(() => {
     if (reducedMotion || !sectionRef.current) return
 
-    // ── Entrance animation ──
     const ctx = gsap.context(() => {
       const inner = sectionRef.current!.querySelector('.join-inner')
       const tag = sectionRef.current!.querySelector('.join-tag')
@@ -96,7 +32,6 @@ export default function JoinSection() {
       const body = sectionRef.current!.querySelector('.join-body')
       const form = sectionRef.current!.querySelector('.join-form')
       const disclaimer = sectionRef.current!.querySelector('.join-disclaimer')
-      const knotSvg = sectionRef.current!.querySelector('.join-knot-svg')
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -164,26 +99,6 @@ export default function JoinSection() {
           '-=0.3'
         )
       }
-
-      // Breathing knot SVG — gentle fade + scale pulse
-      if (knotSvg) {
-        tl.fromTo(
-          knotSvg,
-          { opacity: 0, scale: 0.92 },
-          { opacity: 0.1, scale: 1, duration: 1.4, ease: 'power1.out' },
-          '-=1.0'
-        )
-
-        // Continuous subtle breathing animation on the knot
-        gsap.to(knotSvg, {
-          scale: 1.03,
-          duration: 6,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: 1.5,
-        })
-      }
     }, sectionRef)
 
     return () => {
@@ -203,7 +118,7 @@ export default function JoinSection() {
             borderRadius: '0 1.5rem 1.5rem 0',
           }}
         >
-          {/* ── Background dot texture ── */}
+          {/* Background dot texture */}
           <div
             className="absolute inset-0 opacity-[0.03]"
             style={{
@@ -213,7 +128,7 @@ export default function JoinSection() {
             }}
           />
 
-          {/* ── Ambient glows ── */}
+          {/* Ambient glows */}
           <div
             className="absolute top-0 left-1/4 w-[400px] h-[200px] blur-[100px] rounded-full"
             style={{ backgroundColor: 'rgba(91, 14, 20, 0.10)' }}
@@ -223,14 +138,7 @@ export default function JoinSection() {
             style={{ backgroundColor: 'rgba(241, 225, 148, 0.08)' }}
           />
 
-          {/* ── Decorative SVG knot — right 40%, breathing ── */}
-          <div className="join-knot-svg absolute top-1/2 right-0 w-[40%] h-full -translate-y-1/2 flex items-center justify-center pointer-events-none opacity-0">
-            <DecorativeKnot
-              className="w-full h-auto max-h-[80%] text-gold"
-            />
-          </div>
-
-          {/* ── Content ── */}
+          {/* Content */}
           <div className="relative z-10 max-w-2xl mx-auto text-center">
             <p
               className="join-tag font-mono text-xs tracking-[0.35em] uppercase mb-6"
@@ -245,6 +153,27 @@ export default function JoinSection() {
               Every tangle starts with one thread joining another.
             </h2>
 
+            {/* Social proof — avatar stack */}
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="flex -space-x-2">
+                {['SM', 'JC', 'ER', 'DP', '+'].map((initials, i) => (
+                  <div
+                    key={i}
+                    className="w-7 h-7 rounded-full border-2 border-noir flex items-center justify-center text-[9px] font-medium"
+                    style={{
+                      backgroundColor: i === 4 ? 'rgba(212,168,67,0.3)' : 'rgba(91,14,20,0.8)',
+                      color: 'rgba(241,225,148,0.7)',
+                    }}
+                  >
+                    {initials}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs" style={{ color: 'rgba(250, 240, 200, 0.50)' }}>
+                Join 35,000+ members
+              </p>
+            </div>
+
             <p
               className="join-body text-sm leading-relaxed mb-10 max-w-md mx-auto"
               style={{ color: 'rgba(250, 240, 200, 0.70)' }}
@@ -255,7 +184,7 @@ export default function JoinSection() {
 
             <form
               onSubmit={handleSubmit}
-              className="join-form flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+              className="join-form group/form flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
             >
               <input
                 type="email"
@@ -263,17 +192,9 @@ export default function JoinSection() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your thread starts here"
                 required
-                className="flex-1 px-6 py-3.5 bg-transparent rounded-full text-sm focus:outline-none transition-colors placeholder:text-gold-pale/40 text-gold-pale"
+                className="flex-1 px-6 py-3.5 bg-transparent rounded-full text-sm transition-colors placeholder:text-gold-pale/40 text-gold-pale focus:outline-none focus:ring-1 focus:ring-gold/50"
                 style={{
                   border: '1px solid rgba(241, 225, 148, 0.20)',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor =
-                    'rgba(241, 225, 148, 0.50)'
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor =
-                    'rgba(241, 225, 148, 0.20)'
                 }}
               />
               <button

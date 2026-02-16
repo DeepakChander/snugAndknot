@@ -1,4 +1,3 @@
-import productsData from '@/data/products.json'
 import mensPremiumData from '@/data/mens-premium-products.json'
 import womensPremiumData from '@/data/womens-premium-products.json'
 import categoriesData from '@/data/categories.json'
@@ -8,9 +7,8 @@ import lookbookData from '@/data/lookbook.json'
 import siteConfigData from '@/data/site-config.json'
 import type { Product, Category, Collection, Review, LookbookSpread, SiteConfig, CategorySlug, SortOption } from '@/types'
 
-// Type assertions for JSON imports — merge all product sources
+// Only real premium products — no placeholders
 const products = [
-  ...(productsData as Product[]),
   ...(mensPremiumData as Product[]),
   ...(womensPremiumData as Product[]),
 ]

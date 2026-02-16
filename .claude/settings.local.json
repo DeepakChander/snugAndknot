@@ -1,6 +1,44 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(npx next build)",
+      "WebFetch(domain:alteregofestival.at)",
+      "WebFetch(domain:qtcapital.ai)",
+      "WebFetch(domain:liquidtechnology.net)",
+      "WebFetch(domain:vizcom.com)",
+      "WebFetch(domain:griflan.com)",
+      "WebFetch(domain:sites.research.google)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run build:*)",
+      "Bash(find:*)",
+      "WebFetch(domain:www.andamen.com)",
+      "Bash(npm install:*)",
+      "Bash(ls:*)",
+      "Bash(python3:*)",
+      "Bash(npm ls:*)",
+      "WebFetch(domain:ecomm.design)",
+      "WebFetch(domain:www.awwwards.com)",
+      "WebFetch(domain:maxibestof.one)",
+      "WebFetch(domain:www.soleycreative.com)",
+      "WebFetch(domain:webdesign.tutsplus.com)",
+      "WebFetch(domain:tympanus.net)",
+      "WebFetch(domain:xeniadobonyi.com)",
+      "WebFetch(domain:vervaunt.com)",
+      "WebFetch(domain:www.nngroup.com)",
+      "WebFetch(domain:centra.com)",
+      "WebFetch(domain:blog.magezon.com)",
+      "WebFetch(domain:www.digitalsilk.com)",
+      "WebFetch(domain:artmuseum.medium.com)",
+      "WebFetch(domain:designworklife.com)",
+      "WebFetch(domain:hookagency.com)",
+      "WebFetch(domain:wiredcraft.com)",
+      "WebFetch(domain:www.siteinspire.com)",
+      "WebFetch(domain:www.itsnicethat.com)",
+      "Bash(npx next dev:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "analytics-mcp"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

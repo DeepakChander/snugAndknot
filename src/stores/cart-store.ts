@@ -2,11 +2,12 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { CartItem } from '@/types'
+import type { CartItem, Coupon } from '@/types'
 
 interface CartStore {
   items: CartItem[]
   isOpen: boolean
+  appliedCoupon: Coupon | null
   addItem: (item: Omit<CartItem, 'id'>) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
@@ -16,6 +17,10 @@ interface CartStore {
   closeCart: () => void
   totalItems: () => number
   totalPrice: () => number
+  applyCoupon: (coupon: Coupon) => void
+  removeCoupon: () => void
+  discountAmount: () => number
+  finalTotal: () => number
 }
 
 export const useCartStore = create<CartStore>()(
@@ -23,6 +28,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      appliedCoupon: null,
 
       addItem: (item) => {
         const items = get().items
@@ -55,17 +61,33 @@ export const useCartStore = create<CartStore>()(
         })
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], appliedCoupon: null }),
       toggleCart: () => set({ isOpen: !get().isOpen }),
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
 
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
       totalPrice: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+
+      applyCoupon: (coupon) => set({ appliedCoupon: coupon }),
+      removeCoupon: () => set({ appliedCoupon: null }),
+
+      discountAmount: () => {
+        const coupon = get().appliedCoupon
+        if (!coupon) return 0
+        const subtotal = get().totalPrice()
+        if (subtotal < coupon.minPurchase) return 0
+        if (coupon.type === 'percentage') return Math.round((subtotal * coupon.value) / 100 * 100) / 100
+        return Math.min(coupon.value, subtotal)
+      },
+
+      finalTotal: () => {
+        return Math.max(0, get().totalPrice() - get().discountAmount())
+      },
     }),
     {
       name: 'snug-knot-cart',
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, appliedCoupon: state.appliedCoupon }),
     }
   )
 )

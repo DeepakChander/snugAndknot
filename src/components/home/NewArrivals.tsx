@@ -5,9 +5,11 @@ import TextReveal from '@/components/animation/TextReveal'
 import FadeIn from '@/components/animation/FadeIn'
 import ProductGrid from '@/components/product/ProductGrid'
 import { getNewArrivals } from '@/lib/data'
+import { smartSlice } from '@/lib/smart-grid'
 
 export default function NewArrivals() {
-  const arrivals = getNewArrivals().slice(0, 8)
+  const allArrivals = getNewArrivals()
+  const arrivals = smartSlice(allArrivals, 4)
 
   return (
     <section className="py-24 lg:py-36 bg-cream-dark">

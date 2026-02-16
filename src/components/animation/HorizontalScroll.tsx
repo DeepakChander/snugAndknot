@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useLayoutEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
@@ -17,7 +17,7 @@ export default function HorizontalScroll({ children, className = '' }: Horizonta
   const trackRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (reducedMotion || !sectionRef.current || !trackRef.current) return
 
     const section = sectionRef.current

@@ -185,6 +185,27 @@ export default function FeaturedCollections() {
               </Link>
             ))}
           </div>
+
+          {/* View All CTA */}
+          <div className="text-center mt-12">
+            <Link
+              href="/collections"
+              className="group inline-flex items-center gap-3 px-8 py-3.5 border border-burgundy/20 text-burgundy text-sm font-medium rounded-full hover:border-burgundy hover:bg-burgundy hover:text-gold transition-all duration-500"
+            >
+              <span>View All Collections</span>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </section>

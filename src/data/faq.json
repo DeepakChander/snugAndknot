@@ -1,0 +1,89 @@
+{
+  "categories": [
+    {
+      "name": "Ordering",
+      "items": [
+        {
+          "title": "How do I place an order?",
+          "content": "Browse our collections, select your desired size and color, add items to your bag, and proceed to checkout. You can check out as a guest or create an account for faster future purchases."
+        },
+        {
+          "title": "Can I modify or cancel my order?",
+          "content": "Orders can be modified or cancelled within 1 hour of placement. After that, our fulfillment process begins and changes cannot be guaranteed. Contact us at hello@snugandknot.com for assistance."
+        },
+        {
+          "title": "Do you offer gift wrapping?",
+          "content": "Yes! We offer complimentary gift wrapping in our signature recycled kraft paper with a gold thread tie. Select the gift wrap option during checkout."
+        }
+      ]
+    },
+    {
+      "name": "Shipping",
+      "items": [
+        {
+          "title": "How long does shipping take?",
+          "content": "Standard shipping takes 5-7 business days within the US, and 7-14 business days internationally. Express shipping (2-3 business days) is available at checkout for domestic orders."
+        },
+        {
+          "title": "Is shipping free?",
+          "content": "We offer free standard shipping on all orders over $100. For orders under $100, a flat rate of $8.95 applies for domestic shipping."
+        },
+        {
+          "title": "Do you ship internationally?",
+          "content": "Yes, we ship to over 40 countries worldwide. International shipping rates are calculated at checkout based on destination and package weight. Duties and taxes may apply."
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "items": [
+        {
+          "title": "What materials do you use?",
+          "content": "We exclusively use 100% natural fibers: organic cotton, merino wool, linen, and cashmere blends. Every fiber is traceable to its origin. No synthetic materials are used in any of our garments."
+        },
+        {
+          "title": "How do I find my size?",
+          "content": "Each product page includes a detailed size guide with measurements in both inches and centimeters. If you're between sizes, we generally recommend sizing up for a relaxed fit or down for a closer silhouette."
+        },
+        {
+          "title": "Are your products sustainable?",
+          "content": "Sustainability is woven into every decision we make. Our materials are responsibly sourced, our packaging is 100% biodegradable, and we maintain carbon-neutral shipping through verified offset programs."
+        },
+        {
+          "title": "How do I care for my garments?",
+          "content": "Care instructions vary by material. Visit our Care Instructions page for detailed guidance on washing, drying, and storing each type of fabric. General rule: cold wash, lay flat to dry, and store folded."
+        }
+      ]
+    },
+    {
+      "name": "Returns",
+      "items": [
+        {
+          "title": "What is your return policy?",
+          "content": "We offer a 30-day return policy on all unworn items in original condition with tags attached. Sale items can be returned within 14 days for store credit only."
+        },
+        {
+          "title": "How do I initiate a return?",
+          "content": "Log into your account, navigate to your order history, and select 'Initiate Return' on the relevant order. You'll receive a prepaid shipping label via email within 24 hours."
+        },
+        {
+          "title": "When will I receive my refund?",
+          "content": "Refunds are processed within 5-7 business days after we receive your return. The amount will be credited to your original payment method. You'll receive an email confirmation when the refund is issued."
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "items": [
+        {
+          "title": "Do I need an account to order?",
+          "content": "No, you can check out as a guest. However, creating an account gives you access to order tracking, faster checkout, wishlist features, and exclusive member pricing."
+        },
+        {
+          "title": "How do I reset my password?",
+          "content": "Click 'Sign In' in the header, then 'Forgot Password.' Enter your email address and we'll send you a reset link. The link expires after 24 hours for security."
+        }
+      ]
+    }
+  ]
+}

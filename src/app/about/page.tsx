@@ -102,6 +102,11 @@ export default function AboutPage() {
       <ValuesGrid reducedMotion={reducedMotion} />
 
       {/* ═══════════════════════════════════════════════════
+          PHILOSOPHY PILLARS — Three knots
+         ═══════════════════════════════════════════════════ */}
+      <PhilosophySection />
+
+      {/* ═══════════════════════════════════════════════════
           TIMELINE — Vertical gold thread + year nodes
          ═══════════════════════════════════════════════════ */}
       <TimelineSection reducedMotion={reducedMotion} />
@@ -591,6 +596,118 @@ function ClosingCTA() {
             </svg>
           </Link>
         </FadeIn>
+      </div>
+    </section>
+  )
+}
+
+/* ──────────────────────────────────────────────────────────
+   PHILOSOPHY SECTION — Three pillars from BrandPhilosophy
+   ────────────────────────────────────────────────────────── */
+
+const pillars = [
+  {
+    number: '01',
+    title: 'Material over material',
+    subtitle: 'Substance First',
+    description:
+      'We do not choose fibers for their name. We choose them for their nerve — the way they resist, yield, and remember the shape of a life lived fully.',
+    stat: { value: '100%', label: 'Natural Fibers' },
+  },
+  {
+    number: '02',
+    title: 'The knot, not the bow',
+    subtitle: 'Function Before Ornament',
+    description:
+      'A bow is decoration. A knot is decision. Every seam, every stitch placement exists because removing it would make the piece less. Nothing is ornamental.',
+    stat: { value: '47', label: 'Stitch Points per Inch' },
+  },
+  {
+    number: '03',
+    title: 'Wear is not damage',
+    subtitle: 'Time as Collaborator',
+    description:
+      'A garment that cannot age was never alive. Our textiles are designed to develop patina — to become more yours with every wearing, not less ours.',
+    stat: { value: '∞', label: 'Wears by Design' },
+  },
+]
+
+function PhilosophySection() {
+  return (
+    <section
+      className="relative py-24 lg:py-32 overflow-hidden"
+      style={{
+        background: 'radial-gradient(ellipse at 50% 0%, #5B0E14 0%, #3D0A0E 40%, #0F0A0B 100%)',
+      }}
+    >
+      <div className="absolute inset-0 knit-pattern-gold" />
+
+      <div className="relative max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
+        <div className="mb-16">
+          <p className="text-xs font-semibold text-gold-muted uppercase tracking-[0.3em] mb-4">
+            Philosophy
+          </p>
+          <TextReveal
+            as="h2"
+            className="text-4xl sm:text-5xl lg:text-6xl text-gold-pale max-w-[800px]"
+          >
+            Three knots that hold everything together
+          </TextReveal>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {pillars.map((pillar, i) => (
+            <FadeIn key={pillar.number} delay={i * 0.1}>
+              <div
+                className={`group relative ${i === 1 ? 'lg:mt-[60px]' : i === 2 ? 'lg:mt-[120px]' : ''}`}
+              >
+                <div
+                  className="relative rounded-2xl p-8 lg:p-10 border border-gold/[0.05] transition-all duration-500 group-hover:border-gold/20 group-hover:translate-y-[-4px]"
+                  style={{
+                    background: 'rgba(241, 225, 148, 0.03)',
+                    boxShadow: 'inset 0 1px 0 rgba(241, 225, 148, 0.06)',
+                  }}
+                >
+                  <div className="flex items-center gap-4 mb-6">
+                    <span
+                      className="font-mono text-[48px] lg:text-[64px] font-bold leading-none text-gold/20"
+                    >
+                      {pillar.number}
+                    </span>
+                    <div className="h-[1px] flex-1 bg-gradient-to-r from-gold/20 to-transparent" />
+                  </div>
+
+                  <span className="inline-block mb-3 font-mono text-[10px] tracking-[0.4em] uppercase text-gold">
+                    {pillar.subtitle}
+                  </span>
+
+                  <h3 className="font-heading text-2xl lg:text-3xl text-gold-pale mb-4 leading-tight">
+                    {pillar.title}
+                  </h3>
+
+                  <p className="text-gold-pale/60 text-sm leading-relaxed mb-8">
+                    {pillar.description}
+                  </p>
+
+                  <div className="flex items-end gap-3 pt-6 border-t border-gold/[0.06]">
+                    <span className="font-heading text-3xl font-bold text-gold">
+                      {pillar.stat.value}
+                    </span>
+                    <span className="font-mono text-[10px] text-gold-pale/40 tracking-wider uppercase pb-1">
+                      {pillar.stat.label}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+
+        <div className="mt-20 text-center">
+          <p className="font-heading text-gold-pale/40 italic text-lg">
+            &ldquo;What frays was never truly bound.&rdquo;
+          </p>
+        </div>
       </div>
     </section>
   )

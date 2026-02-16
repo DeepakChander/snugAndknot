@@ -6,27 +6,24 @@ import type { Toast } from '@/types'
 interface UIStore {
   isMenuOpen: boolean
   isSearchOpen: boolean
-  isPreloaderDone: boolean
   toasts: Toast[]
-  cursorLabel: string
   openMenu: () => void
   closeMenu: () => void
   toggleMenu: () => void
   openSearch: () => void
   closeSearch: () => void
-  setPreloaderDone: () => void
   addToast: (message: string, type?: Toast['type']) => void
   removeToast: (id: string) => void
-  setCursorLabel: (label: string) => void
-  clearCursorLabel: () => void
+  // Lenis smooth scroll controls (set by SmoothScroll provider)
+  lenisStop: (() => void) | null
+  lenisStart: (() => void) | null
+  setLenisControls: (stop: () => void, start: () => void) => void
 }
 
 export const useUIStore = create<UIStore>((set, get) => ({
   isMenuOpen: false,
   isSearchOpen: false,
-  isPreloaderDone: false,
   toasts: [],
-  cursorLabel: '',
 
   openMenu: () => set({ isMenuOpen: true }),
   closeMenu: () => set({ isMenuOpen: false }),
@@ -34,8 +31,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   openSearch: () => set({ isSearchOpen: true }),
   closeSearch: () => set({ isSearchOpen: false }),
-
-  setPreloaderDone: () => set({ isPreloaderDone: true }),
 
   addToast: (message, type = 'success') => {
     const id = `toast-${Date.now()}`
@@ -47,6 +42,8 @@ export const useUIStore = create<UIStore>((set, get) => ({
     set({ toasts: get().toasts.filter((t) => t.id !== id) })
   },
 
-  setCursorLabel: (label) => set({ cursorLabel: label }),
-  clearCursorLabel: () => set({ cursorLabel: '' }),
+  // Lenis smooth scroll controls
+  lenisStop: null,
+  lenisStart: null,
+  setLenisControls: (stop, start) => set({ lenisStop: stop, lenisStart: start }),
 }))

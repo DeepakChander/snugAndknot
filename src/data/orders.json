@@ -1,0 +1,84 @@
+[
+  {
+    "id": "order-1",
+    "orderNumber": "SNK-2026-0847",
+    "status": "shipped",
+    "items": [
+      {
+        "productId": "women-ivory-cable-cardigan",
+        "handle": "women-ivory-cable-cardigan",
+        "title": "Ivory Cable Knit Cardigan",
+        "image": "/images/products/women-ivory-cable-cardigan-1.jpg",
+        "price": 189,
+        "size": "M",
+        "color": "Ivory",
+        "quantity": 1
+      },
+      {
+        "productId": "men-black-red-contrast-tee",
+        "handle": "men-black-red-contrast-tee",
+        "title": "Noir & Crimson Contrast Knit Tee",
+        "image": "/images/products/men-black-red-contrast-tee-1.jpg",
+        "price": 129,
+        "size": "L",
+        "color": "Black/Red",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 318,
+    "shipping": 0,
+    "discount": 0,
+    "total": 318,
+    "shippingAddress": {
+      "id": "addr-1",
+      "name": "Jane Doe",
+      "street": "142 Mercer Street",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10012",
+      "country": "United States",
+      "phone": "+1 (212) 555-0189",
+      "isDefault": true
+    },
+    "trackingNumber": "1Z999AA10123456784",
+    "placedAt": "2026-02-10T14:30:00Z",
+    "confirmedAt": "2026-02-10T15:00:00Z",
+    "shippedAt": "2026-02-12T09:00:00Z",
+    "estimatedDelivery": "2026-02-18"
+  },
+  {
+    "id": "order-2",
+    "orderNumber": "SNK-2026-0621",
+    "status": "delivered",
+    "items": [
+      {
+        "productId": "women-terracotta-textured-cardigan",
+        "handle": "women-terracotta-textured-cardigan",
+        "title": "Terracotta Textured Cardigan",
+        "image": "/images/products/women-terracotta-textured-cardigan-1.jpg",
+        "price": 169,
+        "size": "S",
+        "color": "Terracotta",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 169,
+    "shipping": 0,
+    "discount": 25,
+    "total": 144,
+    "shippingAddress": {
+      "id": "addr-1",
+      "name": "Jane Doe",
+      "street": "142 Mercer Street",
+      "city": "New York",
+      "state": "NY",
+      "zip": "10012",
+      "country": "United States",
+      "isDefault": true
+    },
+    "placedAt": "2026-01-20T10:00:00Z",
+    "confirmedAt": "2026-01-20T11:00:00Z",
+    "shippedAt": "2026-01-22T08:00:00Z",
+    "deliveredAt": "2026-01-25T14:00:00Z"
+  }
+]

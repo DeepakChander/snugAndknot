@@ -5,9 +5,11 @@ import ProductCard from '@/components/product/ProductCard'
 import TextReveal from '@/components/animation/TextReveal'
 import FadeIn from '@/components/animation/FadeIn'
 import { getFeaturedProducts } from '@/lib/data'
+import { smartSlice } from '@/lib/smart-grid'
 
 export default function TheEdit() {
-  const featured = getFeaturedProducts().slice(0, 8)
+  const allFeatured = getFeaturedProducts()
+  const featured = smartSlice(allFeatured, 4)
 
   return (
     <section className="py-20 lg:py-28">

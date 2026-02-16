@@ -1,0 +1,6 @@
+[
+  { "code": "WELCOME10", "type": "percentage", "value": 10, "minPurchase": 0, "description": "10% off your first order", "expiresAt": "2026-12-31" },
+  { "code": "SNUG20", "type": "percentage", "value": 20, "minPurchase": 150, "description": "20% off orders over $150", "expiresAt": "2026-06-30" },
+  { "code": "KNOTFREE", "type": "fixed", "value": 15, "minPurchase": 100, "description": "$15 off orders over $100", "expiresAt": "2026-12-31" },
+  { "code": "THREAD25", "type": "percentage", "value": 25, "minPurchase": 200, "description": "25% off orders over $200 (Members Only)", "expiresAt": "2026-03-31" }
+]

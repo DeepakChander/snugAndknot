@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCartStore } from '@/stores/cart-store'
+import { useUIStore } from '@/stores/ui-store'
 import { formatPrice } from '@/lib/utils'
 
 export default function CartDrawer() {
@@ -23,7 +24,13 @@ export default function CartDrawer() {
       }
     }
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    document.body.style.overflow = 'hidden'
+    useUIStore.getState().lenisStop?.()
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = ''
+      useUIStore.getState().lenisStart?.()
+    }
   }, [isOpen, closeCart])
 
   return (
@@ -63,7 +70,7 @@ export default function CartDrawer() {
             </div>
 
             {/* Items */}
-            <div className="flex-1 overflow-y-auto px-6 py-4">
+            <div className="flex-1 overflow-y-auto px-6 py-4" data-lenis-prevent>
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-sand mb-4">
@@ -145,9 +152,13 @@ export default function CartDrawer() {
                 >
                   View Bag
                 </Link>
-                <button className="w-full py-3 bg-terracotta text-cream text-sm font-medium rounded-full hover:bg-terracotta-dark transition-colors">
+                <Link
+                  href="/checkout"
+                  onClick={closeCart}
+                  className="block w-full py-3 bg-burgundy text-gold-pale text-sm font-medium text-center rounded-full hover:bg-burgundy-deep transition-colors"
+                >
                   Checkout
-                </button>
+                </Link>
               </div>
             )}
       </div>

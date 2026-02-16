@@ -6,71 +6,11 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import TextReveal from '@/components/animation/TextReveal'
 import FadeIn from '@/components/animation/FadeIn'
+import FloatingInput from '@/components/checkout/FloatingInput'
 import { useUIStore } from '@/stores/ui-store'
 import { getSiteConfig } from '@/lib/data'
 
 gsap.registerPlugin(ScrollTrigger)
-
-/* ─── Floating-label input ─── */
-function FloatingInput({
-  id,
-  label,
-  type = 'text',
-  value,
-  onChange,
-  required = true,
-}: {
-  id: string
-  label: string
-  type?: string
-  value: string
-  onChange: (v: string) => void
-  required?: boolean
-}) {
-  const [focused, setFocused] = useState(false)
-  const active = focused || value.length > 0
-
-  return (
-    <div className="relative">
-      {/* Gold underline that draws on focus */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-dust/40" />
-      <div
-        className="absolute bottom-0 left-0 h-px origin-left transition-transform duration-400 bg-gold"
-        style={{
-          transform: focused ? 'scaleX(1)' : 'scaleX(0)',
-          transitionTimingFunction: 'cubic-bezier(0.22, 0.68, 0.36, 1.0)',
-        }}
-      />
-
-      {/* Floating label */}
-      <label
-        htmlFor={id}
-        className="absolute left-0 pointer-events-none origin-left transition-all duration-250"
-        style={{
-          color: focused ? 'var(--color-gold)' : 'var(--color-dust)',
-          transform: active ? 'translateY(-20px) scale(0.75)' : 'translateY(0) scale(1)',
-          opacity: active ? 1 : 0.6,
-          transitionTimingFunction: 'cubic-bezier(0.22, 0.68, 0.36, 1.0)',
-        }}
-      >
-        <span className="text-sm tracking-wide">{label}</span>
-      </label>
-
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        required={required}
-        className="w-full bg-transparent pt-5 pb-3 text-wine text-sm outline-none placeholder-transparent"
-        placeholder={label}
-        autoComplete="off"
-      />
-    </div>
-  )
-}
 
 /* ─── Floating-label textarea ─── */
 function FloatingTextarea({
@@ -323,23 +263,26 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
                     <FloatingInput
-                      id="name"
+                      name="name"
                       label="Your Name"
+                      variant="underline"
                       value={form.name}
                       onChange={(v) => setForm({ ...form, name: v })}
                     />
                     <FloatingInput
-                      id="email"
+                      name="email"
                       label="Email Address"
                       type="email"
+                      variant="underline"
                       value={form.email}
                       onChange={(v) => setForm({ ...form, email: v })}
                     />
                   </div>
 
                   <FloatingInput
-                    id="subject"
+                    name="subject"
                     label="Subject"
+                    variant="underline"
                     value={form.subject}
                     onChange={(v) => setForm({ ...form, subject: v })}
                   />

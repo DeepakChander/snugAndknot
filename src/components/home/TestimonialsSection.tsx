@@ -47,7 +47,7 @@ export default function TestimonialsSection() {
 
   const prevIndex = (current - 1 + testimonials.length) % testimonials.length
 
-  // Reset and restart the 6s gold progress bar
+  // Reset and restart the 8s gold progress bar
   const startProgressBar = useCallback(() => {
     if (!progressBarRef.current) return
     if (progressTween.current) progressTween.current.kill()
@@ -55,7 +55,7 @@ export default function TestimonialsSection() {
     gsap.set(progressBarRef.current, { scaleX: 0 })
     progressTween.current = gsap.to(progressBarRef.current, {
       scaleX: 1,
-      duration: 6,
+      duration: 8,
       ease: 'none',
     })
   }, [])
@@ -128,11 +128,21 @@ export default function TestimonialsSection() {
     animateTransition((current - 1 + testimonials.length) % testimonials.length)
   }, [current, animateTransition])
 
-  // Auto-advance every 6s
+  // Auto-advance every 8s
   useEffect(() => {
-    const timer = setInterval(goNext, 6000)
+    const timer = setInterval(goNext, 8000)
     return () => clearInterval(timer)
   }, [goNext])
+
+  // Keyboard arrow navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') goPrev()
+      else if (e.key === 'ArrowRight') goNext()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [goNext, goPrev])
 
   // Start the progress bar on mount and whenever current changes
   useEffect(() => {
@@ -174,10 +184,20 @@ export default function TestimonialsSection() {
       </div>
 
       <div className="testimonial-inner max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section tag -- gold text */}
+        {/* Section tag + aggregate rating */}
         <div className="text-center mb-16">
-          <p className="font-mono text-xs text-gold tracking-[0.3em] uppercase">
+          <p className="font-mono text-xs text-gold tracking-[0.3em] uppercase mb-4">
             Worn In
+          </p>
+          <div className="flex items-center justify-center gap-2 mb-1">
+            {[...Array(5)].map((_, i) => (
+              <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#D4A843" className="text-gold">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            ))}
+          </div>
+          <p className="text-xs text-rosewood/60">
+            4.9/5 from 2,847 reviews
           </p>
         </div>
 
@@ -192,6 +212,14 @@ export default function TestimonialsSection() {
             aria-atomic="true"
           >
             <div ref={quoteRef}>
+              {/* 5-star rating */}
+              <div className="flex items-center justify-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#D4A843">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
               <blockquote className="font-heading text-2xl sm:text-3xl lg:text-4xl text-burgundy leading-[1.3] mb-8">
                 &ldquo;{testimonials[current].quote}&rdquo;
               </blockquote>

@@ -4,7 +4,6 @@ import { useRef, useEffect } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -15,7 +14,7 @@ const blogPosts = [
     title: 'Where Cotton Learns Tension',
     description:
       'A fiber does not become thread by accident. Follow organic cotton from the field where it first resists the wind to the loom where it finds its counterpart.',
-    image: '/images/blog/organic-cotton.jpg',
+    image: '/images/blog/organic-cotton.png',
     href: '/blog/organic-cotton-journey',
     readTime: '6-minute thread',
   },
@@ -24,7 +23,7 @@ const blogPosts = [
     title: 'The Knot Diary',
     description:
       'Forty years between a weaver\'s fingers. We sat with three of our loom partners and asked them one question: what does the thread remember?',
-    image: '/images/blog/behind-knit.jpg',
+    image: '/images/blog/behind-knit.png',
     href: '/blog/behind-the-knit',
     readTime: '8-minute thread',
   },
@@ -33,7 +32,7 @@ const blogPosts = [
     title: 'Against the Wardrobe',
     description:
       'The idea of a "capsule wardrobe" is already a compromise. What if you stopped collecting and started binding? A case for fewer, tighter knots.',
-    image: '/images/blog/wardrobe-essentials.jpg',
+    image: '/images/blog/wardrobe-essentials.png',
     href: '/blog/timeless-wardrobe',
     readTime: '4-minute thread',
   },
@@ -153,15 +152,16 @@ export default function BlogShowcase() {
             className="blog-card-main group block"
           >
             <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden bg-silk">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={mainPost.image}
                 alt={mainPost.title}
-                fill
-                className="object-cover transition-all duration-700 group-hover:scale-105"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
               />
               {/* Overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-burgundy/60 via-burgundy/20 to-transparent" />
+              {/* Watermark cover */}
+              <div className="absolute bottom-0 right-0 w-20 h-20 pointer-events-none" style={{ background: 'radial-gradient(circle at 100% 100%, rgba(91,14,20,0.9) 0%, transparent 70%)' }} />
 
               {/* Read More Tag on hover */}
               <div className="absolute top-4 right-4 bg-ivory/90 backdrop-blur-sm px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
@@ -207,15 +207,16 @@ export default function BlogShowcase() {
                 <div className="flex flex-col sm:flex-row rounded-2xl overflow-hidden bg-ivory h-full">
                   {/* Image left */}
                   <div className="relative w-full sm:w-2/5 aspect-[4/3] sm:aspect-auto sm:min-h-[220px] lg:min-h-[260px] overflow-hidden">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={post.image}
                       alt={post.title}
-                      fill
-                      className="object-cover transition-all duration-700 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
                     />
                     {/* Image overlay gradient */}
                     <div className="absolute inset-0 bg-gradient-to-r from-burgundy/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {/* Watermark cover */}
+                    <div className="absolute bottom-0 right-0 w-14 h-14 pointer-events-none" style={{ background: 'radial-gradient(circle at 100% 100%, rgba(0,0,0,0.85) 0%, transparent 70%)' }} />
 
                     {/* Read More Tag on hover */}
                     <div className="absolute bottom-3 right-3 bg-ivory/90 backdrop-blur-sm px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">

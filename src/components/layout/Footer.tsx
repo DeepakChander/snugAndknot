@@ -261,7 +261,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Company links */}
+            {/* Company links + contact info */}
             <div className="footer-row">
               <h3 className="text-xs font-semibold text-gold-pale/40 uppercase tracking-[0.2em] mb-5">
                 The Weave
@@ -277,6 +277,22 @@ export default function Footer() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <a
+                    href="mailto:hello@snugandknot.com"
+                    className="text-sm text-gold-pale/60 hover:text-gold transition-colors duration-300"
+                  >
+                    hello@snugandknot.com
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="tel:+12125550189"
+                    className="text-sm text-gold-pale/60 hover:text-gold transition-colors duration-300"
+                  >
+                    +1 (212) 555-0189
+                  </a>
+                </li>
               </ul>
             </div>
 
