@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { gsap } from 'gsap'
@@ -9,7 +10,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { getCollectionByHandle, getCollectionProducts } from '@/lib/data'
 import TextReveal from '@/components/animation/TextReveal'
 import FadeIn from '@/components/animation/FadeIn'
-import ProductCard from '@/components/product/ProductCard'
+import FloatingProductCard from '@/components/shop/FloatingProductCard'
+import CurtainReveal from '@/components/shop/CurtainReveal'
+import MaterialTransitions from '@/components/shop/MaterialTransitions'
+import ParticleField from '@/components/shop/ParticleField'
+
+// Dynamic import for 3D canvas (client-side only)
+const ShopHeroCanvas = dynamic(() => import('@/components/3d/ShopHeroCanvas'), {
+  ssr: false,
+})
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -33,6 +42,10 @@ export default function CollectionPage() {
   const editorialRef = useRef<HTMLDivElement>(null)
   const [editorialRevealed, setEditorialRevealed] = useState(false)
 
+  // 3D canvas scroll progress and ready state
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [canvasReady, setCanvasReady] = useState(false)
+
   useEffect(() => {
     if (!editorialRef.current) return
     const observer = new IntersectionObserver(
@@ -46,6 +59,24 @@ export default function CollectionPage() {
     )
     observer.observe(editorialRef.current)
     return () => observer.disconnect()
+  }, [])
+
+  // Track scroll progress for 3D animations
+  useEffect(() => {
+    setCanvasReady(true)
+
+    const handleScroll = () => {
+      if (!heroRef.current) return
+      const heroHeight = heroRef.current.offsetHeight
+      const scrolled = window.scrollY
+      const progress = Math.min(scrolled / heroHeight, 1)
+      setScrollProgress(progress)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   // GSAP hero parallax + entrance animations
@@ -167,58 +198,68 @@ export default function CollectionPage() {
   const gridProducts = products.slice(2)
 
   return (
-    <div className="pb-0 bg-ivory">
-      {/* ═══════════════════════════════════════════════════════════
-          HERO — Full-bleed, 60vh, burgundy gradient overlay, parallax
-          ═══════════════════════════════════════════════════════════ */}
-      <div
-        ref={heroRef}
-        className="relative w-full overflow-hidden"
-        style={{ height: '60vh', minHeight: '420px' }}
-      >
-        {/* Parallax image layer — 0.8x scroll speed */}
+    <>
+      {/* Material transition backgrounds */}
+      <MaterialTransitions />
+
+      {/* Ambient particle field */}
+      <ParticleField />
+
+      <div className="pb-0 bg-transparent">
+        {/* ═══════════════════════════════════════════════════════════
+            HERO — Enhanced with 3D canvas, parallax, burgundy overlay
+            ═══════════════════════════════════════════════════════════ */}
         <div
-          ref={heroImageRef}
-          className="absolute inset-0 w-full"
-          style={{
-            height: '125%',
-            top: '-12.5%',
-          }}
+          ref={heroRef}
+          className="relative w-full overflow-hidden"
+          style={{ height: '60vh', minHeight: '420px' }}
         >
-          <Image
-            src={collection.image}
-            alt={collection.title}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
+          {/* 3D Canvas with cloth, threads, and particles */}
+          <ShopHeroCanvas scrollProgress={scrollProgress} isReady={canvasReady} />
+
+          {/* Parallax image layer — 0.8x scroll speed */}
+          <div
+            ref={heroImageRef}
+            className="absolute inset-0 w-full z-[2]"
+            style={{
+              height: '125%',
+              top: '-12.5%',
+            }}
+          >
+            <Image
+              src={collection.image}
+              alt={collection.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          </div>
+
+          {/* Burgundy gradient overlay: from burgundy-deep/80 to burgundy/60 */}
+          <div
+            ref={heroOverlayRef}
+            className="absolute inset-0 z-[3]"
+            style={{
+              background: `linear-gradient(
+                to top,
+                rgba(61, 10, 14, 0.80) 0%,
+                rgba(91, 14, 20, 0.60) 40%,
+                rgba(91, 14, 20, 0.30) 70%,
+                rgba(61, 10, 14, 0.15) 100%
+              )`,
+              opacity: 0.6,
+            }}
           />
-        </div>
 
-        {/* Burgundy gradient overlay: from burgundy-deep/80 to burgundy/60 */}
-        <div
-          ref={heroOverlayRef}
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(
-              to top,
-              rgba(61, 10, 14, 0.80) 0%,
-              rgba(91, 14, 20, 0.60) 40%,
-              rgba(91, 14, 20, 0.30) 70%,
-              rgba(61, 10, 14, 0.15) 100%
-            )`,
-            opacity: 0.6,
-          }}
-        />
-
-        {/* Decorative knit texture overlay */}
-        <div
-          className="absolute inset-0 pointer-events-none knit-pattern-gold"
-          style={{ opacity: 0.03 }}
-        />
+          {/* Decorative knit texture overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none knit-pattern-gold z-[4]"
+            style={{ opacity: 0.25 }}
+          />
 
         {/* Hero content */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
+        <div className="absolute bottom-0 left-0 right-0 z-[10]">
           <div className="max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-16 pb-10 sm:pb-14 lg:pb-20">
             {/* Gold accent line */}
             <div
@@ -342,19 +383,21 @@ export default function CollectionPage() {
           ═══════════════════════════════════════════════════════════ */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-20">
-          {/* Featured pair — large split layout */}
+          {/* Featured pair — large split layout with curtain reveals */}
           {featuredProducts.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
               {/* First featured product — flush left */}
-              <FadeIn className="lg:col-span-1">
-                <ProductCard product={featuredProducts[0]} priority />
-              </FadeIn>
+              <CurtainReveal index={0}>
+                <FloatingProductCard product={featuredProducts[0]} index={0} priority />
+              </CurtainReveal>
 
               {/* Second featured product — offset down for editorial feel */}
               {featuredProducts[1] && (
-                <FadeIn delay={0.15} className="lg:col-span-1 lg:pt-20">
-                  <ProductCard product={featuredProducts[1]} />
-                </FadeIn>
+                <div className="lg:pt-20">
+                  <CurtainReveal index={1} delay={0.15}>
+                    <FloatingProductCard product={featuredProducts[1]} index={1} />
+                  </CurtainReveal>
+                </div>
               )}
             </div>
           )}
@@ -455,9 +498,9 @@ export default function CollectionPage() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {gridProducts.map((product, i) => (
-                  <FadeIn key={product.id} delay={i * 0.06}>
-                    <ProductCard product={product} index={i} />
-                  </FadeIn>
+                  <CurtainReveal key={product.id} index={i + 2}>
+                    <FloatingProductCard product={product} index={i + 2} />
+                  </CurtainReveal>
                 ))}
               </div>
             </div>
@@ -540,6 +583,7 @@ export default function CollectionPage() {
           </FadeIn>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

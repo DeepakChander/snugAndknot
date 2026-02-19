@@ -1,11 +1,20 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import TextReveal from '@/components/animation/TextReveal'
 import FadeIn from '@/components/animation/FadeIn'
-import ProductCard from '@/components/product/ProductCard'
+import FloatingProductCard from '@/components/shop/FloatingProductCard'
+import CurtainReveal from '@/components/shop/CurtainReveal'
+import MaterialTransitions from '@/components/shop/MaterialTransitions'
+import ParticleField from '@/components/shop/ParticleField'
 import { filterProducts, getAllColors, getAllSizes, getPriceRange } from '@/lib/data'
 import type { SortOption } from '@/types'
+
+// Dynamic import for 3D canvas (client-side only)
+const ShopHeroCanvas = dynamic(() => import('@/components/3d/ShopHeroCanvas'), {
+  ssr: false,
+})
 
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'featured', label: 'Featured' },
@@ -21,6 +30,27 @@ export default function ShopPage() {
   const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [canvasReady, setCanvasReady] = useState(false)
+  const heroRef = useRef<HTMLElement>(null)
+
+  // Track scroll progress for 3D animations
+  useEffect(() => {
+    setCanvasReady(true)
+
+    const handleScroll = () => {
+      if (!heroRef.current) return
+      const heroHeight = heroRef.current.offsetHeight
+      const scrolled = window.scrollY
+      const progress = Math.min(scrolled / heroHeight, 1)
+      setScrollProgress(progress)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const allColors = getAllColors()
   const allSizes = getAllSizes()
@@ -52,26 +82,37 @@ export default function ShopPage() {
   const hasActiveFilters = selectedColors.length > 0 || selectedSizes.length > 0
 
   return (
-    <div className="min-h-screen">
-      {/* ============================================
-          SHOP HERO -- Dark gradient with gold headline
-          ============================================ */}
-      <section
-        className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 overflow-hidden"
-        style={{
-          background: 'linear-gradient(170deg, #0F0A0B 0%, #3D0A0E 55%, #5B0E14 100%)',
-        }}
-      >
-        {/* Decorative knit pattern overlay */}
-        <div className="absolute inset-0 knit-pattern-gold pointer-events-none" />
+    <>
+      {/* Material transition backgrounds */}
+      <MaterialTransitions />
 
-        {/* Subtle gold radial glow */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] pointer-events-none"
+      {/* Ambient particle field */}
+      <ParticleField />
+
+      <div>
+        {/* ============================================
+            SHOP HERO -- Enhanced with 3D canvas
+            ============================================ */}
+        <section
+          ref={heroRef}
+          className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 overflow-hidden"
           style={{
-            background: 'radial-gradient(ellipse, rgba(241,225,148,0.06) 0%, transparent 70%)',
+            background: 'linear-gradient(170deg, #0F0A0B 0%, #3D0A0E 55%, #5B0E14 100%)',
           }}
-        />
+        >
+          {/* 3D Canvas with cloth, threads, and particles */}
+          <ShopHeroCanvas scrollProgress={scrollProgress} isReady={canvasReady} />
+
+          {/* Decorative knit pattern overlay */}
+          <div className="absolute inset-0 knit-pattern-gold pointer-events-none opacity-30" />
+
+          {/* Subtle gold radial glow */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse, rgba(241,225,148,0.08) 0%, transparent 70%)',
+            }}
+          />
 
         <div className="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -357,14 +398,14 @@ export default function ShopPage() {
             </div>
           </FadeIn>
 
-          {/* Grid */}
+          {/* Grid with curtain reveal and floating cards */}
           <div
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10"
           >
             {products.map((product, i) => (
-              <div key={product.id}>
-                <ProductCard product={product} index={i} priority={i < 8} />
-              </div>
+              <CurtainReveal key={product.id} index={i}>
+                <FloatingProductCard product={product} index={i} priority={i < 8} />
+              </CurtainReveal>
             ))}
           </div>
 
@@ -420,6 +461,7 @@ export default function ShopPage() {
           )}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }
