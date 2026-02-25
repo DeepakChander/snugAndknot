@@ -51,7 +51,7 @@ const sections = [
   {
     id: 'contact',
     title: '10. Contact Us',
-    content: `If you have questions about this Privacy Policy or our data practices, please contact us at:\n\nSnug&Knot Privacy Team\nEmail: privacy@snugandknot.com\nMail: 180 Lafayette Street, New York, NY 10013\nPhone: +1 (212) 555-0189`,
+    content: `If you have questions about this Privacy Policy or our data practices, please contact us at:\n\nSnug&Knot Privacy Team\nEmail: privacy@snugandknot.com\nMail: 180 Lafayette Street, New York, NY 10013\nPhone: +91-9355704093`,
   },
 ]
 

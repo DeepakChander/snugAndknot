@@ -34,7 +34,12 @@
       "WebFetch(domain:wiredcraft.com)",
       "WebFetch(domain:www.siteinspire.com)",
       "WebFetch(domain:www.itsnicethat.com)",
-      "Bash(npx next dev:*)"
+      "Bash(npx next dev:*)",
+      "WebFetch(domain:www.footer.design)",
+      "Bash(node -e:*)",
+      "WebSearch",
+      "Bash(git add:*)",
+      "Bash(curl:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -264,7 +264,7 @@ export default function ConnectWithUs() {
               </a>
 
               <a
-                href="tel:+12125550189"
+                href="tel:+919355704093"
                 className="contact-item group flex items-center gap-4 text-burgundy hover:text-gold transition-all duration-500"
               >
                 <div className="w-14 h-14 rounded-2xl bg-ivory/80 border border-burgundy/10 group-hover:border-gold/30 group-hover:bg-gold/5 flex items-center justify-center transition-all duration-500 group-hover:scale-110">
@@ -275,7 +275,7 @@ export default function ConnectWithUs() {
                 <div>
                   <p className="text-xs text-rosewood/70 uppercase tracking-wider font-mono mb-1">Spoken Thread</p>
                   <p className="font-semibold text-base text-burgundy group-hover:text-gold transition-colors duration-500">
-                    +1 (212) 555-0189
+                    +91-9355704093
                   </p>
                 </div>
               </a>

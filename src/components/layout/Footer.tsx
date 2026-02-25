@@ -554,8 +554,8 @@ export default function Footer() {
               </li>
               <li>
                 <RollingLink
-                  href="tel:+12125550189"
-                  label="+1 (212) 555-0189"
+                  href="tel:+919355704093"
+                  label="+91-9355704093"
                 />
               </li>
             </ul>

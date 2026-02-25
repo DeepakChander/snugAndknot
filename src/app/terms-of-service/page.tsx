@@ -56,7 +56,7 @@ const sections = [
   {
     id: 'contact',
     title: '11. Contact Information',
-    content: `For questions about these Terms of Service, please contact us at:\n\nSnug&Knot Legal Team\nEmail: legal@snugandknot.com\nMail: 180 Lafayette Street, New York, NY 10013\nPhone: +1 (212) 555-0189`,
+    content: `For questions about these Terms of Service, please contact us at:\n\nSnug&Knot Legal Team\nEmail: legal@snugandknot.com\nMail: 180 Lafayette Street, New York, NY 10013\nPhone: +91-9355704093`,
   },
 ]
 
