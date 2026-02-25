@@ -44,7 +44,7 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className="group relative inline-block py-1.5 text-sm text-burgundy/80 hover:text-burgundy transition-colors duration-200"
+      className="group relative inline-block py-1.5 text-sm text-ivory/70 hover:text-gold transition-colors duration-200"
       role="menuitem"
     >
       {label}
@@ -85,7 +85,7 @@ export default function MegaMenuPanel({ isOpen, onLinkClick }: MegaMenuPanelProp
           transitionDelay: isOpen ? '100ms' : '0ms',
         }}
       >
-        <h3 className="text-xs uppercase tracking-widest text-burgundy/40 font-semibold mb-4">
+        <h3 className="text-xs uppercase tracking-widest text-gold/50 font-semibold mb-4">
           Shop by Gender
         </h3>
         <nav className="flex flex-col gap-1" role="menu">
@@ -109,7 +109,7 @@ export default function MegaMenuPanel({ isOpen, onLinkClick }: MegaMenuPanelProp
           transitionDelay: isOpen ? '200ms' : '0ms',
         }}
       >
-        <h3 className="text-xs uppercase tracking-widest text-burgundy/40 font-semibold mb-4">
+        <h3 className="text-xs uppercase tracking-widest text-gold/50 font-semibold mb-4">
           Shop by Category
         </h3>
         <nav className="flex flex-col gap-1" role="menu">
@@ -137,7 +137,7 @@ export default function MegaMenuPanel({ isOpen, onLinkClick }: MegaMenuPanelProp
           ref={featuredRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="relative rounded-xl overflow-hidden aspect-[4/3] bg-burgundy/5 cursor-pointer group"
+          className="relative rounded-xl overflow-hidden aspect-[4/3] bg-ivory/5 cursor-pointer group"
           style={{ perspective: '600px' }}
           onClick={onLinkClick}
         >
