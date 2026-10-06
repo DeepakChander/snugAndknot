@@ -1,6 +1,7 @@
 import { playfairDisplay, inter, jetbrainsMono } from '@/lib/fonts'
 import { siteMetadata } from './metadata'
 import ClientProviders from '@/components/layout/ClientProviders'
+import Analytics from '@/components/layout/Analytics'
 import './globals.css'
 
 export const metadata = siteMetadata
@@ -14,6 +15,7 @@ export default function RootLayout({
     <html lang="en" className={`${playfairDisplay.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="bg-ivory text-burgundy font-body antialiased">
         <ClientProviders>{children}</ClientProviders>
+        <Analytics />
       </body>
     </html>
   )
