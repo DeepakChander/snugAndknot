@@ -38,25 +38,6 @@
   --color-success: #5a7a52;
   --color-error: #b3261e;
 
-  /* Legacy aliases — keep un-rebuilt pages legible during the redesign */
-  --color-gold-muted: #b89656;
-  --color-gold-pale: #f3e7c6;
-  --color-rosewood: #4a1a20;
-  --color-blush-wine: #c4636b;
-  --color-silk: #e8d5b8;
-  --color-dust: #bfa88e;
-  --color-thread-gold: #c9a35c;
-  --color-error-garnet: #9b2335;
-  --color-success-moss: #5a7a52;
-  --color-charcoal: #16100e;
-  --color-cream: #f8f3ea;
-  --color-cream-dark: #e7dccb;
-  --color-walnut: #6e6257;
-  --color-earth: #3a2e29;
-  --color-sand: #d6c8b2;
-  --color-beige: #e7dccb;
-  --color-espresso: #16100e;
-
   /* Type */
   --font-display: var(--font-instrument), 'Times New Roman', serif;
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;

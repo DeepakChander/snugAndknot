@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next'
 import { instrumentSerif, geist, geistMono } from '@/lib/fonts'
 import { getStoreSettings } from '@/server/catalog'
 import './globals.css'
-import './legacy.css'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://snug-andknot.vercel.app'
 

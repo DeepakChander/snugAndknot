@@ -18,7 +18,7 @@ const FRAMES = [
   '/images/Collections-Hero/Winter.png',
 ]
 
-const optimised = (src: string) => `/_next/image?url=${encodeURIComponent(src)}&w=384&q=70`
+const optimised = (src: string) => `/_next/image?url=${encodeURIComponent(src)}&w=384&q=75`
 
 /**
  * First visit of a session: "Snug" and "Knot" part while a small frame between them
