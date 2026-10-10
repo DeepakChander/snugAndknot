@@ -16,6 +16,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
     commerce: settings.commerce,
     announcement: settings.announcement,
     homepage: settings.homepage,
+    reviews: settings.reviews,
   }
 
   const count = (g: 'men' | 'women' | 'kids') =>

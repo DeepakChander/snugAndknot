@@ -6,7 +6,7 @@ import { DEFAULT_SETTINGS } from '@/lib/settings-defaults'
 import type { Category, Collection, Product, SiteSettings } from '@/types/commerce'
 
 /** Settings the storefront may see (everything admin-editable is public by design). */
-export type PublicSettings = Pick<SiteSettings, 'store' | 'commerce' | 'announcement' | 'homepage'>
+export type PublicSettings = Pick<SiteSettings, 'store' | 'commerce' | 'announcement' | 'homepage' | 'reviews'>
 
 export interface NavData {
   collections: Pick<Collection, 'handle' | 'title' | 'subtitle' | 'image'>[]
