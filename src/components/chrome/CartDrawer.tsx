@@ -9,8 +9,7 @@ import { useHydrated } from '@/hooks/use-hydrated'
 import { useMoney, useNavData, useSettings } from '@/components/providers/SettingsProvider'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { ButtonLink } from '@/components/kit/Button'
-import { MinusIcon, PlusIcon } from '@/components/kit/icons'
-import { KnotMark } from './Preloader'
+import { BagIcon, MinusIcon, PlusIcon } from '@/components/kit/icons'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
@@ -84,9 +83,11 @@ export default function CartDrawer() {
 
       {lines.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-          <KnotMark className="h-24 w-24 text-gold" strokeWidth={1.4} />
-          <h3 className="mt-6 font-display text-4xl">Nothing knotted yet</h3>
-          <p className="mt-3 max-w-xs text-stone">Your bag is empty. Begin with a piece made slowly, to be worn for years.</p>
+          <span className="flex h-24 w-24 items-center justify-center rounded-full bg-parchment text-burgundy">
+            <BagIcon size={40} />
+          </span>
+          <h3 className="mt-6 font-display text-4xl">Your bag is empty</h3>
+          <p className="mt-3 max-w-xs text-stone">Begin with a piece made slowly, to be worn for years.</p>
           <ButtonLink href="/shop" onClick={closeCart} className="mt-8" arrow>
             Explore the collection
           </ButtonLink>

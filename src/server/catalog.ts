@@ -92,6 +92,11 @@ export const getReviews = unstable_cache(
   { tags: [TAGS.reviews], revalidate: REVALIDATE }
 )
 
+export const getLatestReviews = unstable_cache((limit: number = 6) => reviews.latestApprovedReviews(limit), ['latest-reviews'], {
+  tags: [TAGS.reviews],
+  revalidate: REVALIDATE,
+})
+
 /** Expire cached storefront data right away and re-render affected pages. */
 export function invalidate(...tags: (keyof typeof TAGS)[]) {
   for (const t of tags) revalidateTag(TAGS[t], { expire: 0 })

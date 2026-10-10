@@ -8,7 +8,6 @@ import { useSettings } from '@/components/providers/SettingsProvider'
 import Magnetic from '@/components/motion/Magnetic'
 import NewsletterForm from './NewsletterForm'
 import { ArrowUp, InstagramIcon, PinterestIcon, TiktokIcon, XIcon } from '@/components/kit/icons'
-import { KnotMark } from './Preloader'
 
 const COLUMNS = [
   {
@@ -99,7 +98,6 @@ function FooterContent() {
 
   return (
     <div className="relative flex min-h-full flex-col overflow-hidden bg-noir text-bone">
-      <KnotMark className="pointer-events-none absolute -right-24 top-10 h-[34rem] w-[34rem] text-bone/[0.035]" strokeWidth={0.6} />
 
       <div className="container-wide relative grid gap-14 pt-20 md:pt-28 lg:grid-cols-12">
         <div className="lg:col-span-5">

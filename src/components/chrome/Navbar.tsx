@@ -122,10 +122,15 @@ export default function Navbar() {
     window.addEventListener('resize', onScroll)
     const lenis = getLenis()
     lenis?.on('scroll', onScroll)
+    // Pages stream in after the shell (Suspense), so re-sample when the content changes.
+    const main = document.getElementById('main')
+    const mo = main ? new MutationObserver(onScroll) : null
+    if (main && mo) mo.observe(main, { childList: true, subtree: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
       lenis?.off('scroll', onScroll)
+      mo?.disconnect()
       if (raf) cancelAnimationFrame(raf)
     }
   }, [pathname])

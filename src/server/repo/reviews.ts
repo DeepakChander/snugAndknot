@@ -95,6 +95,25 @@ export async function markHelpful(id: string): Promise<number | null> {
   return rows[0] ? Math.trunc(num(rows[0].helpful)) : null
 }
 
+/** Latest approved reviews across the catalogue, with store-wide average and count. */
+export async function latestApprovedReviews(limit = 6) {
+  const rows = await query(
+    `SELECT r.*, p.title AS product_title, p.handle AS product_handle
+       FROM reviews r JOIN products p ON p.id = r.product_id AND p.status = 'active'
+      WHERE r.status = 'approved' ORDER BY r.rating DESC, r.created_at DESC LIMIT $1`,
+    [limit]
+  )
+  const [agg] = await query<{ avg: number; n: number }>(
+    `SELECT coalesce(avg(rating), 0)::float8 AS avg, count(*)::int AS n FROM reviews r
+       JOIN products p ON p.id = r.product_id AND p.status = 'active' WHERE r.status = 'approved'`
+  )
+  return {
+    reviews: rows.map((r) => ({ ...mapReview(r), productTitle: r.product_title as string, productHandle: r.product_handle as string })),
+    average: Math.round(num(agg?.avg) * 10) / 10,
+    count: Math.trunc(num(agg?.n)),
+  }
+}
+
 /* ─────────────────────────── Admin ─────────────────────────── */
 
 export interface AdminReview extends Review {

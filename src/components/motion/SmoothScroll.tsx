@@ -17,6 +17,7 @@ export default function SmoothScroll() {
       wheelMultiplier: 1,
     })
     setLenis(lenis)
+    ;(window as unknown as { __lenis?: Lenis }).__lenis = lenis
     lenis.on('scroll', ScrollTrigger.update)
     const tick = (time: number) => lenis.raf(time * 1000)
     gsap.ticker.add(tick)
@@ -25,6 +26,7 @@ export default function SmoothScroll() {
       gsap.ticker.remove(tick)
       lenis.destroy()
       setLenis(null)
+      delete (window as unknown as { __lenis?: Lenis }).__lenis
     }
   }, [])
   return null
