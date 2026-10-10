@@ -1,0 +1,33 @@
+import { z } from 'zod'
+import { getSettings, saveSettings } from '@/server/repo/settings'
+import { invalidate } from '@/server/catalog'
+import { HttpError, ok, parseBody, requireAdmin, route } from '@/server/http'
+import { settingsSchemas } from '@/server/validation'
+import type { SettingsKey, SiteSettings } from '@/types/commerce'
+
+export const dynamic = 'force-dynamic'
+
+export const GET = route(async () => {
+  await requireAdmin()
+  return ok({ settings: await getSettings() })
+})
+
+const envelope = z.object({
+  section: z.enum(['store', 'commerce', 'announcement', 'reviews', 'homepage', 'seo']),
+  value: z.unknown(),
+})
+
+export const PUT = route(async (req) => {
+  await requireAdmin()
+  const { section, value } = await parseBody(req, envelope)
+  const parsed = settingsSchemas[section].safeParse(value)
+  if (!parsed.success) {
+    const fields: Record<string, string> = {}
+    for (const issue of parsed.error.issues) fields[issue.path.join('.')] ??= issue.message
+    const first = parsed.error.issues[0]
+    throw new HttpError(422, `${first.path.join('.')}: ${first.message}`, fields)
+  }
+  const saved = await saveSettings(section as SettingsKey, parsed.data as SiteSettings[SettingsKey])
+  invalidate('settings')
+  return ok({ section, value: saved })
+})
