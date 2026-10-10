@@ -7,19 +7,20 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://snug-andknot.verce
 
 export async function generateMetadata(): Promise<Metadata> {
   const { seo, store } = await getStoreSettings()
+  const description = seo.description || store.description
   return {
     metadataBase: new URL(SITE_URL),
     title: { default: seo.title, template: `%s — ${store.name}` },
-    description: seo.description,
+    description,
     applicationName: store.name,
     openGraph: {
       type: 'website',
       siteName: store.name,
       title: seo.title,
-      description: seo.description,
+      description,
       images: seo.ogImage ? [{ url: seo.ogImage }] : undefined,
     },
-    twitter: { card: 'summary_large_image', title: seo.title, description: seo.description, images: seo.ogImage ? [seo.ogImage] : undefined },
+    twitter: { card: 'summary_large_image', title: seo.title, description, images: seo.ogImage ? [seo.ogImage] : undefined },
     icons: { icon: '/favicon.ico', apple: '/apple-touch-icon.png' },
     manifest: '/manifest.json',
   }

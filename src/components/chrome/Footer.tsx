@@ -188,7 +188,7 @@ function FooterContent() {
 
       <div className="container-wide relative flex flex-wrap items-center justify-between gap-4 border-t border-bone/10 py-6 text-xs text-bone/50">
         <p>
-          © {new Date().getFullYear()} {store.name}. Hand-finished in small batches.
+          © {new Date().getFullYear()} {store.name}.{store.tagline ? ` ${store.tagline}` : ''}
         </p>
         <div className="flex items-center gap-6">
           <Link href="/privacy-policy" className="link-wipe">
