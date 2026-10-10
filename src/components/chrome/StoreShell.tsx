@@ -16,6 +16,7 @@ import AuthModal from './AuthModal'
 import CustomCursor from './CustomCursor'
 import WelcomeOffer from './WelcomeOffer'
 import HelpWidget from './HelpWidget'
+import AuthRefresher from '@/components/providers/AuthRefresher'
 
 /*
  * Every overlay below renders nothing on the server and on the first client pass
@@ -33,6 +34,7 @@ export default function StoreShell({ settings, nav, children }: { settings: Publ
         Skip to content
       </a>
       <SmoothScroll />
+      <AuthRefresher />
       <Preloader />
       <PageTransition />
       <Navbar />
