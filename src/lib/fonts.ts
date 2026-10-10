@@ -1,21 +1,24 @@
-import { Playfair_Display, Inter, JetBrains_Mono } from 'next/font/google'
+import { Instrument_Serif, Geist, Geist_Mono } from 'next/font/google'
 
-export const playfairDisplay = Playfair_Display({
+/** Display serif — editorial headlines, product names, numerals. */
+export const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: '400',
   style: ['normal', 'italic'],
-  variable: '--font-heading',
+  variable: '--font-instrument',
   display: 'swap',
 })
 
-export const inter = Inter({
+/** Interface and body text. */
+export const geist = Geist({
   subsets: ['latin'],
-  variable: '--font-body',
+  variable: '--font-geist',
   display: 'swap',
 })
 
-export const jetbrainsMono = JetBrains_Mono({
+/** Labels, prices, counters. */
+export const geistMono = Geist_Mono({
   subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'optional',
+  variable: '--font-geist-mono',
+  display: 'swap',
 })

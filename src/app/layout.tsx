@@ -1,22 +1,41 @@
-import { playfairDisplay, inter, jetbrainsMono } from '@/lib/fonts'
-import { siteMetadata } from './metadata'
-import ClientProviders from '@/components/layout/ClientProviders'
-import Analytics from '@/components/layout/Analytics'
+import type { Metadata, Viewport } from 'next'
+import { instrumentSerif, geist, geistMono } from '@/lib/fonts'
+import { getStoreSettings } from '@/server/catalog'
 import './globals.css'
+import './legacy.css'
 
-export const metadata = siteMetadata
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://snug-andknot.vercel.app'
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo, store } = await getStoreSettings()
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: seo.title, template: `%s — ${store.name}` },
+    description: seo.description,
+    applicationName: store.name,
+    openGraph: {
+      type: 'website',
+      siteName: store.name,
+      title: seo.title,
+      description: seo.description,
+      images: seo.ogImage ? [{ url: seo.ogImage }] : undefined,
+    },
+    twitter: { card: 'summary_large_image', title: seo.title, description: seo.description, images: seo.ogImage ? [seo.ogImage] : undefined },
+    icons: { icon: '/favicon.ico', apple: '/apple-touch-icon.png' },
+    manifest: '/manifest.json',
+  }
+}
+
+export const viewport: Viewport = {
+  themeColor: '#0d0a09',
+  width: 'device-width',
+  initialScale: 1,
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${playfairDisplay.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="bg-ivory text-burgundy font-body antialiased">
-        <ClientProviders>{children}</ClientProviders>
-        <Analytics />
-      </body>
+    <html lang="en" className={`${instrumentSerif.variable} ${geist.variable} ${geistMono.variable}`}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }

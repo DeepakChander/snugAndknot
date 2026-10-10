@@ -1,91 +1,96 @@
 'use client'
 
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import type { User } from '@/types'
+import { api, ApiError } from '@/lib/api'
+import type { PublicUser } from '@/types/commerce'
+
+type AuthMode = 'login' | 'signup' | 'forgot-password'
 
 interface AuthStore {
-  user: User | null
+  user: PublicUser | null
+  /** 'idle' until the first /api/auth/me check finishes. */
+  status: 'idle' | 'loading' | 'ready'
   isAuthenticated: boolean
   isAuthModalOpen: boolean
-  authMode: 'login' | 'signup' | 'forgot-password'
+  authMode: AuthMode
+  error: string | null
+  fieldErrors: Record<string, string>
+  /** Runs after a successful sign-in from the modal (e.g. "write a review"). */
+  afterAuth: (() => void) | null
+  fetchSession: () => Promise<void>
   login: (email: string, password: string) => Promise<boolean>
   signup: (name: string, email: string, password: string) => Promise<boolean>
-  logout: () => void
-  openAuthModal: (mode?: 'login' | 'signup') => void
+  logout: () => Promise<void>
+  setUser: (user: PublicUser | null) => void
+  openAuthModal: (mode?: 'login' | 'signup', afterAuth?: () => void) => void
   closeAuthModal: () => void
-  setAuthMode: (mode: 'login' | 'signup' | 'forgot-password') => void
+  setAuthMode: (mode: AuthMode) => void
+  clearErrors: () => void
+  /** Legacy: points are now earned server-side; refresh the session instead. */
   updatePoints: (points: number) => void
 }
 
-export const useAuthStore = create<AuthStore>()(
-  persist(
-    (set, get) => ({
-      user: null,
-      isAuthenticated: false,
-      isAuthModalOpen: false,
-      authMode: 'login',
+export const useAuthStore = create<AuthStore>()((set, get) => ({
+  user: null,
+  status: 'idle',
+  isAuthenticated: false,
+  isAuthModalOpen: false,
+  authMode: 'login',
+  error: null,
+  fieldErrors: {},
+  afterAuth: null,
 
-      login: async (email, _password) => {
-        // Mock authentication — ready for Shopify Customer API
-        await new Promise((r) => setTimeout(r, 800))
-        const user: User = {
-          id: `user-${Date.now()}`,
-          name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-          email,
-          tier: 'stitch',
-          points: 1247,
-          createdAt: new Date().toISOString(),
-        }
-        set({ user, isAuthenticated: true, isAuthModalOpen: false })
-        return true
-      },
-
-      signup: async (name, email, _password) => {
-        await new Promise((r) => setTimeout(r, 1000))
-        const user: User = {
-          id: `user-${Date.now()}`,
-          name,
-          email,
-          tier: 'thread',
-          points: 100, // Welcome bonus
-          createdAt: new Date().toISOString(),
-        }
-        set({ user, isAuthenticated: true, isAuthModalOpen: false })
-        return true
-      },
-
-      logout: () => {
-        set({ user: null, isAuthenticated: false })
-      },
-
-      openAuthModal: (mode = 'login') => {
-        set({ isAuthModalOpen: true, authMode: mode })
-      },
-
-      closeAuthModal: () => {
-        set({ isAuthModalOpen: false })
-      },
-
-      setAuthMode: (mode) => {
-        set({ authMode: mode })
-      },
-
-      updatePoints: (points) => {
-        const user = get().user
-        if (user) {
-          const newPoints = user.points + points
-          let tier: User['tier'] = 'thread'
-          if (newPoints >= 3000) tier = 'tapestry'
-          else if (newPoints >= 1500) tier = 'weave'
-          else if (newPoints >= 500) tier = 'stitch'
-          set({ user: { ...user, points: newPoints, tier } })
-        }
-      },
-    }),
-    {
-      name: 'snug-knot-auth',
-      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
+  fetchSession: async () => {
+    if (get().status === 'loading') return
+    set({ status: 'loading' })
+    try {
+      const { user } = await api<{ user: PublicUser | null }>('/api/auth/me')
+      set({ user, isAuthenticated: !!user, status: 'ready' })
+    } catch {
+      set({ status: 'ready' })
     }
-  )
-)
+  },
+
+  login: async (email, password) => {
+    set({ error: null, fieldErrors: {} })
+    try {
+      const { user } = await api<{ user: PublicUser }>('/api/auth/login', { body: { email, password } })
+      const after = get().afterAuth
+      set({ user, isAuthenticated: true, isAuthModalOpen: false, afterAuth: null, status: 'ready' })
+      after?.()
+      return true
+    } catch (err) {
+      set({ error: err instanceof ApiError ? err.message : 'Sign-in failed.', fieldErrors: err instanceof ApiError ? err.fields ?? {} : {} })
+      return false
+    }
+  },
+
+  signup: async (name, email, password) => {
+    set({ error: null, fieldErrors: {} })
+    try {
+      const { user } = await api<{ user: PublicUser }>('/api/auth/signup', { body: { name, email, password } })
+      const after = get().afterAuth
+      set({ user, isAuthenticated: true, isAuthModalOpen: false, afterAuth: null, status: 'ready' })
+      after?.()
+      return true
+    } catch (err) {
+      set({ error: err instanceof ApiError ? err.message : 'Could not create your account.', fieldErrors: err instanceof ApiError ? err.fields ?? {} : {} })
+      return false
+    }
+  },
+
+  logout: async () => {
+    await api('/api/auth/logout', { method: 'POST' }).catch(() => {})
+    set({ user: null, isAuthenticated: false })
+  },
+
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  openAuthModal: (mode = 'login', afterAuth) =>
+    set({ isAuthModalOpen: true, authMode: mode, error: null, fieldErrors: {}, afterAuth: afterAuth ?? null }),
+  closeAuthModal: () => set({ isAuthModalOpen: false, afterAuth: null }),
+  setAuthMode: (mode) => set({ authMode: mode, error: null, fieldErrors: {} }),
+  clearErrors: () => set({ error: null, fieldErrors: {} }),
+  updatePoints: () => {
+    void get().fetchSession()
+  },
+}))

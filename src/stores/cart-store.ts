@@ -2,22 +2,39 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { CartItem, Coupon } from '@/types'
+import type { CartLine } from '@/types/commerce'
+
+/** Legacy coupon shape still used by the old checkout until it is rebuilt. */
+interface LegacyCoupon {
+  code: string
+  type: 'percentage' | 'fixed'
+  value: number
+  minPurchase: number
+  description: string
+  expiresAt: string
+}
+
+const MAX_QTY = 20
 
 interface CartStore {
-  items: CartItem[]
+  items: CartLine[]
   isOpen: boolean
-  appliedCoupon: Coupon | null
-  addItem: (item: Omit<CartItem, 'id'>) => void
+  couponCode: string | null
+  /** Bumped whenever a line is added — the bag icon listens to pulse. */
+  lastAddedAt: number
+  addItem: (item: Omit<CartLine, 'id'> & { id?: string }) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
   clearCart: () => void
   toggleCart: () => void
   openCart: () => void
   closeCart: () => void
+  setCouponCode: (code: string | null) => void
   totalItems: () => number
   totalPrice: () => number
-  applyCoupon: (coupon: Coupon) => void
+  // Legacy API (old checkout)
+  appliedCoupon: LegacyCoupon | null
+  applyCoupon: (coupon: LegacyCoupon) => void
   removeCoupon: () => void
   discountAmount: () => number
   finalTotal: () => number
@@ -28,66 +45,70 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      couponCode: null,
+      lastAddedAt: 0,
       appliedCoupon: null,
 
       addItem: (item) => {
+        const id = item.variantId
         const items = get().items
-        const existingIndex = items.findIndex(
-          (i) => i.productId === item.productId && i.variantId === item.variantId
-        )
-
-        if (existingIndex > -1) {
-          const updated = [...items]
-          updated[existingIndex].quantity += item.quantity
-          set({ items: updated })
-        } else {
-          set({
-            items: [...items, { ...item, id: `${item.productId}-${item.variantId}-${Date.now()}` }],
-          })
-        }
+        const existing = items.find((i) => i.id === id)
+        const next = existing
+          ? items.map((i) => (i.id === id ? { ...i, quantity: Math.min(MAX_QTY, i.quantity + item.quantity) } : i))
+          : [...items, { ...item, id, size: item.size ?? null, color: item.color ?? null, quantity: Math.min(MAX_QTY, item.quantity) }]
+        set({ items: next, lastAddedAt: Date.now() })
       },
 
-      removeItem: (id) => {
-        set({ items: get().items.filter((i) => i.id !== id) })
-      },
+      removeItem: (id) => set({ items: get().items.filter((i) => i.id !== id) }),
 
       updateQuantity: (id, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(id)
-          return
-        }
-        set({
-          items: get().items.map((i) => (i.id === id ? { ...i, quantity } : i)),
-        })
+        if (quantity <= 0) return get().removeItem(id)
+        set({ items: get().items.map((i) => (i.id === id ? { ...i, quantity: Math.min(MAX_QTY, quantity) } : i)) })
       },
 
-      clearCart: () => set({ items: [], appliedCoupon: null }),
+      clearCart: () => set({ items: [], couponCode: null, appliedCoupon: null }),
       toggleCart: () => set({ isOpen: !get().isOpen }),
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
+      setCouponCode: (code) => set({ couponCode: code ? code.trim().toUpperCase() : null }),
 
-      totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
-      totalPrice: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+      totalItems: () => get().items.reduce((s, i) => s + i.quantity, 0),
+      totalPrice: () => Math.round(get().items.reduce((s, i) => s + i.price * i.quantity, 0) * 100) / 100,
 
-      applyCoupon: (coupon) => set({ appliedCoupon: coupon }),
-      removeCoupon: () => set({ appliedCoupon: null }),
-
+      applyCoupon: (coupon) => set({ appliedCoupon: coupon, couponCode: coupon.code }),
+      removeCoupon: () => set({ appliedCoupon: null, couponCode: null }),
       discountAmount: () => {
-        const coupon = get().appliedCoupon
-        if (!coupon) return 0
-        const subtotal = get().totalPrice()
-        if (subtotal < coupon.minPurchase) return 0
-        if (coupon.type === 'percentage') return Math.round((subtotal * coupon.value) / 100 * 100) / 100
-        return Math.min(coupon.value, subtotal)
+        const c = get().appliedCoupon
+        if (!c) return 0
+        const total = get().totalPrice()
+        return Math.round(Math.min(total, c.type === 'percentage' ? (total * c.value) / 100 : c.value) * 100) / 100
       },
-
-      finalTotal: () => {
-        return Math.max(0, get().totalPrice() - get().discountAmount())
-      },
+      finalTotal: () => Math.max(0, get().totalPrice() - get().discountAmount()),
     }),
     {
       name: 'snug-knot-cart',
-      partialize: (state) => ({ items: state.items, appliedCoupon: state.appliedCoupon }),
+      version: 2,
+      partialize: (s) => ({ items: s.items, couponCode: s.couponCode }),
+      // v1 lines had timestamped ids; v2 keys each line by its variant.
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as { items?: (CartLine & { size?: string; color?: string })[] }
+        if (version < 2 && Array.isArray(state.items)) {
+          const merged = new Map<string, CartLine>()
+          for (const i of state.items) {
+            if (!i?.variantId) continue
+            const prev = merged.get(i.variantId)
+            merged.set(i.variantId, {
+              ...i,
+              id: i.variantId,
+              size: i.size ?? null,
+              color: i.color ?? null,
+              quantity: Math.min(MAX_QTY, (prev?.quantity ?? 0) + (i.quantity || 1)),
+            })
+          }
+          return { items: Array.from(merged.values()), couponCode: null }
+        }
+        return state as { items: CartLine[]; couponCode: string | null }
+      },
     }
   )
 )
