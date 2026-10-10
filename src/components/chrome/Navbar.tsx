@@ -138,6 +138,8 @@ export default function Navbar() {
   useEffect(() => {
     setMega(null)
     closeMenu()
+    // A new page always starts with the header visible.
+    setHidden(false)
   }, [pathname, closeMenu])
 
   useEffect(() => {
