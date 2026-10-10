@@ -84,6 +84,7 @@
   --gutter: clamp(1rem, 2.6vw, 3rem);
   --nav-h: 76px;
   --announce-h: 0px;
+  --nav-offset: var(--nav-h);
   --grain-opacity: 0.06;
   color-scheme: light;
 }

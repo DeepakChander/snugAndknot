@@ -144,6 +144,13 @@ export default function Navbar() {
     document.documentElement.style.setProperty('--announce-h', announcement && !scrolled ? '34px' : '0px')
   }, [announcement, scrolled])
 
+  // Sticky page elements (shop toolbar, summaries) sit under the visible header only.
+  const overlayVisible = !!mega || isMenuOpen
+  useEffect(() => {
+    const offset = hidden && !overlayVisible ? '0px' : `calc(var(--nav-h) + ${announcement && !scrolled ? '34px' : '0px'})`
+    document.documentElement.style.setProperty('--nav-offset', offset)
+  }, [hidden, overlayVisible, announcement, scrolled])
+
   const openMega = useCallback((kind: MegaKind) => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
     setMega(kind)
