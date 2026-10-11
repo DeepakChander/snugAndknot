@@ -4,10 +4,12 @@ import { useEffect, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { gsap, prefersReducedMotion, setPageReady, ScrollTrigger } from '@/lib/motion/gsap'
 import { scrollToTop } from '@/lib/motion/lenis'
+import Wordmark from './Wordmark'
 import { useUIStore } from '@/stores/ui-store'
 import { useCartStore } from '@/stores/cart-store'
 
 const COLUMNS = 5
+const PANEL_TONES = ['bg-ink', 'bg-signal', 'bg-clay', 'bg-sage', 'bg-butter']
 
 function isPlainLeftClick(e: MouseEvent) {
   return e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && !e.defaultPrevented
@@ -105,14 +107,13 @@ export default function PageTransition() {
 
   return (
     <div ref={root} className="pointer-events-none fixed inset-0 z-[180] flex" style={{ visibility: 'hidden' }} data-chrome aria-hidden>
+      {/* Panels in the yarn palette sweep across between pages */}
       {Array.from({ length: COLUMNS }).map((_, i) => (
-        <div key={i} data-col className="relative h-full flex-1 origin-bottom scale-y-0 bg-noir">
-          <div className="absolute inset-y-0 right-0 w-px bg-gold/15" />
-        </div>
+        <div key={i} data-col className={`relative h-full flex-1 origin-bottom scale-y-0 ${PANEL_TONES[i % PANEL_TONES.length]}`} />
       ))}
       <div data-mark className="absolute inset-0 flex items-center justify-center opacity-0">
-        <span className="font-display text-4xl text-bone">
-          Snug<span className="italic text-gold">&amp;</span>Knot
+        <span className="rounded-full bg-ink px-6 py-3.5 text-bone">
+          <Wordmark variant="chip" className="text-base" />
         </span>
       </div>
     </div>

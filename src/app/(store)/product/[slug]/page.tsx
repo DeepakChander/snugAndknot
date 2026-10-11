@@ -5,17 +5,24 @@ import ProductInfo from '@/components/product/ProductInfo'
 import Reviews from '@/components/product/Reviews'
 import { FabricStory, RecentlyViewed, Related, StickyBuyBar } from '@/components/product/ProductExtras'
 import { getProduct, getRelated, getReviews, getStoreSettings } from '@/server/catalog'
+import JsonLd from '@/components/seo/JsonLd'
+import { breadcrumbLd, metaDescription, productLd } from '@/lib/seo'
 
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await getProduct((await params).slug)
+  const [product, { store }] = await Promise.all([getProduct((await params).slug), getStoreSettings()])
   if (!product) return { title: 'Piece not found' }
-  const description = product.seoDescription || product.description.slice(0, 155)
+  const description = metaDescription(product.seoDescription || product.description)
+  const path = `/product/${product.handle}`
+  const images = product.images.slice(0, 4).map((i) => ({ url: i.src, alt: i.alt || product.title }))
   return {
     title: product.seoTitle || product.title,
     description,
-    openGraph: { title: product.title, description, images: product.images.slice(0, 1).map((i) => ({ url: i.src, alt: i.alt })) },
+    alternates: { canonical: path },
+    // A page's openGraph replaces the layout's whole block, so it carries the site name too.
+    openGraph: { type: 'website', siteName: store.name, locale: 'en_US', url: path, title: product.title, description, images },
+    twitter: { card: 'summary_large_image', title: product.title, description, images },
   }
 }
 
@@ -25,31 +32,20 @@ export default async function ProductPage({ params }: Props) {
   if (!product) notFound()
   const [{ reviews, summary }, related, settings] = await Promise.all([getReviews(product.id), getRelated(product.handle, 4), getStoreSettings()])
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.title,
-    description: product.description,
-    image: product.images.map((i) => i.src),
-    sku: product.variants[0]?.sku,
-    brand: { '@type': 'Brand', name: settings.store.name },
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: settings.commerce.currency,
-      lowPrice: Math.min(...product.variants.map((v) => v.price)),
-      highPrice: Math.max(...product.variants.map((v) => v.price)),
-      offerCount: product.variants.length,
-      availability: product.variants.some((v) => v.available) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-    },
-    // Only real, approved reviews — never a placeholder rating.
-    ...(summary.count > 0 ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: summary.average, reviewCount: summary.count } } : {}),
-  }
+  const structured = [
+    productLd(product, summary, reviews, settings),
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Shop', path: '/shop' },
+      { name: product.title, path: `/product/${product.handle}` },
+    ]),
+  ]
 
   const detailImage = product.images[1]?.src ?? product.images[0]?.src ?? ''
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <JsonLd data={structured} />
       <section className="bg-ivory pb-20 pt-nav text-ink">
         <div className="container-wide grid gap-10 pt-8 md:pt-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16 xl:gap-24">
           <FabricGallery images={product.images} title={product.title} />

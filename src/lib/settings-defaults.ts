@@ -7,8 +7,8 @@ import type { SiteSettings } from '@/types/commerce'
 export const DEFAULT_SETTINGS: SiteSettings = {
   store: {
     name: 'Snug&Knot',
-    tagline: 'Where tension becomes tenderness.',
-    description: 'Textiles knotted at the crossroads of tradition and nerve. Every thread earns its place.',
+    tagline: 'Hand-finished knitwear, made in small runs.',
+    description: 'Knitwear in merino, cashmere blends and long-staple cotton — made in small runs and finished by hand.',
     email: 'hello@snugandknot.com',
     phone: '+91-9355704093',
     address: { street: '142 Mercer Street', city: 'New York', state: 'NY', zip: '10012', country: 'United States' },
@@ -33,9 +33,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   announcement: {
     enabled: true,
     messages: [
-      'Complimentary shipping on orders over $150',
+      'Free shipping on orders over $150',
       'Hand-finished in small batches',
-      '30-day returns, no questions asked',
+      '30-day returns on unworn pieces',
     ],
     link: '/shop',
   },
@@ -43,22 +43,23 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     moderation: 'manual',
   },
   homepage: {
-    heroEyebrow: 'Autumn / Winter Atelier',
-    heroTitle: 'Knitted slowly. Worn for a lifetime.',
+    heroEyebrow: 'Autumn–Winter 2026',
+    heroTitle: 'Knitwear made slowly, *to wear for years*.',
     heroSubtitle:
-      'Merino, cashmere and long-staple cotton — knotted by hand in small batches, finished with intention.',
-    primaryCtaLabel: 'Shop the collection',
-    primaryCtaHref: '/shop',
-    secondaryCtaLabel: 'Inside the atelier',
-    secondaryCtaHref: '/about',
+      'Merino, cashmere blends and long-staple cotton — knitted in small runs and finished by hand.',
+    primaryCtaLabel: 'Shop new in',
+    primaryCtaHref: '/shop?sort=newest',
+    secondaryCtaLabel: 'See the collections',
+    secondaryCtaHref: '/collections',
     manifesto:
-      'Tension is not the enemy of softness. Every knot is a decision, every thread earns its place, and the loom does not rush.',
+      'We make a short list of knitwear and make it properly: natural fibres, small runs, and every piece *finished by hand* before it is folded and sent to you.',
   },
   seo: {
     title: 'Snug&Knot — Luxury Knitwear, Hand-Finished',
     description:
-      'Luxury knitwear knotted by hand: merino, cashmere and long-staple cotton cardigans and knit tees, made in small batches to last a lifetime.',
-    ogImage: '/images/Collections-Hero/Artisan.png',
+      'Hand-finished knitwear in merino, cashmere blends and long-staple cotton: cardigans and knit tees made in small runs to be worn for years.',
+    // 1200×630, the size link previews expect: three of the real pieces side by side.
+    ogImage: '/images/og/snugandknot.jpg',
   },
 }
 

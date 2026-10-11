@@ -14,7 +14,7 @@ import { getLenis } from '@/lib/motion/lenis'
 import { cn } from '@/lib/format'
 import Wordmark from './Wordmark'
 import MegaMenu, { type MegaKind } from './MegaMenu'
-import { BagIcon, HeartIcon, SearchIcon, UserIcon } from '@/components/kit/icons'
+import { HeartIcon, SearchIcon, UserIcon } from '@/components/kit/icons'
 
 const NAV: { label: string; href: string; mega?: MegaKind }[] = [
   { label: 'Shop', href: '/shop', mega: 'shop' },
@@ -34,11 +34,11 @@ function AnnouncementBar({ messages, link, hidden }: { messages: string[]; link:
   return (
     <div
       className={cn(
-        'overflow-hidden bg-noir text-bone transition-[height] duration-500 ease-[cubic-bezier(.16,1,.3,1)]',
+        'overflow-hidden bg-ink text-bone transition-[height] duration-500 ease-[cubic-bezier(.16,1,.3,1)]',
         hidden ? 'h-0' : 'h-[34px]'
       )}
     >
-      <Link href={link || '/shop'} className="relative flex h-[34px] items-center justify-center text-eyebrow text-bone/85 hover:text-gold-light">
+      <Link href={link || '/shop'} className="relative flex h-[34px] items-center justify-center text-eyebrow text-bone/80 transition-colors hover:text-butter">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
             key={i}
@@ -48,6 +48,7 @@ function AnnouncementBar({ messages, link, hidden }: { messages: string[]; link:
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="absolute px-4 text-center"
           >
+            <span className="mr-2 inline-block h-1.5 w-1.5 -translate-y-px rounded-full bg-signal align-middle" aria-hidden />
             {messages[i]}
           </motion.span>
         </AnimatePresence>
@@ -56,20 +57,28 @@ function AnnouncementBar({ messages, link, hidden }: { messages: string[]; link:
   )
 }
 
-function CountBadge({ count, pulse }: { count: number; pulse?: number }) {
-  if (count <= 0) return null
+/** `tone` names the ink of an empty bubble: 'dark' on the bone chip, 'light' on the ink chip. */
+function CountBubble({ count, pulse, tone }: { count: number; pulse?: number; tone: 'light' | 'dark' }) {
   return (
     <motion.span
       key={pulse}
       initial={{ scale: 0.4 }}
       animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-      className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-burgundy px-1 font-mono text-[10px] leading-none text-ivory"
+      className={cn(
+        'flex h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 font-mono text-[11px] leading-none tabular-nums',
+        count > 0 ? 'bg-burgundy-deep text-bone' : tone === 'dark' ? 'bg-ink/10 text-ink' : 'bg-bone/15 text-bone'
+      )}
     >
       {count}
     </motion.span>
   )
 }
+
+/** Chip surfaces: frosted glass for groups and icons, solid for the logo and the bag. */
+const glassChip = (dark: boolean) =>
+  dark ? 'bg-noir/45 text-bone ring-1 ring-bone/12 backdrop-blur-xl' : 'bg-bone/70 text-ink ring-1 ring-ink/[0.07] backdrop-blur-xl'
+const solidChip = (dark: boolean) => (dark ? 'bg-bone text-ink' : 'bg-ink text-bone')
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -107,10 +116,12 @@ export default function Navbar() {
         last = y
       }
       const probe = (headerRef.current?.offsetHeight ?? 80) * 0.6
+      // The centre of the bar decides; the x test matters for panels that slide sideways.
+      const probeX = window.innerWidth / 2
       let t: 'light' | 'dark' = 'light'
       for (const el of document.querySelectorAll<HTMLElement>('[data-nav-theme]')) {
         const r = el.getBoundingClientRect()
-        if (r.top <= probe && r.bottom > probe) t = el.dataset.navTheme === 'dark' ? 'dark' : 'light'
+        if (r.top <= probe && r.bottom > probe && r.left <= probeX && r.right > probeX) t = el.dataset.navTheme === 'dark' ? 'dark' : 'light'
       }
       setTheme(t)
     }
@@ -170,8 +181,18 @@ export default function Navbar() {
   }, [mega])
 
   const overlayOpen = !!mega || isMenuOpen
-  const dark = overlayOpen ? true : theme === 'dark'
-  const solid = scrolled && !overlayOpen
+  const dark = isMenuOpen ? true : !!mega ? false : theme === 'dark'
+
+  const logo = (cls: string) => (
+    <Link
+      href="/"
+      aria-label={`${settings.store.name} — home`}
+      onMouseEnter={scheduleClose}
+      className={cn('group flex h-10 items-center rounded-full px-3.5 transition-colors duration-500 sm:px-4', solidChip(dark), cls)}
+    >
+      <Wordmark name={settings.store.name} variant="chip" className="text-[0.74rem] sm:text-[0.8rem]" />
+    </Link>
+  )
 
   return (
     <>
@@ -179,6 +200,9 @@ export default function Navbar() {
         ref={headerRef}
         data-chrome
         onMouseLeave={scheduleClose}
+        onBlur={(e) => {
+          if (!headerRef.current?.contains(e.relatedTarget as Node | null)) setMega(null)
+        }}
         className={cn(
           'fixed inset-x-0 top-0 z-[100] transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)]',
           hidden && !overlayOpen ? '-translate-y-full' : 'translate-y-0'
@@ -186,17 +210,10 @@ export default function Navbar() {
       >
         {announcement ? <AnnouncementBar messages={settings.announcement.messages.filter(Boolean)} link={settings.announcement.link} hidden={scrolled} /> : null}
 
-        <div
-          className={cn(
-            'relative transition-[background-color,color,box-shadow,backdrop-filter] duration-500',
-            dark ? 'text-bone' : 'text-ink',
-            solid && (dark ? 'glass-dark shadow-[0_1px_0_rgba(241,233,220,0.06)]' : 'glass shadow-[0_1px_0_rgba(22,16,14,0.06)]'),
-            overlayOpen && 'bg-noir'
-          )}
-        >
-          <nav aria-label="Main" className="mx-auto grid h-[var(--nav-h)] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center px-gutter">
-            {/* Left — menu (mobile) / primary nav (desktop) */}
-            <div className="flex items-center gap-1">
+        <div className={cn('relative transition-colors duration-500', mega && 'bg-ivory')}>
+          <nav aria-label="Main" className="mx-auto grid h-[var(--nav-h)] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-gutter">
+            {/* Left — menu chip (mobile) and logo chip (desktop) */}
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={toggleMenu}
@@ -204,20 +221,26 @@ export default function Navbar() {
                 aria-controls="mobile-menu"
                 aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                 data-cursor="hover"
-                className="group -ml-2 flex h-11 items-center gap-3 rounded-full px-2 lg:hidden"
+                className={cn('group flex h-10 min-w-10 items-center justify-center gap-2.5 rounded-full px-3 transition-colors duration-500 sm:pl-3.5 sm:pr-4 lg:hidden', glassChip(dark))}
               >
-                <span className="relative flex h-3 w-6 flex-col justify-between">
-                  <span className={cn('h-px w-full origin-center bg-current transition-transform duration-500', isMenuOpen && 'translate-y-[5.5px] rotate-45')} />
-                  <span className={cn('h-px w-full origin-center bg-current transition-transform duration-500', isMenuOpen && '-translate-y-[5.5px] -rotate-45')} />
+                <span className="relative flex h-2.5 w-[18px] flex-col justify-between">
+                  <span className={cn('h-[1.5px] w-full origin-center rounded bg-current transition-transform duration-500', isMenuOpen && 'translate-y-[4.25px] rotate-45')} />
+                  <span className={cn('h-[1.5px] w-full origin-center rounded bg-current transition-transform duration-500', isMenuOpen && '-translate-y-[4.25px] -rotate-45')} />
                 </span>
-                <span className="roll hidden text-label sm:inline-flex">
+                <span className="roll hidden font-display text-[0.84rem] font-medium tracking-[-0.01em] sm:inline-flex">
                   <span data-text={isMenuOpen ? 'Close' : 'Menu'}>{isMenuOpen ? 'Close' : 'Menu'}</span>
                 </span>
               </button>
+              {logo('hidden lg:flex')}
+            </div>
 
-              <ul className="hidden items-center gap-1 lg:flex">
+            {/* Centre — logo (mobile) / link pill (desktop) */}
+            <div className="justify-self-center">
+              {logo('lg:hidden')}
+              <ul className={cn('hidden items-center gap-0.5 rounded-full p-1 transition-colors duration-500 lg:flex', glassChip(dark))}>
                 {NAV.map((item) => {
                   const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+                  const highlighted = active || (!!item.mega && mega === item.mega)
                   return (
                     <li key={item.href} onMouseEnter={() => (item.mega ? openMega(item.mega) : scheduleClose())}>
                       <Link
@@ -226,17 +249,15 @@ export default function Navbar() {
                         aria-expanded={item.mega ? mega === item.mega : undefined}
                         aria-haspopup={item.mega ? 'true' : undefined}
                         onFocus={() => item.mega && openMega(item.mega)}
-                        className="group relative flex h-11 items-center px-3.5 text-[0.84rem] tracking-[-0.005em]"
+                        className={cn(
+                          'group relative flex h-9 items-center gap-1.5 rounded-full px-4 font-display text-[0.86rem] font-medium tracking-[-0.01em] transition-colors duration-500',
+                          highlighted ? solidChip(dark) : dark ? 'text-bone/80 hover:text-bone' : 'text-ink/75 hover:text-ink'
+                        )}
                       >
+                        {active ? <span className="h-1.5 w-1.5 rounded-full bg-signal" aria-hidden /> : null}
                         <span className="roll">
                           <span data-text={item.label}>{item.label}</span>
                         </span>
-                        <span
-                          className={cn(
-                            'absolute bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-gold transition-all duration-500',
-                            active || mega === item.mega ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
-                          )}
-                        />
                       </Link>
                     </li>
                   )
@@ -244,22 +265,17 @@ export default function Navbar() {
               </ul>
             </div>
 
-            {/* Centre — wordmark */}
-            <Link href="/" aria-label={`${settings.store.name} — home`} className="justify-self-center" onMouseEnter={scheduleClose}>
-              <Wordmark name={settings.store.name} className="text-[1.65rem] md:text-[1.9rem]" />
-            </Link>
-
-            {/* Right — utilities */}
-            <div className="flex items-center justify-end gap-0.5 md:gap-1" onMouseEnter={scheduleClose}>
+            {/* Right — utility chips */}
+            <div className="flex items-center justify-end gap-1.5" onMouseEnter={scheduleClose}>
               <button
                 type="button"
                 onClick={openSearch}
                 data-cursor="hover"
                 aria-label="Search"
-                className="group flex h-10 items-center gap-2 rounded-full px-2.5 transition-colors hover:bg-current/5"
+                className={cn('hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 sm:flex xl:w-auto xl:gap-2 xl:px-4', glassChip(dark))}
               >
-                <SearchIcon size={19} />
-                <span className="roll hidden text-[0.84rem] xl:inline-flex">
+                <SearchIcon size={17} />
+                <span className="roll hidden font-display text-[0.84rem] font-medium tracking-[-0.01em] xl:inline-flex">
                   <span data-text="Search">Search</span>
                 </span>
               </button>
@@ -267,9 +283,9 @@ export default function Navbar() {
                 <Link
                   href="/account"
                   aria-label="Your account"
-                  className="hidden h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-current/5 sm:flex"
+                  className={cn('hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 sm:flex', glassChip(dark))}
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold font-mono text-[11px] uppercase text-ink">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-butter font-mono text-[11px] uppercase text-ink">
                     {user.name.trim().split(/\s+/).map((p) => p[0]).slice(0, 2).join('')}
                   </span>
                 </Link>
@@ -279,38 +295,30 @@ export default function Navbar() {
                   onClick={() => openAuthModal('login')}
                   data-cursor="hover"
                   aria-label="Sign in"
-                  className="hidden h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-current/5 sm:flex"
+                  className={cn('hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 sm:flex', glassChip(dark))}
                 >
-                  <UserIcon size={19} />
+                  <UserIcon size={17} />
                 </button>
               )}
               <Link
                 href="/account/wishlist"
                 aria-label={`Wishlist${hydrated && wishCount ? ` (${wishCount})` : ''}`}
-                className="relative hidden h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-current/5 sm:flex"
+                className={cn('relative hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 md:flex', glassChip(dark))}
               >
-                <HeartIcon size={19} />
-                <CountBadge count={hydrated ? wishCount : 0} />
+                <HeartIcon size={17} />
+                {hydrated && wishCount > 0 ? <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-signal" aria-hidden /> : null}
               </Link>
               <button
                 type="button"
                 onClick={openCart}
                 data-cursor="hover"
                 aria-label={`Bag, ${bagCount} item${bagCount === 1 ? '' : 's'}`}
-                className="group relative flex h-10 items-center gap-2 rounded-full pl-2.5 pr-2.5 transition-colors hover:bg-current/5 md:pr-3"
+                className={cn('group flex h-10 items-center gap-2 rounded-full pl-4 pr-1.5 transition-colors duration-500', solidChip(dark))}
               >
-                <span className="relative">
-                  <BagIcon size={19} />
-                  <span className="md:hidden">
-                    <CountBadge count={bagCount} pulse={lastAddedAt} />
-                  </span>
+                <span className="roll font-display text-[0.84rem] font-medium tracking-[-0.01em]">
+                  <span data-text="Bag">Bag</span>
                 </span>
-                <span className="hidden font-mono text-[0.78rem] tabular-nums md:inline">
-                  Bag
-                  <motion.span key={lastAddedAt} initial={{ y: -6, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="ml-1 inline-block">
-                    ({bagCount})
-                  </motion.span>
-                </span>
+                <CountBubble count={bagCount} pulse={lastAddedAt} tone={dark ? 'dark' : 'light'} />
               </button>
             </div>
           </nav>
@@ -328,7 +336,7 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[90] bg-noir/45 backdrop-blur-[2px]"
+            className="fixed inset-0 z-[90] bg-ink/30 backdrop-blur-[3px]"
             onMouseEnter={scheduleClose}
             onClick={() => setMega(null)}
             aria-hidden

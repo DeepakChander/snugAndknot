@@ -12,7 +12,7 @@ export default function NotFoundView({ standalone = false }: { standalone?: bool
   return (
     <div data-nav-theme="dark" className="relative flex min-h-[100svh] items-center overflow-hidden bg-noir text-bone">
       <motion.div initial={{ opacity: 0, scale: 1.08 }} animate={{ opacity: 0.35, scale: 1 }} transition={{ duration: 2, ease: EASE }} className="absolute inset-0">
-        <Image src="/images/lookbook/after-dark-2.png" alt="" fill priority sizes="100vw" className="object-cover" />
+        <Image src="/images/Collections-Hero/Coastal.png" alt="" fill priority sizes="100vw" className="object-cover" />
       </motion.div>
       <div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/30" />
       <div className="container-wide relative py-28">
@@ -21,11 +21,11 @@ export default function NotFoundView({ standalone = false }: { standalone?: bool
             <Wordmark className="text-3xl" />
           </Link>
         ) : null}
-        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE }} className="font-mono text-sm text-gold">
-          404
+        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE }} className="text-eyebrow slash text-butter">
+          Error 404
         </motion.p>
         <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.2, ease: EASE, delay: 0.1 }} className="mt-4 max-w-[12ch] text-mega">
-          We dropped a stitch.
+          We dropped a <em>stitch</em>.
         </motion.h1>
         <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE, delay: 0.3 }} className="mt-8 max-w-md text-lead text-bone/70">
           This page has come unravelled — it may have moved or never existed. Let us find you something worth wearing instead.

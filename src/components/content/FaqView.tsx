@@ -22,7 +22,7 @@ export default function FaqView({ groups }: { groups: FaqGroup[] }) {
 
   return (
     <>
-      <PageHero eyebrow="Client care" title="Questions, answered" intro="Everything about ordering, delivery, sizing and returns. Can’t find it? Write to us — a person will reply." />
+      <PageHero eyebrow="Client care" title="Questions, *answered*" intro="Everything about ordering, delivery, sizing and returns. Can’t find it? Write to us — a person will reply." />
       <div className="bg-ivory pb-28 text-ink">
         <div className="container-wide border-t border-ink/10 pt-12">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
@@ -54,7 +54,7 @@ export default function FaqView({ groups }: { groups: FaqGroup[] }) {
             ))}
             {!filtered.length ? <p className="text-stone">No questions match “{q}”.</p> : null}
           </div>
-          <div className="mt-20 flex flex-wrap items-center justify-between gap-6 rounded-[2rem] bg-noir p-10 text-bone">
+          <div className="mt-20 flex flex-wrap items-center justify-between gap-6 rounded-[2rem] bg-signal p-10 text-bone [&_:focus-visible]:outline-bone">
             <p className="font-display text-4xl">Still wondering?</p>
             <ButtonLink href="/contact" variant="light" arrow>
               Write to us

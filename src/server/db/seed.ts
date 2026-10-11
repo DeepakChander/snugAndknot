@@ -224,7 +224,7 @@ const COLLECTIONS = [
     subtitle: 'Hand-finished, slowly',
     description:
       'Pieces that carry the hand that made them — heritage stitches, natural buttons and yarns chosen one skein at a time.',
-    image: '/images/Collections-Hero/Artisan.png',
+    image: "/images/collection-home/Artisan's.png",
     productIds: ['women-ivory-cable-cardigan', 'women-terracotta-textured-cardigan', 'men-navy-tan-colorblock-tee', 'men-black-red-contrast-tee'],
   },
   {

@@ -21,7 +21,7 @@ export function ShippingView() {
   ]
   return (
     <>
-      <PageHero eyebrow="Client care" title="Shipping & returns" intro="How your knitwear reaches you, and how to send it back if it is not quite right." image="/images/lookbook/new-workwear-2.png" />
+      <PageHero eyebrow="Client care" title="Shipping & *returns*" intro="How your knitwear reaches you, and how to send it back if it is not quite right." image="/images/blog/wardrobe-essentials.png" />
       <section className="bg-ivory pb-24 text-ink" aria-label="Shipping rates">
         <div className="container-wide">
           <RevealGroup className="grid gap-4 md:grid-cols-3">
@@ -105,7 +105,7 @@ const FIBRES = [
 export function CareView() {
   return (
     <>
-      <PageHero eyebrow="Care guide" title="Caring for knitwear" intro="Treat a good knit well and it will remember your shape for years. A few gentle habits make all the difference." image="/images/lookbook/soft-focus-1.png" />
+      <PageHero eyebrow="Care guide" title="Caring for *knitwear*" intro="Treat a good knit well and it will remember your shape for years. A few gentle habits make all the difference." image="/images/lookbook/soft-focus-2.png" />
       <section className="bg-ivory pb-24 text-ink" aria-label="By fibre">
         <div className="container-wide space-y-6">
           {FIBRES.map((f, i) => (
@@ -115,7 +115,7 @@ export function CareView() {
                   <Image src={f.image} alt="" fill sizes="(min-width:768px) 40vw, 100vw" className="object-cover" />
                 </div>
                 <div className="p-8 md:p-12">
-                  <p className="font-mono text-xs text-gold-deep">{String(i + 1).padStart(2, '0')}</p>
+                  <p className="font-mono text-xs text-burgundy">{String(i + 1).padStart(2, '0')}</p>
                   <h2 className="mt-3 font-display text-4xl">{f.name}</h2>
                   <ol className="mt-6 space-y-3">
                     {f.steps.map((s, j) => (
@@ -142,7 +142,7 @@ export function CareView() {
               </div>
             ))}
           </div>
-          <div className="mt-12 flex flex-wrap items-center justify-between gap-6 rounded-[2rem] bg-noir p-10 text-bone">
+          <div className="mt-12 flex flex-wrap items-center justify-between gap-6 rounded-[2rem] bg-signal p-10 text-bone [&_:focus-visible]:outline-bone">
             <p className="max-w-lg font-display text-3xl leading-tight">A loose button or a pulled thread? Write to us and we will help.</p>
             <ButtonLink href="/contact" variant="light" arrow>
               Contact the atelier
@@ -157,7 +157,7 @@ export function CareView() {
 export function SizeGuideView() {
   return (
     <>
-      <PageHero eyebrow="Fit" title="Size guide" intro="Body measurements for every size we make. Each product page adds fit notes and what other customers found." />
+      <PageHero eyebrow="Fit" title="Size *guide*" intro="Body measurements for every size we make. Each product page adds fit notes and what other customers found." />
       <section className="bg-ivory pb-24 text-ink">
         <div className="container-wide grid gap-12 lg:grid-cols-[1.4fr_1fr]">
           <SizeGuideTable />

@@ -232,7 +232,7 @@ export default function ShopView({
   )
 }
 
-const INTERLUDE = { src: '/images/lookbook/golden-hour-1.png', quote: 'Made to be reached for, every cold morning.' }
+const INTERLUDE = { src: '/images/collection-home/Material-Intimacy.png', alt: 'A hand resting on a cream cable knit' }
 
 function ProductCardSlot({ product, index, showInterlude, dense }: { product: CardProduct; index: number; showInterlude: boolean; dense: boolean }) {
   return (
@@ -246,9 +246,14 @@ function ProductCardSlot({ product, index, showInterlude, dense }: { product: Ca
           transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
           className="relative col-span-2 hidden overflow-hidden rounded-[1.25rem] bg-umber md:block md:col-span-1 lg:row-span-1"
         >
-          <Image src={INTERLUDE.src} alt="" fill sizes="33vw" className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-noir/70 to-transparent" />
-          <figcaption className="absolute inset-x-6 bottom-6 font-display text-3xl leading-tight text-bone">{INTERLUDE.quote}</figcaption>
+          <Image src={INTERLUDE.src} alt={INTERLUDE.alt} fill sizes="33vw" className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-noir/75 via-noir/10 to-transparent" />
+          <figcaption className="absolute inset-x-6 bottom-6 text-bone">
+            <span className="text-eyebrow slash text-butter">Small runs</span>
+            <span className="mt-3 block font-display text-[clamp(1.8rem,2.6vw,2.6rem)] font-semibold uppercase leading-[0.9] tracking-[-0.05em]">
+              Made to be <em>reached for</em> every cold morning.
+            </span>
+          </figcaption>
         </motion.figure>
       ) : null}
     </>

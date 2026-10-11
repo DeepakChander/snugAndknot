@@ -45,9 +45,9 @@ export default function MobileMenu() {
           animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
           exit={{ clipPath: 'inset(0% 0% 100% 0%)' }}
           transition={{ duration: 0.85, ease: [0.87, 0, 0.13, 1] }}
-          className="fixed inset-0 z-[95] flex flex-col overflow-y-auto bg-noir pt-[calc(var(--nav-h)+var(--announce-h))] text-bone lg:hidden"
+          className="fixed inset-0 z-[95] flex flex-col overflow-y-auto bg-ink pt-[calc(var(--nav-h)+var(--announce-h))] text-bone lg:hidden"
         >
-          <div className="knit-texture pointer-events-none absolute inset-0 text-bone opacity-40" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_80%_10%,rgba(217,68,43,0.18),transparent_70%)]" aria-hidden />
           {/* Keyboard users stay trapped in the dialog, so give them a close control inside it. */}
           <button type="button" onClick={closeMenu} className="sr-only focus:not-sr-only focus:absolute focus:right-4 focus:top-[calc(var(--nav-h)+0.5rem)] focus:rounded-full focus:bg-bone focus:px-4 focus:py-2 focus:text-ink">
             Close menu
@@ -63,8 +63,8 @@ export default function MobileMenu() {
                     transition={{ duration: 0.9, ease: EASE, delay: 0.25 + i * 0.05 }}
                   >
                     <Link href={l.href} onClick={closeMenu} className="flex items-baseline gap-4 py-3">
-                      <span className="w-6 font-mono text-[0.65rem] text-gold">{String(i + 1).padStart(2, '0')}</span>
-                      <span className="font-display text-[clamp(2.4rem,11vw,4rem)] leading-[0.95] tracking-[-0.02em]">{l.label}</span>
+                      <span className="w-6 font-mono text-[0.65rem] text-butter">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="font-display text-[clamp(2.3rem,11.5vw,4.2rem)] font-semibold uppercase leading-[0.9] tracking-[-0.055em]">{l.label}</span>
                     </Link>
                   </motion.div>
                 </li>
@@ -80,7 +80,7 @@ export default function MobileMenu() {
             className="relative grid grid-cols-2 gap-6 px-gutter pb-10 pt-10 text-sm"
           >
             <div className="space-y-2">
-              <p className="text-eyebrow text-taupe">Account</p>
+              <p className="text-eyebrow slash text-bone/60">Account</p>
               {user ? (
                 <>
                   <Link href="/account" onClick={closeMenu} className="block">
@@ -110,8 +110,8 @@ export default function MobileMenu() {
               </button>
             </div>
             <div className="space-y-2">
-              <p className="text-eyebrow text-taupe">Say hello</p>
-              <a href={`mailto:${store.email}`} className="block break-all">
+              <p className="text-eyebrow slash text-bone/60">Say hello</p>
+              <a href={`mailto:${store.email}`} className="block text-[0.8rem] [overflow-wrap:anywhere]">
                 {store.email}
               </a>
               {store.phone ? (

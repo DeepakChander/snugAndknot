@@ -14,6 +14,15 @@ if (typeof window !== 'undefined') {
   CustomEase.create('silk', '0.19, 1, 0.22, 1')
   CustomEase.create('curtain', '0.87, 0, 0.13, 1')
   ScrollTrigger.config({ ignoreMobileResize: true })
+  // A reload opens at the top, so scroll-driven intros start from their first frame: the entry is
+  // marked 'manual' as the page unloads (the browser decides whether to restore before any script on
+  // the next page runs). Once a page is shown, 'auto' goes back, through ScrollTrigger, which otherwise
+  // re-applies the mode it found at registration, so Back and Forward keep their scroll position.
+  window.addEventListener('pagehide', () => {
+    history.scrollRestoration = 'manual'
+  })
+  window.addEventListener('pageshow', () => ScrollTrigger.clearScrollMemory('auto'))
+  if (document.readyState === 'complete') ScrollTrigger.clearScrollMemory('auto')
 }
 
 export { gsap, ScrollTrigger, SplitText, useGSAP }

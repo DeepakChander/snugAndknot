@@ -1,46 +1,57 @@
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════════════════════════════════
-   SNUG & KNOT — "Atelier at Night" design system
-   Warm near-blacks and bone whites, burgundy velvet, gold thread.
+   SNUG & KNOT — "Index" design system
+   Warm paper and ink, one tomato-red signal, and a yarn palette that gives
+   every section its own colour. Tight grotesk headlines with an italic serif
+   accent word, mono capitals for labels.
    ══════════════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* Darks */
-  --color-noir: #0d0a09;
-  --color-ink: #16100e;
-  --color-umber: #221915;
-  --color-smoke: #3a2e29;
+  /* Ink (darks) */
+  --color-noir: #0f0e0d;
+  --color-ink: #161513;
+  --color-umber: #24221f;
+  --color-smoke: #3a3733;
 
-  /* Lights */
-  --color-ivory: #f8f3ea;
-  --color-bone: #f1e9dc;
-  --color-parchment: #e7dccb;
-  --color-oat: #d6c8b2;
+  /* Paper (lights) */
+  --color-ivory: #eeebe4;
+  --color-bone: #f7f5f0;
+  --color-parchment: #e3dfd5;
+  --color-oat: #d4cec1;
 
   /* Neutrals */
-  --color-taupe: #a59886;
-  --color-stone: #6e6257;
+  --color-taupe: #a39d92;
+  --color-stone: #66625b;
 
-  /* Brand accents */
-  --color-burgundy: #5b0e14;
-  --color-burgundy-deep: #3d0a0e;
-  --color-burgundy-light: #7a1b22;
-  --color-wine: #7a1b22;
-  --color-garnet: #9b2335;
-  --color-gold: #c9a35c;
-  --color-gold-light: #e8d3a0;
-  --color-gold-deep: #a07c3a;
-  --color-terracotta: #a5452f;
-  --color-sage: #7f8f72;
+  /* Signal red — the one accent (a red yarn tag) */
+  --color-signal: #d9442b;
+  /* Red for small text: signal itself is 4.0:1 on paper, too light below display sizes. */
+  --color-burgundy: #b23520;
+  --color-burgundy-deep: #b23520;
+  --color-burgundy-light: #ee7356;
+  --color-wine: #b23520;
+  --color-garnet: #d9442b;
+
+  /* Yarn palette — one per section */
+  --color-butter: #efe5b0;
+  --color-sage: #a8c1b3;
+  --color-clay: #e7a487;
+  --color-plum: #4e4558;
+  --color-moss: #3f4a3c;
+  --color-gold: #e3cf7f;
+  --color-gold-light: #efe5b0;
+  --color-gold-deep: #a48a2f;
+  --color-terracotta: #e7a487;
 
   /* States */
-  --color-success: #5a7a52;
-  --color-error: #b3261e;
+  --color-success: #3d7a4f;
+  --color-error: #a82e1a;
 
   /* Type */
-  --font-display: var(--font-instrument), 'Times New Roman', serif;
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter-tight), 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: var(--font-instrument), 'Times New Roman', serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-heading: var(--font-display);
   --font-body: var(--font-sans);
@@ -73,7 +84,7 @@
 /* ─────────────────────────── Base ─────────────────────────── */
 
 html {
-  background: var(--color-noir);
+  background: var(--color-ivory);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -113,9 +124,27 @@ body {
   h3,
   h4 {
     font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+  }
+  /* The display face is never set light: without its own weight it takes the heading weight.
+     Utilities sit in a later layer, so an explicit weight or tracking class still wins. */
+  .font-display {
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  /* The accent: one italic serif word or phrase inside grotesk type, kept in its own case. */
+  :is(h1, h2, h3, h4, .font-display, .text-mega, .text-display, .text-headline, .text-title, .text-statement) em,
+  .accent {
+    font-family: var(--font-accent);
+    font-style: italic;
     font-weight: 400;
-    line-height: 0.95;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    font-size: 1.06em;
+    line-height: 0.9;
+    padding-right: 0.04em;
   }
   a {
     color: inherit;
@@ -136,7 +165,7 @@ body {
 
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--color-gold);
+    outline: 2px solid var(--color-signal);
     outline-offset: 3px;
   }
 }
@@ -155,48 +184,75 @@ body {
 
 /* ─────────────────────────── Type scale ─────────────────────────── */
 
+/* Page titles: one or two big words in capitals. Never broken mid-word. */
 @utility text-mega {
   font-family: var(--font-display);
-  font-size: clamp(4.25rem, 15.5vw, 17rem);
+  font-weight: 650;
+  font-size: clamp(3.1rem, 11vw, 12.5rem);
   line-height: 0.82;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.06em;
+  text-transform: uppercase;
+  overflow-wrap: normal;
+  hyphens: none;
 }
 @utility text-display {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 9vw, 9.5rem);
-  line-height: 0.88;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  font-size: clamp(3.1rem, 9.2vw, 10.5rem);
+  line-height: 0.84;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
 }
 @utility text-headline {
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5.2vw, 5.25rem);
-  line-height: 0.95;
-  letter-spacing: -0.025em;
+  font-weight: 600;
+  font-size: clamp(2.35rem, 5.2vw, 5.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+}
+@utility text-statement {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.7rem, 3.6vw, 3.9rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
 }
 @utility text-title {
   font-family: var(--font-display);
-  font-size: clamp(1.65rem, 2.6vw, 2.6rem);
+  font-weight: 550;
+  font-size: clamp(1.4rem, 2.1vw, 2.15rem);
   line-height: 1.02;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.03em;
 }
 @utility text-lead {
-  font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+  font-size: clamp(1.02rem, 1.2vw, 1.2rem);
   line-height: 1.5;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.006em;
 }
 @utility text-eyebrow {
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: 0.6875rem;
   line-height: 1.2;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 @utility text-label {
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: 0.75rem;
   line-height: 1.3;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+/* "/ LABEL" — the slash that opens every small label */
+@utility slash {
+  &::before {
+    content: '/';
+    margin-right: 0.45em;
+    font-weight: 300;
+    opacity: 0.55;
+  }
 }
 
 /* ─────────────────────────── Layout ─────────────────────────── */
@@ -308,6 +364,8 @@ body {
 }
 .roll > span::after {
   content: attr(data-text);
+  /* The rolled copy is decorative: screen readers read the label once. */
+  content: attr(data-text) / '';
   position: absolute;
   left: 0;
   top: 100%;

@@ -38,7 +38,7 @@ export default function AdminLogin({ configured, denied }: { configured: boolean
   return (
     <div className="grid min-h-[100svh] bg-noir text-bone lg:grid-cols-2">
       <div className="relative hidden lg:block">
-        <Image src="/images/Collections-Hero/Artisan.png" alt="" fill priority sizes="50vw" className="object-cover opacity-70" />
+        <Image src="/images/collection-home/Material-Intimacy.png" alt="" fill preload sizes="50vw" className="object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/30" />
         <p className="absolute bottom-10 left-10 max-w-sm font-display text-4xl leading-tight">Run the atelier: pieces, orders, reviews and every setting in one place.</p>
       </div>

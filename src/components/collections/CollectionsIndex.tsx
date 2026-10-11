@@ -31,7 +31,7 @@ export default function CollectionsIndex({ collections }: { collections: (Collec
               <Reveal>
                 <p className="font-mono text-sm text-gold">{String(i + 1).padStart(2, '0')}</p>
                 <p className="mt-4 text-eyebrow text-taupe">{c.subtitle}</p>
-                <h2 className="mt-3 text-display">{c.title}</h2>
+                <h2 className="mt-3 text-headline uppercase">{c.title}</h2>
                 <p className="mt-6 max-w-md text-bone/60">{c.description}</p>
                 <div className="mt-8 flex items-center gap-6">
                   <ButtonLink href={`/collections/${c.handle}`} variant="light" arrow>

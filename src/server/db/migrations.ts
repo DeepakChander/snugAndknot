@@ -249,6 +249,45 @@ CREATE INDEX IF NOT EXISTS rate_limits_reset_at_idx ON rate_limits (reset_at);
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS admin_notes TEXT;
 `,
   },
+  {
+    version: 3,
+    name: 'refresh-default-copy',
+    // The storefront copy was rewritten (src/lib/settings-defaults.ts), but defaults only reach a
+    // database when it is first seeded. Each field (or link label and target together) moves to the
+    // new wording only while it still holds the old default, so anything edited in the admin stays.
+    // On a fresh database this matches no rows and the seed writes the new defaults.
+    sql: `
+UPDATE settings SET value = jsonb_set(value, '{tagline}', to_jsonb('Hand-finished knitwear, made in small runs.'::text)), updated_at = now()
+ WHERE key = 'store' AND value->>'tagline' = 'Where tension becomes tenderness.';
+UPDATE settings SET value = jsonb_set(value, '{description}', to_jsonb('Knitwear in merino, cashmere blends and long-staple cotton — made in small runs and finished by hand.'::text)), updated_at = now()
+ WHERE key = 'store' AND value->>'description' = 'Textiles knotted at the crossroads of tradition and nerve. Every thread earns its place.';
+
+UPDATE settings SET value = jsonb_set(value, '{messages}', '["Free shipping on orders over $150", "Hand-finished in small batches", "30-day returns on unworn pieces"]'::jsonb), updated_at = now()
+ WHERE key = 'announcement' AND value->'messages' = '["Complimentary shipping on orders over $150", "Hand-finished in small batches", "30-day returns, no questions asked"]'::jsonb;
+
+UPDATE settings SET value = jsonb_set(value, '{heroEyebrow}', to_jsonb('Autumn–Winter 2026'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'heroEyebrow' = 'Autumn / Winter Atelier';
+UPDATE settings SET value = jsonb_set(value, '{heroTitle}', to_jsonb('Knitwear made slowly, *to wear for years*.'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'heroTitle' = 'Knitted slowly. Worn for a lifetime.';
+UPDATE settings SET value = jsonb_set(value, '{heroSubtitle}', to_jsonb('Merino, cashmere blends and long-staple cotton — knitted in small runs and finished by hand.'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'heroSubtitle' = 'Merino, cashmere and long-staple cotton — knotted by hand in small batches, finished with intention.';
+UPDATE settings SET value = value || '{"primaryCtaLabel": "Shop new in", "primaryCtaHref": "/shop?sort=newest"}'::jsonb, updated_at = now()
+ WHERE key = 'homepage' AND value->>'primaryCtaLabel' = 'Shop the collection' AND value->>'primaryCtaHref' = '/shop';
+UPDATE settings SET value = value || '{"secondaryCtaLabel": "See the collections", "secondaryCtaHref": "/collections"}'::jsonb, updated_at = now()
+ WHERE key = 'homepage' AND value->>'secondaryCtaLabel' = 'Inside the atelier' AND value->>'secondaryCtaHref' = '/about';
+UPDATE settings SET value = jsonb_set(value, '{manifesto}', to_jsonb('We make a short list of knitwear and make it properly: natural fibres, small runs, and every piece *finished by hand* before it is folded and sent to you.'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'manifesto' = 'Tension is not the enemy of softness. Every knot is a decision, every thread earns its place, and the loom does not rush.';
+
+UPDATE settings SET value = jsonb_set(value, '{description}', to_jsonb('Hand-finished knitwear in merino, cashmere blends and long-staple cotton: cardigans and knit tees made in small runs to be worn for years.'::text)), updated_at = now()
+ WHERE key = 'seo' AND value->>'description' = 'Luxury knitwear knotted by hand: merino, cashmere and long-staple cotton cardigans and knit tees, made in small batches to last a lifetime.';
+-- The old share image and the seeded collection image show a weaving loom, not knitting. The new share
+-- image is a 1200x630 picture of three of the pieces.
+UPDATE settings SET value = jsonb_set(value, '{ogImage}', to_jsonb('/images/og/snugandknot.jpg'::text)), updated_at = now()
+ WHERE key = 'seo' AND value->>'ogImage' = '/images/Collections-Hero/Artisan.png';
+UPDATE collections SET image = '/images/collection-home/Artisan''s.png', updated_at = now()
+ WHERE handle = 'the-artisan-edit' AND image = '/images/Collections-Hero/Artisan.png';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

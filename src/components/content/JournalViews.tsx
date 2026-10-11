@@ -15,7 +15,7 @@ export function JournalIndex({ posts }: { posts: JournalPost[] }) {
   return (
     <div className="bg-ivory pb-28 pt-nav text-ink">
       <header className="container-wide pb-14 pt-12 md:pt-20">
-        <p className="text-eyebrow text-burgundy">The journal</p>
+        <p className="text-eyebrow slash text-stone">The journal</p>
         <SplitReveal as="h1" type="chars" intro className="mt-5 text-mega">
           Notes on knitwear
         </SplitReveal>
@@ -27,7 +27,7 @@ export function JournalIndex({ posts }: { posts: JournalPost[] }) {
         <Link href={`/journal/${lead.slug}`} className="group container-wide grid items-end gap-10 border-t border-ink/10 pt-12 lg:grid-cols-[1.4fr_1fr]" data-cursor="view" data-cursor-label="Read">
           <UnmaskImage src={lead.image} alt="" sizes="(min-width:1024px) 58vw, 100vw" className="aspect-[16/11]" />
           <div>
-            <p className="text-eyebrow text-burgundy">
+            <p className="text-eyebrow slash text-stone">
               {lead.tag} · {lead.readTime}
             </p>
             <h2 className="mt-4 text-headline transition-colors group-hover:text-burgundy">{lead.title}</h2>
@@ -43,7 +43,7 @@ export function JournalIndex({ posts }: { posts: JournalPost[] }) {
               <span className="relative block aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-parchment">
                 <Image src={p.image} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105" />
               </span>
-              <span className="mt-5 block text-eyebrow text-burgundy">
+              <span className="mt-5 block text-eyebrow slash text-stone">
                 {p.tag} · {p.readTime}
               </span>
               <span className="mt-2 block font-display text-4xl leading-tight transition-colors group-hover:text-burgundy">{p.title}</span>
@@ -76,7 +76,7 @@ export function JournalArticle({ post, more }: { post: JournalPost; more: Journa
           <Link href="/journal" className="link-wipe text-eyebrow text-bone/60">
             ← Journal
           </Link>
-          <p className="mt-6 text-eyebrow text-gold">
+          <p className="mt-6 text-eyebrow slash text-butter">
             {post.tag} · {post.readTime} · {formatDate(post.date, 'en-US', { dateStyle: 'long' })}
           </p>
           <SplitReveal as="h1" type="chars" intro className="mt-4 max-w-[16ch] text-display">
@@ -115,7 +115,7 @@ export function JournalArticle({ post, more }: { post: JournalPost; more: Journa
                     <Image src={p.image} alt="" fill sizes="140px" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                   </span>
                   <span>
-                    <span className="text-eyebrow text-burgundy">{p.tag}</span>
+                    <span className="text-eyebrow slash text-stone">{p.tag}</span>
                     <span className="mt-2 block font-display text-3xl leading-tight group-hover:text-burgundy">{p.title}</span>
                   </span>
                 </Link>

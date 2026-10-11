@@ -1,10 +1,15 @@
 import type { MetadataRoute } from 'next'
+import { INDEXABLE, SITE_URL } from '@/lib/site'
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://snug-andknot.vercel.app'
+/** Private and per-visitor pages stay out of search; previews are not crawled at all. */
+const PRIVATE = ['/admin', '/api/', '/account', '/checkout', '/cart', '/search', '/track']
 
 export default function robots(): MetadataRoute.Robots {
+  if (!INDEXABLE) return { rules: [{ userAgent: '*', disallow: '/' }] }
   return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/admin', '/api/', '/account', '/checkout', '/cart', '/search'] }],
-    sitemap: `${BASE}/sitemap.xml`,
+    // Uploaded product photos are served from /api/media/, so that one API path stays crawlable.
+    rules: [{ userAgent: '*', allow: ['/', '/api/media/'], disallow: PRIVATE }],
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   }
 }

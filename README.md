@@ -32,7 +32,20 @@ Set these in Vercel → Project → Settings → Environment Variables. Never co
 | `AUTH_SECRET` | Yes | Signs login cookies. At least 32 characters: `openssl rand -base64 32`. Changing it signs everyone out. |
 | `ADMIN_EMAIL` | Yes | The store owner's admin sign-in. This address cannot be registered as a customer. |
 | `ADMIN_PASSWORD` | Yes | At least 12 characters. Changing it ends every admin session and retires the old password straight away. |
-| `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical URL for links, sitemap and social previews. |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical URL for links, sitemap, feeds and social previews. On Vercel the production domain is used when it is unset. |
+| `GOOGLE_SITE_VERIFICATION` | Optional | The code Google Search Console gives you for the HTML-tag method; it is added as a meta tag. |
+| `BING_SITE_VERIFICATION` | Optional | The `msvalidate.01` code from Bing Webmaster Tools. |
+
+## Search and AI crawlers
+
+| URL | What it is |
+| --- | --- |
+| `/robots.txt` | Allows the shop, blocks admin, account, bag, checkout, search, order tracking and the API (except uploaded images). Preview deployments block everything and carry `noindex`. |
+| `/sitemap.xml` | Every product, category, department with pieces, collection, journal post and content page, with their photographs. |
+| `/llms.txt`, `/llms-full.txt` | Markdown maps of the shop for AI assistants ([llmstxt.org](https://llmstxt.org)); the full file adds product details, policies, the FAQ and journal articles. Built from the live catalogue. |
+| `/journal/feed.xml` | RSS feed of the journal. |
+
+Every indexable page has a canonical URL (filters and sorting point at the bare page) and Open Graph and Twitter tags. Pages carry schema.org data: the store and site search on the home page, `Product` with price, stock, return window and real approved reviews on product pages, breadcrumbs and item lists on categories and collections, `BlogPosting` on journal posts and `FAQPage` on the FAQ. Nothing in it is invented: there is no rating without reviews, and no shipping region or fee the shop has not published.
 
 ## Security model
 

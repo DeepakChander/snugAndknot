@@ -22,7 +22,7 @@ export function Stars({ value, size = 14, className, label = true }: { value: nu
         ))}
         <g clipPath={`url(#clip-${id})`}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <path key={`f${i}`} d={STAR} transform={`translate(${i * 26} 0)`} fill="var(--color-gold)" />
+            <path key={`f${i}`} d={STAR} transform={`translate(${i * 26} 0)`} fill="currentColor" />
           ))}
         </g>
       </svg>
@@ -43,7 +43,7 @@ export function StarInput({ value, onChange, name = 'rating', error }: { value: 
           <label key={n} className="cursor-pointer p-1" onPointerEnter={() => setHover(n)} data-cursor="hover">
             <input type="radio" name={name} value={n} checked={value === n} onChange={() => onChange(n)} className="peer sr-only" />
             <svg viewBox="0 0 24 24" className={cn('h-7 w-7 transition-transform duration-300 peer-focus-visible:scale-110', n <= shown ? 'scale-105' : '')} aria-hidden>
-              <path d={STAR} fill={n <= shown ? 'var(--color-gold)' : 'currentColor'} opacity={n <= shown ? 1 : 0.2} />
+              <path d={STAR} fill="currentColor" opacity={n <= shown ? 1 : 0.2} />
             </svg>
             <span className="sr-only">{n} star{n > 1 ? 's' : ''}</span>
           </label>

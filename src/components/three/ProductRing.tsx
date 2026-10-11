@@ -154,17 +154,28 @@ function Card({
 function Ring({
   items,
   scroll,
+  hold,
   onActive,
   onOpen,
   setCursor,
 }: {
   items: RingItem[]
   scroll: React.RefObject<number>
+  hold?: React.RefObject<boolean>
   onActive: (i: number) => void
   onOpen: (i: number) => void
   setCursor: (v: 'drag' | 'view' | 'default') => void
 }) {
-  const textures = useTexture(items.map((i) => textureUrl(i.src)))
+  // Set up in useTexture's onLoad, which runs before drei uploads them, so each texture is uploaded once.
+  const textures = useTexture(
+    items.map((i) => textureUrl(i.src)),
+    (loaded) => {
+      for (const t of Array.isArray(loaded) ? loaded : [loaded]) {
+        t.colorSpace = THREE.SRGBColorSpace
+        t.anisotropy = 8
+      }
+    }
+  )
   const count = items.length
   const step = (Math.PI * 2) / count
   const radius = Math.max(3.2, (count * CARD_W * 1.18) / (Math.PI * 2))
@@ -176,13 +187,6 @@ function Ring({
   const lastActive = useRef(-1)
   const { size, gl } = useThree()
 
-  useEffect(() => {
-    textures.forEach((t) => {
-      t.colorSpace = THREE.SRGBColorSpace
-      t.anisotropy = 8
-      t.needsUpdate = true
-    })
-  }, [textures])
 
   // Drag anywhere on the canvas to spin; release settles on the nearest piece.
   useEffect(() => {
@@ -217,7 +221,8 @@ function Ring({
   useFrame((state, dt) => {
     const now = performance.now()
     // Gentle auto-advance one piece at a time when nobody is interacting.
-    if (!drag.current.active && hovered.current < 0 && now - drag.current.idleAt > 3800) {
+    // Held while the piece's name or button has keyboard focus, so the link does not change under it.
+    if (!drag.current.active && hovered.current < 0 && !hold?.current && now - drag.current.idleAt > 3800) {
       target.current = Math.round(target.current / step) * step + step
       drag.current.idleAt = now
     }
@@ -280,6 +285,7 @@ function CameraRig({ count }: { count: number }) {
 export default function ProductRing({
   items,
   scroll,
+  hold,
   active,
   onActive,
   onOpen,
@@ -287,6 +293,8 @@ export default function ProductRing({
 }: {
   items: RingItem[]
   scroll: React.RefObject<number>
+  /** While true the ring does not auto-advance. */
+  hold?: React.RefObject<boolean>
   active: boolean
   onActive: (i: number) => void
   onOpen: (i: number) => void
@@ -303,7 +311,7 @@ export default function ProductRing({
     >
       <CameraRig count={items.length} />
       <Suspense fallback={null}>
-        <Ring items={items} scroll={scroll} onActive={onActive} onOpen={onOpen} setCursor={setCursor} />
+        <Ring items={items} scroll={scroll} hold={hold} onActive={onActive} onOpen={onOpen} setCursor={setCursor} />
       </Suspense>
     </Canvas>
   )

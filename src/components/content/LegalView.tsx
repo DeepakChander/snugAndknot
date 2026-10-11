@@ -48,8 +48,8 @@ export default function LegalView({ eyebrow, title, intro, sections }: { eyebrow
           <article className="max-w-2xl space-y-14">
             {sections.map((s, i) => (
               <section key={s.id} id={s.id} className="scroll-mt-32">
-                <p className="font-mono text-xs text-gold-deep">{String(i + 1).padStart(2, '0')}</p>
-                <h2 className="mt-2 font-display text-4xl leading-tight">{s.title}</h2>
+                <p className="font-mono text-xs text-burgundy">{String(i + 1).padStart(2, '0')}</p>
+                <h2 className="mt-2 font-display text-[clamp(1.8rem,3vw,2.5rem)] font-semibold leading-[1] tracking-[-0.04em]">{s.title}</h2>
                 <div className="mt-5 space-y-4 leading-relaxed text-stone">
                   {s.body.map((p, j) => (
                     <p key={j}>{p}</p>

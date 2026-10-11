@@ -14,7 +14,7 @@ const FRAMES = [
   '/images/products/women/terracotta-textured-cardigan-1.jpg',
   '/images/collection-home/Material-Intimacy.png',
   '/images/products/men/black-red-contrast-tee-1.jpg',
-  '/images/lookbook/golden-hour-2.png',
+  '/images/lookbook/soft-focus-2.png',
   '/images/Collections-Hero/Winter.png',
 ]
 
@@ -114,8 +114,8 @@ export default function Preloader() {
   if (done) return null
 
   return (
-    <div ref={root} className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-noir text-bone" data-chrome aria-hidden>
-      <div className="flex items-center gap-[2vw] font-display text-[clamp(3.25rem,10vw,9rem)] leading-[0.9] tracking-[-0.035em]">
+    <div ref={root} className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-ivory text-ink" data-chrome aria-hidden>
+      <div className="flex items-center gap-[1.6vw] font-display text-[clamp(3rem,10.5vw,10rem)] font-[680] uppercase leading-[0.84] tracking-[-0.065em]">
         <span data-left className="flex overflow-hidden">
           {'Snug'.split('').map((c, i) => (
             <span key={i} data-letter className="inline-block">
@@ -123,12 +123,12 @@ export default function Preloader() {
             </span>
           ))}
         </span>
-        <span data-window className="relative block h-[clamp(110px,15vw,210px)] overflow-hidden rounded-[1rem] bg-umber">
+        <span data-window className="relative block h-[clamp(110px,15vw,210px)] overflow-hidden rounded-[1rem] bg-parchment">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={optimised(FRAMES[frame])} alt="" className="absolute inset-0 h-full w-full object-cover" />
         </span>
         <span data-right className="flex overflow-hidden">
-          <span data-letter className="inline-block pr-[0.06em] italic text-gold">
+          <span data-letter className="inline-block pr-[0.06em] font-accent font-normal normal-case italic tracking-normal text-signal">
             &amp;
           </span>
           {'Knot'.split('').map((c, i) => (
@@ -139,14 +139,14 @@ export default function Preloader() {
         </span>
       </div>
 
-      <p data-fade className="absolute bottom-8 left-[var(--gutter)] text-eyebrow text-taupe">
+      <p data-fade className="absolute bottom-8 left-[var(--gutter)] text-eyebrow slash text-stone">
         Knitwear, hand-finished
       </p>
-      <p data-fade className="absolute bottom-7 right-[var(--gutter)] font-mono text-sm tabular-nums text-bone/80">
+      <p data-fade className="absolute bottom-7 right-[var(--gutter)] font-mono text-sm tabular-nums text-ink/80">
         <span data-count>000</span>
       </p>
-      <div data-fade className="absolute bottom-0 left-0 right-0 h-px bg-bone/10">
-        <div data-bar className="h-full origin-left scale-x-0 bg-gold" />
+      <div data-fade className="absolute bottom-0 left-0 right-0 h-[3px] bg-ink/10">
+        <div data-bar className="h-full origin-left scale-x-0 bg-signal" />
       </div>
     </div>
   )

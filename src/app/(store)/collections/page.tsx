@@ -3,6 +3,7 @@ import CollectionsIndex from '@/components/collections/CollectionsIndex'
 import { getCollections, getProducts } from '@/server/catalog'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/collections' },
   title: 'Collections',
   description: 'Snug&Knot collections — knitwear gathered around a feeling: winter warmth, the artisan edit, everyday essentials and coastal walks.',
 }

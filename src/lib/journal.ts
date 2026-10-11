@@ -17,7 +17,7 @@ export const JOURNAL: JournalPost[] = [
   {
     slug: 'organic-cotton-journey',
     tag: 'Fibre',
-    title: 'Where cotton learns tension',
+    title: 'Why cotton fibre length matters',
     description: 'Why the length of a cotton fibre decides how a knit feels, pills and ages — and what to look for on a label.',
     image: '/images/blog/organic-cotton.png',
     readTime: '6 min read',
@@ -39,7 +39,7 @@ export const JOURNAL: JournalPost[] = [
     tag: 'Craft',
     title: 'How to read a knit',
     description: 'Rib, cable, jersey, gauge — a short field guide to the stitches and terms on our product pages.',
-    image: '/images/blog/behind-knit.png',
+    image: '/images/collection-home/Material-Intimacy.png',
     readTime: '7 min read',
     date: '2026-08-30',
     body: [

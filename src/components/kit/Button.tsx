@@ -5,22 +5,24 @@ import { forwardRef, type ComponentPropsWithoutRef, type PointerEvent, type Reac
 import { cn } from '@/lib/format'
 import Magnetic from '@/components/motion/Magnetic'
 
-type Variant = 'primary' | 'light' | 'outline' | 'outline-light' | 'gold' | 'ghost'
+type Variant = 'primary' | 'light' | 'outline' | 'outline-light' | 'gold' | 'signal' | 'ghost'
 type Size = 'sm' | 'md' | 'lg'
 
 const VARIANT: Record<Variant, string> = {
-  primary: 'bg-ink text-ivory [--btn-fill:var(--color-burgundy)] [--btn-ink-hover:var(--color-ivory)]',
-  light: 'bg-ivory text-ink [--btn-fill:var(--color-gold)] [--btn-ink-hover:var(--color-ink)]',
-  gold: 'bg-gold text-ink [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-gold-light)]',
-  outline: 'border border-ink/25 text-ink [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-ivory)]',
-  'outline-light': 'border border-ivory/30 text-ivory [--btn-fill:var(--color-ivory)] [--btn-ink-hover:var(--color-ink)]',
+  // Fills under small labels use the deeper red: bone on signal red is only 4.0:1.
+  primary: 'bg-ink text-bone [--btn-fill:var(--color-burgundy-deep)] [--btn-ink-hover:var(--color-bone)]',
+  light: 'bg-bone text-ink hover:text-bone focus-visible:text-bone [--btn-fill:var(--color-burgundy-deep)] [--btn-ink-hover:var(--color-bone)]',
+  gold: 'bg-butter text-ink hover:text-butter focus-visible:text-butter [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-butter)]',
+  signal: 'bg-signal text-bone [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-bone)]',
+  outline: 'border border-ink/25 text-ink hover:text-ivory focus-visible:text-ivory [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-ivory)]',
+  'outline-light': 'border border-bone/35 text-bone hover:text-ink focus-visible:text-ink [--btn-fill:var(--color-bone)] [--btn-ink-hover:var(--color-ink)]',
   ghost: 'text-current [--btn-fill:color-mix(in_srgb,currentColor_10%,transparent)] [--btn-ink-hover:currentColor]',
 }
 
 const SIZE: Record<Size, string> = {
-  sm: 'h-10 px-5 text-[0.8125rem]',
-  md: 'h-12 px-7 text-sm',
-  lg: 'h-14 px-9 text-[0.95rem]',
+  sm: 'h-10 px-5 text-[0.84rem]',
+  md: 'h-12 px-6 text-[0.92rem]',
+  lg: 'h-14 px-8 text-[1rem]',
 }
 
 export function Arrow({ className }: { className?: string }) {
@@ -66,11 +68,11 @@ function Inner({ children, arrow, icon, loading }: Pick<Common, 'children' | 'ar
       <span className="btn-fill" aria-hidden />
       {loading ? <Spinner /> : null}
       {label ? (
-        <span className="roll font-medium tracking-[-0.01em]">
+        <span className="roll font-display font-medium tracking-[-0.02em]">
           <span data-text={label}>{label}</span>
         </span>
       ) : (
-        <span className="inline-flex items-center gap-2 font-medium">{children}</span>
+        <span className="inline-flex items-center gap-2 font-display font-medium tracking-[-0.02em]">{children}</span>
       )}
       {icon ?? (arrow ? <Arrow className="btn-icon" /> : null)}
     </>

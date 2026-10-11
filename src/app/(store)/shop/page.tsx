@@ -3,6 +3,7 @@ import ShopView from '@/components/shop/ShopView'
 import { loadShop } from '@/server/shop'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/shop' },
   title: 'Shop all knitwear',
   description: 'Every Snug&Knot piece — cardigans and fine-gauge knit tees in merino, cashmere blends and long-staple cotton.',
 }

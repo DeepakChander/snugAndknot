@@ -97,13 +97,13 @@ function FooterContent() {
   ].filter((s) => s.href)
 
   return (
-    <div className="relative flex min-h-full flex-col overflow-hidden bg-noir text-bone">
+    <div className="relative flex min-h-full flex-col overflow-hidden bg-ink text-bone">
 
       <div className="container-wide relative grid gap-14 pt-20 md:pt-28 lg:grid-cols-12">
         <div className="lg:col-span-5">
-          <p className="text-eyebrow text-gold">The atelier letter</p>
+          <p className="text-eyebrow slash text-butter">The atelier letter</p>
           <h2 className="mt-5 text-headline text-balance">
-            Slow news from the <em className="text-gold-light">workroom</em>.
+            Slow news from the <em className="text-butter">workroom</em>.
           </h2>
           <p className="mt-5 max-w-md text-bone/60">New pieces, restocks and the stories behind the yarn — a few times a season, never more.</p>
           <NewsletterForm source="footer" className="mt-8 max-w-lg" />
@@ -112,11 +112,11 @@ function FooterContent() {
         <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-7 lg:pl-12">
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <p className="text-eyebrow text-taupe">{col.title}</p>
+              <p className="text-eyebrow slash text-bone/60">{col.title}</p>
               <ul className="mt-5 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="link-wipe text-[0.95rem] text-bone/80 transition-colors hover:text-bone">
+                    <Link href={l.href} className="link-wipe font-display text-[1.02rem] font-medium tracking-[-0.02em] text-bone/80 transition-colors hover:text-bone">
                       {l.label}
                     </Link>
                   </li>
@@ -158,7 +158,7 @@ function FooterContent() {
               rel="noopener noreferrer"
               aria-label={label}
               data-cursor="hover"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-bone/15 transition-colors hover:border-gold hover:text-gold"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-bone/15 transition-colors hover:border-signal hover:bg-signal"
             >
               <Icon size={17} />
             </a>
@@ -167,14 +167,14 @@ function FooterContent() {
       </div>
 
       <div ref={word} className="relative mt-auto select-none overflow-hidden px-[2vw] pt-14" aria-hidden>
-        <div className="flex justify-between font-display text-[19.5vw] leading-[0.78] tracking-[-0.045em] text-bone">
+        <div className="flex items-baseline justify-between font-display text-[17.2vw] font-[680] uppercase leading-[0.8] tracking-[-0.06em] text-bone">
           {a.split('').map((c, i) => (
             <span key={`a${i}`} data-l className="inline-block">
               {c}
             </span>
           ))}
           {name.includes('&') ? (
-            <span data-l className="inline-block italic text-gold">
+            <span data-l className="inline-block font-accent font-normal normal-case italic tracking-normal text-signal">
               &amp;
             </span>
           ) : null}

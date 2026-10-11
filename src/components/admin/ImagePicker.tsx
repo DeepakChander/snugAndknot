@@ -36,14 +36,13 @@ export function MediaLibrary({ open, onClose, onPick }: { open: boolean; onClose
     '/images/products/men/navy-tan-colorblock-tee-1.jpg',
     '/images/products/men/black-red-contrast-tee-1.jpg',
     '/images/Collections-Hero/Winter.png',
-    '/images/Collections-Hero/Artisan.png',
+    "/images/collection-home/Artisan's.png",
     '/images/Collections-Hero/Essentials.png',
     '/images/Collections-Hero/Coastal.png',
     '/images/lookbook/quiet-luxury-1.png',
-    '/images/lookbook/golden-hour-2.png',
-    '/images/lookbook/after-dark-1.png',
+    '/images/collection-home/Lived-In.png',
+    '/images/blog/wardrobe-essentials.png',
     '/images/lookbook/soft-focus-2.png',
-    '/images/about/about-hero.png',
     '/images/collection-home/Material-Intimacy.png',
   ]
   return (
