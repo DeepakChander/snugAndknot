@@ -40,3 +40,9 @@ next-env.d.ts
 *.swp
 *.swo
 *~
+
+# local database (PGlite)
+/.data/
+
+# Claude Code local settings
+.claude/settings.local.json

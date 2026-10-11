@@ -1,11 +1,11 @@
 {
-  "name": "Snug&Knot - Premium Fashion",
+  "name": "Snug&Knot — Hand-finished knitwear",
   "short_name": "Snug&Knot",
-  "description": "Timeless fashion pieces crafted with care, designed to be cherished",
+  "description": "Knitwear in merino, cashmere blends and long-staple cotton — made in small runs and finished by hand.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FDF6EE",
-  "theme_color": "#2C2420",
+  "background_color": "#eeebe4",
+  "theme_color": "#eeebe4",
   "orientation": "portrait-primary",
   "icons": [
     {
