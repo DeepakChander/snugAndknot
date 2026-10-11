@@ -23,11 +23,12 @@ const NUMERIC_OID = 1700
 const INT8_OID = 20
 
 /**
- * Only DATABASE_URL is used. Hosting integrations add variables such as POSTGRES_URL for databases
- * that may belong to something else; the shop never writes to one it was not explicitly given.
+ * SNUGKNOT_DATABASE_URL, else DATABASE_URL. The first exists for hosting projects where a database
+ * integration already owns DATABASE_URL for another app. Variables such as POSTGRES_URL are never
+ * read: the shop only writes to a database it was explicitly given.
  */
 function connectionString(): string | undefined {
-  return process.env.DATABASE_URL || undefined
+  return process.env.SNUGKNOT_DATABASE_URL || process.env.DATABASE_URL || undefined
 }
 
 /** Every table the migrations create — used to recognise a database that belongs to another app. */
@@ -165,8 +166,9 @@ async function migrate(db: Db) {
         )
         if (clash.length) {
           throw new Error(
-            `DATABASE_URL points to a database that already has tables named ${clash.map((c) => c.name).join(', ')} ` +
-              'from another app. Snug&Knot needs an empty database (or one it created itself); nothing was changed.'
+            `The database in ${process.env.SNUGKNOT_DATABASE_URL ? 'SNUGKNOT_DATABASE_URL' : 'DATABASE_URL'} already has tables named ` +
+              `${clash.map((c) => c.name).join(', ')} from another app. Snug&Knot needs an empty database (or one it ` +
+              'created itself): set SNUGKNOT_DATABASE_URL to one. Nothing was changed.'
           )
         }
       }

@@ -40,7 +40,7 @@ export function sessionSecret(): Buffer {
     warned = true
     console.warn('[auth] AUTH_SECRET is not set; deriving the session key from the database URL. Set AUTH_SECRET.')
   }
-  const db = process.env.DATABASE_URL || process.env.POSTGRES_URL
+  const db = process.env.SNUGKNOT_DATABASE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL
   if (db) return createHash('sha256').update(`snugknot-session:${db}`).digest()
   if (!processSecret) processSecret = randomBytes(32)
   return processSecret

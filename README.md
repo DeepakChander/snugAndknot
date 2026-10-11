@@ -28,7 +28,8 @@ Set these in Vercel → Project → Settings → Environment Variables. Never co
 
 | Name | Required | Notes |
 | --- | --- | --- |
-| `DATABASE_URL` | Yes, in production | Any Postgres URL (Neon, Supabase, Vercel Postgres). Without it the site runs on an in-memory demo database and loses every change on restart. Remote connections use TLS with certificate checks. Only this variable is read: `POSTGRES_URL` and similar variables added by hosting integrations are ignored, and the app refuses a database that already holds another app's tables. Use an empty database. |
+| `DATABASE_URL` | Yes, in production | Any Postgres URL (Neon, Supabase, Vercel Postgres). Without it the site runs on an in-memory demo database and loses every change on restart. Remote connections use TLS with certificate checks. `POSTGRES_URL` and similar integration variables are ignored, and the app refuses a database that already holds another app's tables. Use an empty database. |
+| `SNUGKNOT_DATABASE_URL` | When `DATABASE_URL` is taken | Wins over `DATABASE_URL`. Use it when a database integration already owns `DATABASE_URL` for something else. |
 | `AUTH_SECRET` | Yes | Signs login cookies. At least 32 characters: `openssl rand -base64 32`. Changing it signs everyone out. |
 | `ADMIN_EMAIL` | Yes | The store owner's admin sign-in. This address cannot be registered as a customer. |
 | `ADMIN_PASSWORD` | Yes | At least 12 characters. Changing it ends every admin session and retires the old password straight away. |
