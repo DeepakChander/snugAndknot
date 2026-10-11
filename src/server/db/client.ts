@@ -1,5 +1,6 @@
 import 'server-only'
 import { MIGRATIONS, LATEST_SCHEMA_VERSION } from './migrations'
+import { databaseUrl, shopVariableNames } from './url'
 import { seedDatabase } from './seed'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -22,13 +23,9 @@ export interface Db extends Queryable {
 const NUMERIC_OID = 1700
 const INT8_OID = 20
 
-/**
- * SNUGKNOT_DATABASE_URL, else DATABASE_URL. The first exists for hosting projects where a database
- * integration already owns DATABASE_URL for another app. Variables such as POSTGRES_URL are never
- * read: the shop only writes to a database it was explicitly given.
- */
+/** See ./url for the order in which variables are tried. */
 function connectionString(): string | undefined {
-  return process.env.SNUGKNOT_DATABASE_URL || process.env.DATABASE_URL || undefined
+  return databaseUrl()?.url
 }
 
 /** Every table the migrations create — used to recognise a database that belongs to another app. */
@@ -166,9 +163,10 @@ async function migrate(db: Db) {
         )
         if (clash.length) {
           throw new Error(
-            `The database in ${process.env.SNUGKNOT_DATABASE_URL ? 'SNUGKNOT_DATABASE_URL' : 'DATABASE_URL'} already has tables named ` +
-              `${clash.map((c) => c.name).join(', ')} from another app. Snug&Knot needs an empty database (or one it ` +
-              'created itself): set SNUGKNOT_DATABASE_URL to one. Nothing was changed.'
+            `The database in ${databaseUrl()?.from} already has tables named ${clash.map((c) => c.name).join(', ')} ` +
+              'from another app. Snug&Knot needs an empty database (or one it created itself): set ' +
+              `SNUGKNOT_DATABASE_URL to one. Variables starting with SNUGKNOT: ${shopVariableNames().join(', ') || 'none'}. ` +
+              'Nothing was changed.'
           )
         }
       }
