@@ -2,6 +2,7 @@ import 'server-only'
 import { createHash } from 'node:crypto'
 import { query } from '@/server/db/client'
 import { HttpError } from '@/server/http'
+import { rateLimited } from '@/server/notify-events'
 
 /**
  * Fixed-window limits stored in the database, so every serverless instance shares one
@@ -38,6 +39,8 @@ function hashKey(name: string, id: string) {
 }
 
 /** Counts one hit against `name` for `id`; throws 429 (with Retry-After) once the window is full. */
+const QUIET = new Set<LimitName>(['helpful', 'quote', 'search'] as LimitName[])
+
 export async function rateLimit(name: LimitName, id: string): Promise<void> {
   const { limit, windowMs, message } = LIMITS[name]
   const rows = await query<{ count: number; retry: number }>(
@@ -55,6 +58,9 @@ export async function rateLimit(name: LimitName, id: string): Promise<void> {
   }
   const { count, retry } = rows[0]
   if (count > limit) {
+    // The first refusal in a window tells the support inbox (repeats are collapsed there). Everyday
+    // limits such as "helpful" votes, search and cart quotes are not worth an email.
+    if (count === limit + 1 && !QUIET.has(name)) await rateLimited(name, hashKey(name, id))
     throw new HttpError(429, message, undefined, { 'Retry-After': String(Math.max(1, retry)) })
   }
 }

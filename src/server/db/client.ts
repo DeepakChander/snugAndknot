@@ -29,7 +29,7 @@ function connectionString(): string | undefined {
 }
 
 /** Every table the migrations create — used to recognise a database that belongs to another app. */
-const SHOP_TABLES = ['settings', 'users', 'categories', 'products', 'variants', 'collections', 'reviews', 'coupons', 'orders', 'order_items', 'returns', 'subscribers', 'messages', 'stock_alerts', 'media', 'rate_limits']
+const SHOP_TABLES = ['settings', 'users', 'categories', 'products', 'variants', 'collections', 'reviews', 'coupons', 'orders', 'order_items', 'returns', 'subscribers', 'messages', 'stock_alerts', 'media', 'rate_limits', 'notifications']
 
 function isLocalHost(url: string): boolean {
   try {

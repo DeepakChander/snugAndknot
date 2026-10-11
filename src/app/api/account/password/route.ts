@@ -3,6 +3,7 @@ import { hashPassword, revokeSessions, sessionUser, startSession, verifyPassword
 import { rateLimit } from '@/server/rate-limit'
 import { HttpError, ok, parseBody, requireUser, route } from '@/server/http'
 import { passwordChangeSchema } from '@/server/validation'
+import { passwordChanged } from '@/server/notify-events'
 
 export const POST = route(async (req) => {
   const user = await requireUser()
@@ -23,5 +24,6 @@ export const POST = route(async (req) => {
   await revokeSessions(user.id)
   const [row] = await query('SELECT * FROM users WHERE id = $1', [user.id])
   await startSession(sessionUser(row))
+  await passwordChanged(user)
   return ok({ ok: true })
 })

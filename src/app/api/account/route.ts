@@ -2,6 +2,7 @@ import { query } from '@/server/db/client'
 import { mapUser } from '@/server/auth'
 import { ok, parseBody, requireUser, route } from '@/server/http'
 import { profileSchema } from '@/server/validation'
+import { profileUpdated } from '@/server/notify-events'
 
 export const PATCH = route(async (req) => {
   const user = await requireUser()
@@ -11,5 +12,7 @@ export const PATCH = route(async (req) => {
     input.name,
     input.phone || null,
   ])
-  return ok({ user: mapUser(rows[0]) })
+  const updated = mapUser(rows[0])
+  await profileUpdated(user, { name: updated.name, phone: updated.phone, email: updated.email })
+  return ok({ user: updated })
 })

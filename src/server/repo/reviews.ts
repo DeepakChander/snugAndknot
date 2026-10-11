@@ -141,6 +141,11 @@ export async function listReviewsAdmin(status?: ReviewStatus): Promise<AdminRevi
   }))
 }
 
+export async function getReviewById(id: string): Promise<Review | null> {
+  const rows = await query('SELECT * FROM reviews WHERE id = $1', [id])
+  return rows[0] ? mapReview(rows[0]) : null
+}
+
 export async function updateReviewAdmin(
   id: string,
   patch: { status?: ReviewStatus; adminReply?: string | null }

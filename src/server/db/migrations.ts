@@ -314,6 +314,41 @@ UPDATE categories SET description = 'Cable, diamond and heritage stitches, butto
 UPDATE products SET updated_at = now() WHERE updated_at = created_at AND created_at < '2025-01-01';
 `,
   },
+  {
+    version: 6,
+    name: 'notifications',
+    // Every email to the store's support inbox is recorded here before it is sent, so a mail outage
+    // loses nothing: failed sends are retried with a back-off, and the log shows what went out.
+    // dedupe_slot makes "one notice per key per window" atomic; claimed_at times a send in progress.
+    sql: `
+CREATE TABLE IF NOT EXISTS notifications (
+  id               TEXT PRIMARY KEY,
+  type             TEXT NOT NULL,
+  subject          TEXT NOT NULL,
+  body_text        TEXT NOT NULL,
+  body_html        TEXT NOT NULL,
+  to_email         TEXT NOT NULL,
+  reply_to         TEXT,
+  dedupe_key       TEXT,
+  dedupe_slot      TEXT,
+  status           TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'sending', 'sent', 'failed', 'skipped', 'suppressed')),
+  attempts         INTEGER NOT NULL DEFAULT 0,
+  error            TEXT,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  claimed_at       TIMESTAMPTZ,
+  next_attempt_at  TIMESTAMPTZ,
+  sent_at          TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS notifications_status_idx ON notifications (status, created_at);
+CREATE INDEX IF NOT EXISTS notifications_created_idx ON notifications (created_at);
+CREATE INDEX IF NOT EXISTS notifications_dedupe_idx ON notifications (type, dedupe_key, created_at);
+CREATE UNIQUE INDEX IF NOT EXISTS notifications_dedupe_slot_idx ON notifications (type, dedupe_slot) WHERE dedupe_slot IS NOT NULL;
+
+-- The store's public address moves from hello@ to support@ (only where it is still the old default).
+UPDATE settings SET value = jsonb_set(value, '{email}', to_jsonb('support@snugandknot.com'::text)), updated_at = now()
+ WHERE key = 'store' AND value->>'email' = 'hello@snugandknot.com';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

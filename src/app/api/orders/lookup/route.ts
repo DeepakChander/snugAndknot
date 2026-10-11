@@ -3,6 +3,7 @@ import { rateLimit } from '@/server/rate-limit'
 import { clientIp, HttpError, ok, parseBody, route } from '@/server/http'
 import { orderLookupSchema } from '@/server/validation'
 import type { Order } from '@/types/commerce'
+import { orderLookedUp } from '@/server/notify-events'
 
 /** Shows enough to recognise the delivery without handing a full address to whoever guessed a number. */
 function maskForGuest(order: Order): Order {
@@ -27,9 +28,11 @@ function maskForGuest(order: Order): Order {
 /** Guest order tracking: order number + the email used at checkout. */
 export const POST = route(async (req) => {
   const input = await parseBody(req, orderLookupSchema)
-  await rateLimit('orderLookupIp', clientIp(req))
+  const ip = clientIp(req)
+  await rateLimit('orderLookupIp', ip)
   await rateLimit('orderLookupEmail', input.email)
   const order = await findOrderForGuest(input.orderNumber, input.email)
+  await orderLookedUp(input.orderNumber, input.email, order, ip)
   if (!order) throw new HttpError(404, 'We could not find an order with that number and email.')
   return ok({ order: maskForGuest(order) })
 })

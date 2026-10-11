@@ -4,8 +4,11 @@ import { requireAdminPage } from '@/server/guards'
 
 export const metadata = { title: 'Inbox' }
 
-export default async function AdminInbox() {
+const TABS = ['messages', 'subscribers', 'alerts'] as const
+
+export default async function AdminInbox({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   await requireAdminPage()
-  const [messages, subscribers, alerts] = await Promise.all([listMessages(), listSubscribers(), listStockAlerts()])
-  return <InboxAdmin messages={messages} subscribers={subscribers} alerts={alerts} />
+  const [{ tab }, messages, subscribers, alerts] = await Promise.all([searchParams, listMessages(), listSubscribers(), listStockAlerts()])
+  const initialTab = TABS.find((t) => t === tab) ?? 'messages'
+  return <InboxAdmin key={initialTab} messages={messages} subscribers={subscribers} alerts={alerts} initialTab={initialTab} />
 }

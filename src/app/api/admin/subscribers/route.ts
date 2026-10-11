@@ -1,5 +1,6 @@
 import { deleteSubscriber, listSubscribers } from '@/server/repo/misc'
 import { guardWrite, HttpError, ok, requireAdmin, route } from '@/server/http'
+import { subscriberRemoved } from '@/server/notify-events'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,8 +21,9 @@ export const GET = route(async (req) => {
 
 export const DELETE = route(async (req) => {
   guardWrite(req)
-  await requireAdmin()
+  const admin = await requireAdmin()
   const email = new URL(req.url).searchParams.get('email')
   if (!email || !(await deleteSubscriber(email))) throw new HttpError(404, 'Subscriber not found.')
+  await subscriberRemoved(email, admin.email)
   return ok({ ok: true })
 })

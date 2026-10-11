@@ -224,9 +224,9 @@ type Message = { id: string; name: string; email: string; subject: string; body:
 type Subscriber = { email: string; source: string; createdAt: string }
 type Alert = { id: string; email: string; productTitle: string; variantTitle: string | null; inventory: number; createdAt: string }
 
-export function InboxAdmin({ messages, subscribers, alerts }: { messages: Message[]; subscribers: Subscriber[]; alerts: Alert[] }) {
+export function InboxAdmin({ messages, subscribers, alerts, initialTab = 'messages' }: { messages: Message[]; subscribers: Subscriber[]; alerts: Alert[]; initialTab?: 'messages' | 'subscribers' | 'alerts' }) {
   const { run, busy } = useMutate()
-  const [tab, setTab] = useState<'messages' | 'subscribers' | 'alerts'>('messages')
+  const [tab, setTab] = useState<'messages' | 'subscribers' | 'alerts'>(initialTab)
   const [showArchived, setShowArchived] = useState(false)
   const visible = messages.filter((m) => showArchived || m.status !== 'archived')
   return (

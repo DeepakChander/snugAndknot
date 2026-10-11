@@ -45,7 +45,7 @@ const GROUPS = [
       { href: '/admin/inbox', label: 'Inbox', count: 'newMessages' as const },
     ],
   },
-  { label: 'Store', items: [{ href: '/admin/settings', label: 'Settings' }] },
+  { label: 'Store', items: [{ href: '/admin/settings', label: 'Settings' }, { href: '/admin/emails', label: 'Emails' }] },
 ]
 
 const EMPTY_NAV: NavData = { collections: [], categories: [], spotlight: [], genders: { men: 0, women: 0, kids: 0 } }

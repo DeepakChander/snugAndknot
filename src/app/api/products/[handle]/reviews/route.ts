@@ -6,6 +6,7 @@ import { HttpError, ok, parseBody, requireUser, route } from '@/server/http'
 import { currentUser } from '@/server/auth'
 import { reviewSchema } from '@/server/validation'
 import { rateLimit } from '@/server/rate-limit'
+import { reviewSubmitted } from '@/server/notify-events'
 
 type Ctx = { params: Promise<{ handle: string }> }
 
@@ -48,5 +49,6 @@ export const POST = route<Ctx>(async (req, { params }) => {
     status: settings.reviews.moderation === 'auto' ? 'approved' : 'pending',
   })
   if (review.status === 'approved') invalidate('reviews', 'products')
+  await reviewSubmitted(review, user.email)
   return ok({ review }, { status: 201 })
 })

@@ -1,6 +1,7 @@
 import { listMedia, MEDIA_MAX_BYTES, MEDIA_TYPES, saveMedia } from '@/server/repo/misc'
 import { guardWrite, HttpError, ok, requireAdmin, route } from '@/server/http'
 import { rateLimit } from '@/server/rate-limit'
+import { catalogChanged, uploadRejected } from '@/server/notify-events'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,7 +43,11 @@ export const POST = route(async (req) => {
   if (file.size > MEDIA_MAX_BYTES) throw new HttpError(413, 'Images must be 4 MB or smaller.')
   const data = Buffer.from(await file.arrayBuffer())
   // The declared type comes from the browser; the bytes must agree with it.
-  if (!looksLike(file.type, data)) throw new HttpError(415, 'That file is not a valid image of the type it claims to be.')
+  if (!looksLike(file.type, data)) {
+    await uploadRejected(file.name || 'upload', file.type, 'its contents do not match the image type it claims to be.', admin.email)
+    throw new HttpError(415, 'That file is not a valid image of the type it claims to be.')
+  }
   const id = await saveMedia(file.name || 'upload', file.type, data)
+  await catalogChanged('Image', 'created', file.name || 'upload', admin.email, [['Type', file.type], ['Size', `${Math.round(file.size / 1024)} KB`], ['URL', `/api/media/${id}`]], '/admin/media')
   return ok({ id, url: `/api/media/${id}` }, { status: 201 })
 })

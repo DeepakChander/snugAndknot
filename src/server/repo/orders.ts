@@ -496,6 +496,15 @@ export async function createReturn(input: {
   })
 }
 
+/** One return with the order's customer, for the admin and its notifications. */
+export async function getReturnAdmin(id: string): Promise<(ReturnRequest & { email: string; customerName: string }) | null> {
+  const rows = await query(
+    `SELECT r.*, o.order_number, o.email, o.customer_name FROM returns r JOIN orders o ON o.id = r.order_id WHERE r.id = $1`,
+    [id]
+  )
+  return rows[0] ? { ...mapReturn(rows[0]), email: rows[0].email, customerName: rows[0].customer_name } : null
+}
+
 export async function updateReturnAdmin(id: string, status: ReturnStatus): Promise<boolean> {
   const rows = await query('UPDATE returns SET status = $2, updated_at = now() WHERE id = $1 RETURNING id', [id, status])
   return rows.length > 0

@@ -3,6 +3,7 @@ import { getSettings } from '@/server/repo/settings'
 import { HttpError, ok, parseBody, requireUser, route } from '@/server/http'
 import { returnSchema } from '@/server/validation'
 import { rateLimit } from '@/server/rate-limit'
+import { returnRequested } from '@/server/notify-events'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +26,7 @@ export const POST = route(async (req) => {
       comments: input.comments ?? null,
       returnWindowDays: settings.commerce.returnWindowDays,
     })
+    await returnRequested(request, { email: user.email, name: user.name })
     return ok({ return: request }, { status: 201 })
   } catch (err) {
     if (err instanceof CheckoutError) throw new HttpError(err.status, err.message)

@@ -5,6 +5,7 @@ import { currentUser } from '@/server/auth'
 import { clientIp, HttpError, ok, parseBody, requireUser, route } from '@/server/http'
 import { rateLimit } from '@/server/rate-limit'
 import { orderSchema } from '@/server/validation'
+import { inventoryAfterOrder, orderPlaced } from '@/server/notify-events'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,8 +22,9 @@ export const POST = route(async (req) => {
   const settings = await getSettings()
   if (!settings.commerce.codEnabled) throw new HttpError(400, 'Checkout is temporarily unavailable.')
   const user = await currentUser()
+  let order
   try {
-    const order = await placeOrder({
+    order = await placeOrder({
       lines: input.lines,
       couponCode: input.couponCode ?? null,
       shippingMethod: input.shippingMethod,
@@ -33,11 +35,13 @@ export const POST = route(async (req) => {
       paymentMethod: input.paymentMethod,
       commerce: settings.commerce,
     })
-    // Inventory changed — product pages must show the new stock.
-    invalidate('products')
-    return ok({ order }, { status: 201 })
   } catch (err) {
     if (err instanceof CheckoutError) throw new HttpError(err.status, err.message)
     throw err
   }
+  // Inventory changed — product pages must show the new stock.
+  invalidate('products')
+  await orderPlaced(order)
+  await inventoryAfterOrder(order)
+  return ok({ order }, { status: 201 })
 })

@@ -2,6 +2,7 @@ import { createUser, findUserByEmail, isEnvAdminEmail, mapUser, sessionUser, sta
 import { rateLimit } from '@/server/rate-limit'
 import { clientIp, HttpError, ok, parseBody, route } from '@/server/http'
 import { signupSchema } from '@/server/validation'
+import { customerSignedUp } from '@/server/notify-events'
 
 export const POST = route(async (req) => {
   const input = await parseBody(req, signupSchema)
@@ -13,5 +14,6 @@ export const POST = route(async (req) => {
   // Welcome bonus: 100 loyalty points.
   const row = await createUser({ ...input, points: 100 })
   await startSession(sessionUser(row))
+  await customerSignedUp(mapUser(row))
   return ok({ user: mapUser(row) }, { status: 201 })
 })

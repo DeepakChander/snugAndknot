@@ -9,7 +9,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     name: 'Snug&Knot',
     tagline: 'Hand-finished knitwear, made in small runs.',
     description: 'Knitwear in merino, cashmere blends and long-staple cotton — made in small runs and finished by hand.',
-    email: 'hello@snugandknot.com',
+    email: 'support@snugandknot.com',
     phone: '+91-9355704093',
     address: { street: '142 Mercer Street', city: 'New York', state: 'NY', zip: '10012', country: 'United States' },
     social: {

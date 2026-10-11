@@ -49,27 +49,36 @@ export async function listMessages() {
   }))
 }
 
-export async function setMessageStatus(id: string, status: MessageStatus) {
-  const rows = await query('UPDATE messages SET status = $2 WHERE id = $1 RETURNING id', [id, status])
-  return rows.length > 0
+type MessageHead = { name: string; email: string; subject: string }
+
+/** `changed` is the message when its status actually moved; a no-op re-mark reports found only. */
+export async function setMessageStatus(id: string, status: MessageStatus): Promise<{ found: boolean; changed: MessageHead | null }> {
+  const rows = await query<MessageHead>(
+    'UPDATE messages SET status = $2 WHERE id = $1 AND status IS DISTINCT FROM $2 RETURNING name, email, subject',
+    [id, status]
+  )
+  if (rows.length) return { found: true, changed: rows[0] }
+  const exists = await query('SELECT 1 FROM messages WHERE id = $1', [id])
+  return { found: exists.length > 0, changed: null }
 }
 
-export async function deleteMessage(id: string) {
-  const rows = await query('DELETE FROM messages WHERE id = $1 RETURNING id', [id])
-  return rows.length > 0
+/** The deleted message's sender and subject, or null when there was nothing to delete. */
+export async function deleteMessage(id: string): Promise<MessageHead | null> {
+  const [row] = await query<MessageHead>('DELETE FROM messages WHERE id = $1 RETURNING name, email, subject', [id])
+  return row ?? null
 }
 
 /* ─────────────────────────── Back-in-stock alerts ─────────────────────────── */
 
-export async function createStockAlert(productId: string, variantId: string | null, email: string) {
+export async function createStockAlert(productId: string, variantId: string | null, email: string): Promise<'missing' | 'created' | 'exists'> {
   const exists = await query('SELECT 1 FROM products WHERE id = $1', [productId])
-  if (!exists.length) return false
-  await query(
+  if (!exists.length) return 'missing'
+  const rows = await query(
     `INSERT INTO stock_alerts (id, product_id, variant_id, email) VALUES ($1, $2, $3, lower($4))
-     ON CONFLICT DO NOTHING`,
+     ON CONFLICT DO NOTHING RETURNING id`,
     [newId('alr'), productId, variantId, email.trim()]
   )
-  return true
+  return rows.length ? 'created' : 'exists'
 }
 
 export async function listStockAlerts() {
@@ -124,9 +133,10 @@ export async function listMedia() {
   }))
 }
 
-export async function deleteMedia(id: string) {
-  const rows = await query('DELETE FROM media WHERE id = $1 RETURNING id', [id])
-  return rows.length > 0
+/** The deleted image's file name, or null when there was nothing to delete. */
+export async function deleteMedia(id: string): Promise<string | null> {
+  const [row] = await query<{ filename: string }>('DELETE FROM media WHERE id = $1 RETURNING filename', [id])
+  return row ? row.filename : null
 }
 
 /* ─────────────────────────── Customers (admin) ─────────────────────────── */
