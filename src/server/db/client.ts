@@ -22,9 +22,16 @@ export interface Db extends Queryable {
 const NUMERIC_OID = 1700
 const INT8_OID = 20
 
+/**
+ * Only DATABASE_URL is used. Hosting integrations add variables such as POSTGRES_URL for databases
+ * that may belong to something else; the shop never writes to one it was not explicitly given.
+ */
 function connectionString(): string | undefined {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL || undefined
+  return process.env.DATABASE_URL || undefined
 }
+
+/** Every table the migrations create — used to recognise a database that belongs to another app. */
+const SHOP_TABLES = ['settings', 'users', 'categories', 'products', 'variants', 'collections', 'reviews', 'coupons', 'orders', 'order_items', 'returns', 'subscribers', 'messages', 'stock_alerts', 'media', 'rate_limits']
 
 function isLocalHost(url: string): boolean {
   try {
@@ -148,6 +155,21 @@ async function migrate(db: Db) {
     if (db.kind === 'postgres') {
       // Two cold starts racing on an empty database must not both migrate.
       await q.query('SELECT pg_advisory_xact_lock(727274)')
+      // A database the shop has never migrated must not already hold tables with the shop's names:
+      // they belong to another app, and migrating over them would fail or, worse, change them.
+      const [{ ours }] = await q.query<{ ours: string | null }>(`SELECT to_regclass('schema_migrations')::text AS ours`)
+      if (!ours) {
+        const clash = await q.query<{ name: string }>(
+          `SELECT table_name AS name FROM information_schema.tables WHERE table_schema = current_schema() AND table_name = ANY($1)`,
+          [SHOP_TABLES]
+        )
+        if (clash.length) {
+          throw new Error(
+            `DATABASE_URL points to a database that already has tables named ${clash.map((c) => c.name).join(', ')} ` +
+              'from another app. Snug&Knot needs an empty database (or one it created itself); nothing was changed.'
+          )
+        }
+      }
     }
     await q.exec(`CREATE TABLE IF NOT EXISTS schema_migrations (
       version     INTEGER PRIMARY KEY,
