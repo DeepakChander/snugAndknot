@@ -8,7 +8,7 @@ import Wordmark from '@/components/chrome/Wordmark'
 import { api, ApiError } from '@/lib/api'
 import type { PublicUser } from '@/types/commerce'
 
-export default function AdminLogin({ configured, denied }: { configured: boolean; denied: boolean }) {
+export default function AdminLogin({ problems, denied }: { problems: string[]; denied: boolean }) {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -49,10 +49,17 @@ export default function AdminLogin({ configured, denied }: { configured: boolean
             <p className="mt-2 text-xs uppercase tracking-[0.2em] text-gold">Admin</p>
           </div>
           <h1 className="pt-6 font-display text-4xl">Sign in</h1>
-          {!configured ? (
-            <p className="rounded-xl border border-gold/30 bg-gold/10 p-3 text-xs leading-relaxed text-bone/80">
-              The owner account is created from the <code className="font-mono">ADMIN_EMAIL</code> and <code className="font-mono">ADMIN_PASSWORD</code> environment variables (a password of 12+ characters). Set them on the server, then sign in with those values.
-            </p>
+          {problems.length ? (
+            <div role="status" className="rounded-xl border border-gold/30 bg-gold/10 p-3 text-xs leading-relaxed text-bone/80">
+              <p>
+                Admin sign-in is off until the server has <code className="font-mono">ADMIN_EMAIL</code> and <code className="font-mono">ADMIN_PASSWORD</code> (12+ characters). On Vercel, set them for <strong>Production</strong> under Settings → Environment Variables, then redeploy: a deployment only sees variables that existed when it was built.
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-4">
+                {problems.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
           ) : null}
           <label className="block">
             <span className="mb-1.5 block text-xs text-bone/60">Email</span>

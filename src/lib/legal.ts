@@ -6,7 +6,6 @@ export interface LegalSection {
   body: string[]
 }
 
-const addressLine = (s: SiteSettings['store']) => [s.address.street, s.address.city, [s.address.state, s.address.zip].filter(Boolean).join(' '), s.address.country].filter(Boolean).join(', ')
 
 /**
  * Privacy policy. Based on the store's existing policy, corrected to match what the site
@@ -83,7 +82,7 @@ export function privacySections({ store }: Pick<SiteSettings, 'store'>): LegalSe
     {
       id: 'contact',
       title: 'Contact',
-      body: [`${store.name} — ${addressLine(store)}`, `Email ${store.email}${store.phone ? ` · Phone ${store.phone}` : ''}`],
+      body: [store.name, `Email ${store.email}${store.phone ? ` · Phone ${store.phone}` : ''}`],
     },
   ]
 }
@@ -115,7 +114,7 @@ export function termsSections({ store, commerce }: Pick<SiteSettings, 'store' | 
     { id: 'ip', title: 'Intellectual property', body: [`Everything on this site — text, photography, designs, logos and software — belongs to ${store.name} or its licensors. Please do not copy or reuse it without our written permission.`] },
     { id: 'prohibited', title: 'Acceptable use', body: ['Do not use the site to break the law, impersonate anyone, upload harmful code, scrape it without permission or interfere with how it works.'] },
     { id: 'liability', title: 'Limitation of liability', body: [`To the extent the law allows, ${store.name} is not liable for indirect or consequential losses, and our total liability for a claim is limited to the amount you paid for the product concerned. Nothing in these terms limits rights you have under consumer law.`] },
-    { id: 'law', title: 'Governing law', body: [`These terms are governed by the laws applicable where ${store.name} is based (${store.address.city}${store.address.state ? `, ${store.address.state}` : ''}).`] },
-    { id: 'contact', title: 'Contact', body: [`${store.name} — ${addressLine(store)}`, `Email ${store.email}${store.phone ? ` · Phone ${store.phone}` : ''}`] },
+    { id: 'law', title: 'Governing law', body: [`These terms are governed by the laws applicable where ${store.name} is based.`] },
+    { id: 'contact', title: 'Contact', body: [store.name, `Email ${store.email}${store.phone ? ` · Phone ${store.phone}` : ''}`] },
   ]
 }

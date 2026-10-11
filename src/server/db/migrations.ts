@@ -304,6 +304,16 @@ UPDATE categories SET description = 'Cable, diamond and heritage stitches, butto
  WHERE slug = 'cardigans' AND description = 'Cable, texture and heritage stitches, finished with natural wooden buttons.';
 `,
   },
+  {
+    version: 5,
+    name: 'seeded-products-modified-now',
+    // Seeded products carried their 2024 launch date as their last change, so the sitemap told search
+    // engines nothing had changed since then. Rows nobody has edited (updated_at still equals the
+    // seeded created_at) move to now; anything edited in the admin already has a later date.
+    sql: `
+UPDATE products SET updated_at = now() WHERE updated_at = created_at AND created_at < '2025-01-01';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

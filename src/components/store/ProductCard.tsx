@@ -97,7 +97,8 @@ export default function ProductCard({
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 50 }}
+      // The first cards are part of the first paint (they are the page's largest image); later ones rise in.
+      initial={priority ? false : { opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: (index % 4) * 0.08 }}

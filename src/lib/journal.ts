@@ -8,6 +8,8 @@ export interface JournalPost {
   title: string
   description: string
   image: string
+  /** What the photograph shows, for screen readers and image search. */
+  imageAlt: string
   readTime: string
   date: string
   body: { type: 'p' | 'h' | 'quote'; text: string }[]
@@ -20,6 +22,7 @@ export const JOURNAL: JournalPost[] = [
     title: 'Why cotton fibre length matters',
     description: 'Why the length of a cotton fibre decides how a knit feels, pills and ages — and what to look for on a label.',
     image: '/images/blog/organic-cotton.png',
+    imageAlt: 'A hand reaching for open cotton bolls in a field at golden hour',
     readTime: '6 min read',
     date: '2026-09-14',
     body: [
@@ -40,6 +43,7 @@ export const JOURNAL: JournalPost[] = [
     title: 'How to read a knit',
     description: 'Rib, cable, jersey, gauge — a short field guide to the stitches and terms on our product pages.',
     image: '/images/collection-home/Material-Intimacy.png',
+    imageAlt: 'A hand resting on the cables of a cream knit',
     readTime: '7 min read',
     date: '2026-08-30',
     body: [
@@ -61,6 +65,7 @@ export const JOURNAL: JournalPost[] = [
     title: 'Against the overflowing wardrobe',
     description: 'A case for fewer, better pieces — and a practical way to choose them.',
     image: '/images/blog/wardrobe-essentials.png',
+    imageAlt: 'Folded knitwear in burgundy, cream and grey stacked beside a mug and a notebook',
     readTime: '4 min read',
     date: '2026-08-02',
     body: [

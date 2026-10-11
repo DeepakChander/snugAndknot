@@ -25,7 +25,7 @@ export function JournalIndex({ posts }: { posts: JournalPost[] }) {
       </header>
       {lead ? (
         <Link href={`/journal/${lead.slug}`} className="group container-wide grid items-end gap-10 border-t border-ink/10 pt-12 lg:grid-cols-[1.4fr_1fr]" data-cursor="view" data-cursor-label="Read">
-          <UnmaskImage src={lead.image} alt="" sizes="(min-width:1024px) 58vw, 100vw" className="aspect-[16/11]" />
+          <UnmaskImage src={lead.image} alt={lead.imageAlt} sizes="(min-width:1024px) 58vw, 100vw" className="aspect-[16/11]" />
           <div>
             <p className="text-eyebrow slash text-stone">
               {lead.tag} · {lead.readTime}
@@ -41,7 +41,7 @@ export function JournalIndex({ posts }: { posts: JournalPost[] }) {
           <Reveal key={p.slug} delay={i * 0.08}>
             <Link href={`/journal/${p.slug}`} className="group block" data-cursor="view" data-cursor-label="Read">
               <span className="relative block aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-parchment">
-                <Image src={p.image} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105" />
+                <Image src={p.image} alt={p.imageAlt} fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105" />
               </span>
               <span className="mt-5 block text-eyebrow slash text-stone">
                 {p.tag} · {p.readTime}
@@ -69,7 +69,7 @@ export function JournalArticle({ post, more }: { post: JournalPost; more: Journa
       <motion.div style={{ scaleX: progress }} className="fixed inset-x-0 top-0 z-[101] h-[3px] origin-left bg-gold" aria-hidden />
       <section ref={hero} data-nav-theme="dark" className="relative h-[86svh] min-h-[560px] overflow-hidden bg-noir text-bone">
         <motion.div style={{ y }} className="absolute inset-[-8%]">
-          <Image src={post.image} alt="" fill priority sizes="100vw" className="object-cover opacity-70" />
+          <Image src={post.image} alt={post.imageAlt} fill priority sizes="100vw" className="object-cover opacity-70" />
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/40 to-noir/20" />
         <div className="container-wide relative flex h-full flex-col justify-end pb-14">

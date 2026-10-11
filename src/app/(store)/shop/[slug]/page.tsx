@@ -2,9 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ShopView from '@/components/shop/ShopView'
 import { DEPARTMENTS, loadShop } from '@/server/shop'
-import { getCategory } from '@/server/catalog'
+import { getCategory, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
-import { breadcrumbLd, itemListLd, metaDescription } from '@/lib/seo'
+import { breadcrumbLd, itemListLd, pageMeta } from '@/lib/seo'
+
+/** "Women's knitwear", "Kids' knitwear". */
+const knitwear = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} knitwear`
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -18,9 +21,20 @@ function isDepartment(slug: string): slug is keyof typeof DEPARTMENTS {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   // Filters and sorting are query strings on the same page, so the canonical is the bare path.
-  if (isDepartment(slug)) return { title: `${DEPARTMENTS[slug].title}'s knitwear`, description: metaDescription(DEPARTMENTS[slug].description), alternates: { canonical: `/shop/${slug}` } }
+  const settings = await getStoreSettings()
+  if (isDepartment(slug)) {
+    // A department with no pieces yet is a "coming soon" note: kept out of the index until it has some
+    // (the sitemap adds it at the same moment).
+    const empty = !(await getProducts({})).some((p) => p.gender === slug || (slug !== 'kids' && p.gender === 'unisex'))
+    return pageMeta(settings, {
+      title: knitwear(DEPARTMENTS[slug].title),
+      description: DEPARTMENTS[slug].description,
+      path: `/shop/${slug}`,
+      robots: empty ? { index: false, follow: true } : undefined,
+    })
+  }
   const category = await getCategory(slug)
-  return category ? { title: category.title, description: metaDescription(category.description), alternates: { canonical: `/shop/${slug}` } } : { title: 'Not found' }
+  return category ? pageMeta(settings, { title: category.title, description: category.description, path: `/shop/${slug}` }) : { title: 'Not found' }
 }
 
 export default async function ShopSegmentPage({ params, searchParams }: Props) {
@@ -35,7 +49,7 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
         <JsonLd
           data={[
             breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: dept.title, path: `/shop/${slug}` }]),
-            itemListLd(`${dept.title}'s knitwear`, data.products),
+            itemListLd(knitwear(dept.title), data.products),
           ]}
         />
         <ShopView

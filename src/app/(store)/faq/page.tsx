@@ -3,12 +3,10 @@ import FaqView from '@/components/content/FaqView'
 import { getStoreSettings } from '@/server/catalog'
 import { faqGroups } from '@/lib/faq'
 import JsonLd from '@/components/seo/JsonLd'
-import { faqLd } from '@/lib/seo'
+import { faqLd, pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'Questions & answers',
-  description: 'Ordering, shipping, sizing, returns and accounts at Snug&Knot.',
-  alternates: { canonical: '/faq' },
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMeta(await getStoreSettings(), { title: 'Questions & answers', description: 'Ordering, shipping, sizing, returns and accounts at Snug&Knot.', path: '/faq' })
 }
 
 export default async function FaqPage() {

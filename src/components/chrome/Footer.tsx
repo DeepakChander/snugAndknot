@@ -50,19 +50,6 @@ const COLUMNS = [
   },
 ]
 
-function LocalTime({ city }: { city: string }) {
-  const [time, setTime] = useState('')
-  useEffect(() => {
-    const tz = city.toLowerCase().includes('new york') ? 'America/New_York' : undefined
-    const f = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz })
-    const tick = () => setTime(f.format(new Date()))
-    tick()
-    const t = setInterval(tick, 30_000)
-    return () => clearInterval(t)
-  }, [city])
-  return <span suppressHydrationWarning>{time}</span>
-}
-
 function FooterContent() {
   const { store } = useSettings()
   const word = useRef<HTMLDivElement>(null)
@@ -128,16 +115,8 @@ function FooterContent() {
       </div>
 
       <div className="container-wide relative mt-16 grid gap-8 text-sm text-bone/65 md:grid-cols-3">
-        <address className="not-italic leading-relaxed">
-          {store.address.street}
-          <br />
-          {store.address.city}
-          {store.address.state ? `, ${store.address.state}` : ''} {store.address.zip}
-          <br />
-          <span className="text-bone/45">
-            {store.address.city} — <LocalTime city={store.address.city} />
-          </span>
-        </address>
+        {/* No street address is published: the shop is online only. */}
+        <p className="leading-relaxed">{store.tagline}</p>
         <div className="leading-relaxed">
           <a href={`mailto:${store.email}`} className="link-wipe text-bone/85">
             {store.email}

@@ -4,26 +4,30 @@ import FabricGallery from '@/components/product/FabricGallery'
 import ProductInfo from '@/components/product/ProductInfo'
 import Reviews from '@/components/product/Reviews'
 import { FabricStory, RecentlyViewed, Related, StickyBuyBar } from '@/components/product/ProductExtras'
-import { getProduct, getRelated, getReviews, getStoreSettings } from '@/server/catalog'
+import { getProduct, getProducts, getRelated, getReviews, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
-import { breadcrumbLd, metaDescription, productLd } from '@/lib/seo'
+import { breadcrumbLd, pageMeta, productLd, socialImage } from '@/lib/seo'
+import { DEPARTMENTS } from '@/server/shop'
 
 type Props = { params: Promise<{ slug: string }> }
 
+// Served from the edge cache and refreshed every five minutes (admin edits refresh it at once).
+export const revalidate = 300
+
+export async function generateStaticParams() {
+  return (await getProducts({})).map((p) => ({ slug: p.handle }))
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const [product, { store }] = await Promise.all([getProduct((await params).slug), getStoreSettings()])
+  const [product, settings] = await Promise.all([getProduct((await params).slug), getStoreSettings()])
   if (!product) return { title: 'Piece not found' }
-  const description = metaDescription(product.seoDescription || product.description)
-  const path = `/product/${product.handle}`
-  const images = product.images.slice(0, 4).map((i) => ({ url: i.src, alt: i.alt || product.title }))
-  return {
+  const lead = product.images[0]
+  return pageMeta(settings, {
     title: product.seoTitle || product.title,
-    description,
-    alternates: { canonical: path },
-    // A page's openGraph replaces the layout's whole block, so it carries the site name too.
-    openGraph: { type: 'website', siteName: store.name, locale: 'en_US', url: path, title: product.title, description, images },
-    twitter: { card: 'summary_large_image', title: product.title, description, images },
-  }
+    description: product.seoDescription || product.description,
+    path: `/product/${product.handle}`,
+    images: lead ? [socialImage(lead.src, lead.alt || product.title)] : undefined,
+  })
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -34,9 +38,11 @@ export default async function ProductPage({ params }: Props) {
 
   const structured = [
     productLd(product, summary, reviews, settings),
+    // The same trail the page shows: department pages are the hubs a shopper comes through.
     breadcrumbLd([
       { name: 'Home', path: '/' },
       { name: 'Shop', path: '/shop' },
+      ...(product.gender !== 'unisex' ? [{ name: DEPARTMENTS[product.gender].title, path: `/shop/${product.gender}` }] : []),
       { name: product.title, path: `/product/${product.handle}` },
     ]),
   ]

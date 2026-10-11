@@ -274,7 +274,7 @@ export async function seedDatabase(q: Queryable) {
       `INSERT INTO products (id, handle, title, description, details, vendor, product_type, gender, category,
          tags, price, compare_at_price, images, colors, sizes, featured, is_new, bestseller, status, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5::jsonb, 'Snug&Knot', $6, $7, $8, $9::text[], $10, $11, $12::jsonb, $13::jsonb,
-         $14::text[], $15, $16, $17, 'active', $18, $18)
+         $14::text[], $15, $16, $17, 'active', $18, now())
        ON CONFLICT (id) DO NOTHING`,
       [
         p.id, p.handle, p.title, p.description, JSON.stringify(p.details), p.productType, p.gender, p.category,

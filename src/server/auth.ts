@@ -198,6 +198,24 @@ export function adminLoginConfigured(): boolean {
   return envAdmin() !== null
 }
 
+/**
+ * What stops the owner from signing in, in plain words for the sign-in page. Names the variables
+ * and the rules, never their values. A password below the minimum is never accepted, so saying
+ * it is too short gives nothing away.
+ */
+export function adminSetupProblems(): string[] {
+  const problems: string[] = []
+  const email = process.env.ADMIN_EMAIL?.trim()
+  const password = process.env.ADMIN_PASSWORD
+  if (!email) problems.push('ADMIN_EMAIL is not set for this deployment.')
+  if (!password) problems.push('ADMIN_PASSWORD is not set for this deployment.')
+  else if (password.length < ADMIN_PASSWORD_MIN) problems.push(`ADMIN_PASSWORD is shorter than ${ADMIN_PASSWORD_MIN} characters.`)
+  else if (PRODUCTION && password === EXAMPLE_ADMIN_PASSWORD) problems.push('ADMIN_PASSWORD is the example password from .env.example; choose your own.')
+  const secret = process.env.AUTH_SECRET
+  if (secret && secret.length < 32) problems.push('AUTH_SECRET is shorter than 32 characters, so sign-in cannot create a session.')
+  return problems
+}
+
 /** True for the email address reserved for the store owner's admin account. */
 export function isEnvAdminEmail(email: string): boolean {
   const env = envAdmin()

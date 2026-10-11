@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import LookbookView, { type Spread } from '@/components/content/LookbookView'
 import lookbook from '@/data/lookbook.json'
-import { getProducts } from '@/server/catalog'
+import { getProducts, getStoreSettings } from '@/server/catalog'
 
-export const metadata: Metadata = {
-  alternates: { canonical: '/lookbook' },
-  title: 'Lookbook',
-  description: 'Four chapters in Snug&Knot knitwear — the cold months, by the water, every day, and finished by hand.',
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMeta(await getStoreSettings(), { title: 'Lookbook', description: 'Four chapters in Snug&Knot knitwear — the cold months, by the water, every day, and finished by hand.', path: '/lookbook' })
 }
 
 type Chapter = Omit<Spread, 'pieces'> & { products: string[] }

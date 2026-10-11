@@ -4,9 +4,12 @@ import { JournalArticle } from '@/components/content/JournalViews'
 import { getJournalPost, JOURNAL } from '@/lib/journal'
 import { getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
-import { articleLd, breadcrumbLd, metaDescription } from '@/lib/seo'
+import { articleLd, breadcrumbLd, pageMeta, socialImage } from '@/lib/seo'
 
 type Props = { params: Promise<{ slug: string }> }
+
+// Only the posts that exist: any other slug is a real 404, not a page rendered on demand.
+export const dynamicParams = false
 
 export function generateStaticParams() {
   return JOURNAL.map((p) => ({ slug: p.slug }))
@@ -15,17 +18,15 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getJournalPost((await params).slug)
   if (!post) return { title: 'Story not found' }
-  const { store } = await getStoreSettings()
-  const path = `/journal/${post.slug}`
-  const description = metaDescription(post.description)
-  const images = [{ url: post.image, alt: post.title }]
-  return {
+  const settings = await getStoreSettings()
+  const meta = pageMeta(settings, {
     title: post.title,
-    description,
-    alternates: { canonical: path, types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: `${store.name} Journal` }] } },
-    openGraph: { type: 'article', siteName: store.name, locale: 'en_US', url: path, title: post.title, description, images, publishedTime: post.date, section: post.tag },
-    twitter: { card: 'summary_large_image', title: post.title, description, images },
-  }
+    description: post.description,
+    path: `/journal/${post.slug}`,
+    images: [socialImage(post.image, post.imageAlt)],
+    article: { publishedTime: `${post.date}T09:00:00+00:00`, section: post.tag },
+  })
+  return { ...meta, alternates: { ...meta.alternates, types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: `${settings.store.name} Journal` }] } } }
 }
 
 export default async function JournalPostPage({ params }: Props) {

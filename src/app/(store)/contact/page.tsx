@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
+import { getStoreSettings } from '@/server/catalog'
 import ContactView from '@/components/content/ContactView'
 
-export const metadata: Metadata = { title: 'Contact', description: 'Write to the Snug&Knot atelier.', alternates: { canonical: '/contact' } }
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMeta(await getStoreSettings(), { title: 'Contact', description: 'Write to the Snug&Knot atelier.', path: '/contact' })
+}
 
 export default function ContactPage() {
   return <ContactView />

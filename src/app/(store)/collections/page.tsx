@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import CollectionsIndex from '@/components/collections/CollectionsIndex'
-import { getCollections, getProducts } from '@/server/catalog'
+import { getCollections, getProducts, getStoreSettings } from '@/server/catalog'
 
-export const metadata: Metadata = {
-  alternates: { canonical: '/collections' },
-  title: 'Collections',
-  description: 'Snug&Knot collections — knitwear gathered around a feeling: winter warmth, the artisan edit, everyday essentials and coastal walks.',
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMeta(await getStoreSettings(), { title: 'Collections', description: 'Snug&Knot collections — knitwear gathered around a feeling: winter warmth, the artisan edit, everyday essentials and coastal walks.', path: '/collections' })
 }
 
 export default async function CollectionsPage() {

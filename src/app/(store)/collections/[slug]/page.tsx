@@ -3,24 +3,19 @@ import { notFound } from 'next/navigation'
 import CollectionDetail from '@/components/collections/CollectionDetail'
 import { getCollection, getCollections, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
-import { breadcrumbLd, itemListLd, metaDescription } from '@/lib/seo'
-import { absoluteUrl } from '@/lib/site'
+import { breadcrumbLd, itemListLd, pageMeta, socialImage } from '@/lib/seo'
 
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const [collection, { store }] = await Promise.all([getCollection((await params).slug), getStoreSettings()])
+  const [collection, settings] = await Promise.all([getCollection((await params).slug), getStoreSettings()])
   if (!collection) return { title: 'Collection not found' }
-  const path = `/collections/${collection.handle}`
-  const description = metaDescription(collection.description)
-  const images = collection.image ? [{ url: absoluteUrl(collection.image), alt: `${collection.title} collection` }] : undefined
-  return {
+  return pageMeta(settings, {
     title: collection.title,
-    description,
-    alternates: { canonical: path },
-    openGraph: { type: 'website', siteName: store.name, locale: 'en_US', url: path, title: collection.title, description, images },
-    twitter: { card: 'summary_large_image', title: collection.title, description, images },
-  }
+    description: collection.description,
+    path: `/collections/${collection.handle}`,
+    images: collection.image ? [socialImage(collection.image, `${collection.title} collection`)] : undefined,
+  })
 }
 
 export default async function CollectionPage({ params }: Props) {

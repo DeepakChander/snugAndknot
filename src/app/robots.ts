@@ -1,8 +1,12 @@
 import type { MetadataRoute } from 'next'
 import { INDEXABLE, SITE_URL } from '@/lib/site'
 
-/** Private and per-visitor pages stay out of search; previews are not crawled at all. */
-const PRIVATE = ['/admin', '/api/', '/account', '/checkout', '/cart', '/search', '/track']
+/**
+ * Never crawled: the admin, the API and unbounded search results. Account, bag, checkout and order
+ * tracking stay crawlable on purpose: they carry noindex, and Google can only obey a noindex it is
+ * allowed to fetch. Previews are not crawled at all.
+ */
+const PRIVATE = ['/admin', '/api/', '/search']
 
 export default function robots(): MetadataRoute.Robots {
   if (!INDEXABLE) return { rules: [{ userAgent: '*', disallow: '/' }] }

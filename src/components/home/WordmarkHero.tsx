@@ -189,7 +189,8 @@ export default function WordmarkHero({ frames, cover }: { frames: string[]; cove
                   alt=""
                   fill
                   sizes="(min-width: 768px) 25vw, 56vw"
-                  preload={i === 0}
+                  loading={i === 0 ? 'eager' : undefined}
+                  fetchPriority={i === 0 ? 'high' : undefined}
                   onLoad={() => markLoaded(i)}
                   className={cn('object-cover', i === frame ? 'opacity-100' : 'opacity-0')}
                 />

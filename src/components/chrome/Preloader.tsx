@@ -73,13 +73,23 @@ export default function Preloader() {
       bar.style.transform = `scaleX(${counter.v / 100})`
     }
 
+    const fill = el.querySelector<HTMLElement>('[data-fill]')!
+    const fillImg = fill.querySelector<HTMLElement>('img')!
+
+    // Only transforms, clip-paths and opacity move here: nothing changes the layout, so the curtain
+    // adds no layout shift (CLS) to the first page of a visit.
     const ctx = gsap.context(() => {
+      const half = win.offsetWidth / 2
       gsap.set(letters, { yPercent: 110 })
-      gsap.set(win, { width: 0, opacity: 0 })
+      gsap.set(win, { clipPath: 'inset(0% 50% 0% 50% round 16px)', opacity: 0 })
+      // The words start together and part as the window opens.
+      gsap.set(left, { x: half })
+      gsap.set(right, { x: -half })
       const intro = gsap.timeline()
       intro
         .to(letters, { yPercent: 0, duration: 1.1, stagger: 0.05, ease: 'expo.out' }, 0.1)
-        .to(win, { width: 'clamp(84px, 11vw, 160px)', opacity: 1, duration: 1, ease: 'expo.inOut' }, 0.55)
+        .to(win, { clipPath: 'inset(0% 0% 0% 0% round 16px)', opacity: 1, duration: 1, ease: 'expo.inOut' }, 0.55)
+        .to([left, right], { x: 0, duration: 1, ease: 'expo.inOut' }, 0.55)
         .to(counter, { v: 88, duration: 2, ease: 'power2.inOut', onUpdate: paint }, 0)
         .add(() => {
           assetsReady.then(() => {
@@ -92,12 +102,36 @@ export default function Preloader() {
                 },
               })
               .to(counter, { v: 100, duration: 0.4, ease: 'power2.out', onUpdate: paint })
-              .add(() => clearInterval(flip))
-              // The frame opens to fill the screen, pushing the words apart.
+              .add(() => {
+                clearInterval(flip)
+                // A full-screen copy of the frame, clipped to the window's rectangle, takes over…
+                const w = win.getBoundingClientRect()
+                const r = el.getBoundingClientRect()
+                gsap.set(fill, {
+                  clipPath: `inset(${w.top - r.top}px ${r.right - w.right}px ${r.bottom - w.bottom}px ${w.left - r.left}px round 16px)`,
+                  autoAlpha: 1,
+                })
+                // Start the copy at exactly the window's crop: object-cover scales by the larger ratio,
+                // so the window shows the photo at k1 and the full screen at k2; scale by k1/k2 and
+                // centre it on the window. Transforms only, so still no layout shift.
+                const shown = win.querySelector('img')!
+                const iw = shown.naturalWidth || 3
+                const ih = shown.naturalHeight || 4
+                const k1 = Math.max(w.width / iw, w.height / ih)
+                const k2 = Math.max(r.width / iw, r.height / ih)
+                gsap.set(fillImg, {
+                  x: w.left + w.width / 2 - (r.left + r.width / 2),
+                  y: w.top + w.height / 2 - (r.top + r.height / 2),
+                  scale: k1 / k2,
+                  transformOrigin: '50% 50%',
+                })
+              })
+              // …and opens to fill the screen while the words part.
               .to(left, { xPercent: -60, opacity: 0, duration: 0.9, ease: 'expo.in' }, '+=0.05')
               .to(right, { xPercent: 60, opacity: 0, duration: 0.9, ease: 'expo.in' }, '<')
               .to(el.querySelectorAll('[data-fade]'), { opacity: 0, duration: 0.3 }, '<')
-              .to(win, { width: '100vw', height: '100svh', borderRadius: 0, duration: 1.1, ease: 'expo.inOut' }, '-=0.45')
+              .to(fill, { clipPath: 'inset(0px 0px 0px 0px round 0px)', duration: 1.1, ease: 'expo.inOut' }, '-=0.45')
+              .to(fillImg, { x: 0, y: 0, scale: 1, duration: 1.1, ease: 'expo.inOut' }, '<')
               .add(() => setPageReady(true), '-=0.3')
               .to(el, { opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.15')
           })
@@ -123,7 +157,7 @@ export default function Preloader() {
             </span>
           ))}
         </span>
-        <span data-window className="relative block h-[clamp(110px,15vw,210px)] overflow-hidden rounded-[1rem] bg-parchment">
+        <span data-window className="relative block h-[clamp(110px,15vw,210px)] w-[clamp(84px,11vw,160px)] shrink-0 overflow-hidden rounded-[1rem] bg-parchment">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={optimised(FRAMES[frame])} alt="" className="absolute inset-0 h-full w-full object-cover" />
         </span>
@@ -137,6 +171,11 @@ export default function Preloader() {
             </span>
           ))}
         </span>
+      </div>
+
+      <div data-fill className="invisible absolute inset-0 z-[1] bg-parchment opacity-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={optimised(FRAMES[frame])} alt="" className="absolute inset-0 h-full w-full object-cover" />
       </div>
 
       <p data-fade className="absolute bottom-8 left-[var(--gutter)] text-eyebrow slash text-stone">

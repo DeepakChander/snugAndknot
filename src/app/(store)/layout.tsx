@@ -12,7 +12,8 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   ])
 
   const publicSettings: PublicSettings = {
-    store: settings.store,
+    // No street address is published (the shop is online only); checkout keeps the country as its default.
+    store: { ...settings.store, address: { street: '', city: '', state: '', zip: '', country: settings.store.address.country } },
     commerce: settings.commerce,
     announcement: settings.announcement,
     homepage: settings.homepage,

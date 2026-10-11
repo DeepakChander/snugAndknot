@@ -2,16 +2,13 @@ import type { Metadata, Viewport } from 'next'
 import { instrumentSerif, inter, interTight, geistMono } from '@/lib/fonts'
 import { getStoreSettings } from '@/server/catalog'
 import { INDEXABLE, SITE_URL } from '@/lib/site'
-import { metaDescription } from '@/lib/seo'
-import { DEFAULT_SETTINGS } from '@/lib/settings-defaults'
+import { metaDescription, shareImages } from '@/lib/seo'
 import './globals.css'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { seo, store } = await getStoreSettings()
   const description = metaDescription(seo.description || store.description)
-  // The default share image is a known 1200×630; an image chosen in the admin is passed through as is.
-  const size = seo.ogImage === DEFAULT_SETTINGS.seo.ogImage ? { width: 1200, height: 630 } : {}
-  const ogImage = seo.ogImage ? [{ url: seo.ogImage, alt: `${store.name} — ${store.tagline}`, ...size }] : undefined
+  const ogImage = shareImages({ store, seo })
   const google = process.env.GOOGLE_SITE_VERIFICATION
   const bing = process.env.BING_SITE_VERIFICATION
   return {
@@ -31,7 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
       images: ogImage,
     },
     twitter: { card: 'summary_large_image', title: seo.title, description, images: ogImage },
-    icons: { icon: '/favicon.ico', apple: '/apple-touch-icon.png' },
+    // Declared with sizes so search engines and browsers pick a sharp one (Google wants ≥48px).
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: '48x48' },
+        { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      ],
+      apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+    },
     manifest: '/manifest.json',
     alternates: { types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: `${store.name} Journal` }] } },
     // Search Console / Bing Webmaster Tools ownership, set from the environment when you have the codes.

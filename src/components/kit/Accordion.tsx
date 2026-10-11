@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useState, type ReactNode } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { motion } from 'motion/react'
 import { cn } from '@/lib/format'
 
 export function AccordionItem({ title, children, defaultOpen = false, className }: { title: ReactNode; children: ReactNode; defaultOpen?: boolean; className?: string }) {
@@ -26,22 +26,20 @@ export function AccordionItem({ title, children, defaultOpen = false, className 
           </span>
         </button>
       </h3>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <motion.div
-            id={`${id}-panel`}
-            role="region"
-            aria-labelledby={`${id}-btn`}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="pb-6 text-sm leading-relaxed opacity-75">{children}</div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {/* Always rendered, so the answer is in the page HTML search engines read; collapsed with CSS and
+          inert while closed, so it is skipped by the keyboard and screen readers until opened. */}
+      <motion.div
+        id={`${id}-panel`}
+        role="region"
+        aria-labelledby={`${id}-btn`}
+        initial={false}
+        animate={open ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="overflow-hidden"
+        inert={!open}
+      >
+        <div className="pb-6 text-sm leading-relaxed opacity-75">{children}</div>
+      </motion.div>
     </div>
   )
 }

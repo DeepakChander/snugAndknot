@@ -6,7 +6,7 @@
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '') ||
-  'https://snug-andknot.vercel.app'
+  'https://www.snugandknot.com'
 ).replace(/\/+$/, '')
 
 /** Absolute URL for a site path (or an already absolute URL). Apostrophes, which the URL parser

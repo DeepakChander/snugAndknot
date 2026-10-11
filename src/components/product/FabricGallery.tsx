@@ -28,7 +28,11 @@ export default function FabricGallery({ images, title }: { images: ProductImage[
   const touch = useRef<{ x: number; t: number } | null>(null)
   const count = images.length
 
-  useEffect(() => setGl(hasWebGL() && !prefersReducedMotion() && count > 0), [count])
+  // The 3D fabric is for desktop-class screens; phones get the photographs, without three.js on load.
+  useEffect(
+    () => setGl(hasWebGL() && !prefersReducedMotion() && count > 0 && window.matchMedia('(pointer: fine) and (min-width: 1024px)').matches),
+    [count]
+  )
 
   const go = useCallback((d: number) => setIndex((i) => (i + d + count) % count), [count])
   const onReady = useCallback(() => setGlReady(true), [])
@@ -68,7 +72,7 @@ export default function FabricGallery({ images, title }: { images: ProductImage[
         <AnimatePresence initial={false}>
           {!gl || !glReady ? (
             <motion.div key={index} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
-              <Image src={images[index].src} alt={images[index].alt || title} fill priority={index === 0} sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
+              <Image src={images[index].src} alt={images[index].alt || title} fill loading={index === 0 ? 'eager' : undefined} fetchPriority={index === 0 ? 'high' : undefined} sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
             </motion.div>
           ) : null}
         </AnimatePresence>

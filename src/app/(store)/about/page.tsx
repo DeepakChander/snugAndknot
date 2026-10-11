@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
+import { pageMeta } from '@/lib/seo'
 import AboutView from '@/components/content/AboutView'
 import { getStoreSettings } from '@/server/catalog'
 
-export const metadata: Metadata = { title: 'Our story', description: 'Snug&Knot makes knitwear from natural fibres, in small runs, finished by hand.', alternates: { canonical: '/about' } }
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMeta(await getStoreSettings(), { title: 'Our story', description: 'Snug&Knot makes knitwear from natural fibres, in small runs, finished by hand.', path: '/about' })
+}
 
 const VALUES = ['Natural fibres', 'Small runs', 'Finished by hand', 'Made to be worn for years', 'Care notes with every piece']
 

@@ -9,7 +9,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import SplitReveal from '@/components/motion/SplitReveal'
 import { Button } from '@/components/kit/Button'
 import { Field, Select, TextArea } from '@/components/kit/Field'
-import { CheckIcon, MailIcon, PhoneIcon, PinIcon } from '@/components/kit/icons'
+import { CheckIcon, MailIcon, PhoneIcon } from '@/components/kit/icons'
 import { api, ApiError } from '@/lib/api'
 
 const TOPICS = ['An order', 'Sizing and fit', 'Returns', 'Care and repairs', 'Press and collaborations', 'Something else']
@@ -68,15 +68,6 @@ export default function ContactView() {
                 </a>
               </li>
             ) : null}
-            <li className="flex items-start gap-4">
-              <PinIcon size={22} className="mt-0.5 text-signal" />
-              <address className="text-lg not-italic leading-snug">
-                {store.address.street}
-                <br />
-                {store.address.city}
-                {store.address.state ? `, ${store.address.state}` : ''} {store.address.zip}
-              </address>
-            </li>
           </ul>
           <div className="relative mt-14 hidden aspect-[5/4] overflow-hidden rounded-[2rem] lg:block">
             <Image src="/images/collection-home/Lived-In.png" alt="" fill sizes="40vw" className="object-cover" />

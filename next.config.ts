@@ -58,6 +58,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // One address for search engines: the project's vercel.app alias forwards to the real domain.
+      { source: '/:path*', has: [{ type: 'host', value: 'snug-andknot.vercel.app' }], destination: 'https://www.snugandknot.com/:path*', permanent: true },
       { source: '/blog', destination: '/journal', permanent: true },
       { source: '/blog/:slug', destination: '/journal/:slug', permanent: true },
     ]
@@ -65,6 +67,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },
+      // Photographs change rarely; cache them for a month (file names are not hashed, so not immutable).
+      { source: '/images/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' }] },
       { source: '/admin', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/admin/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
     ]

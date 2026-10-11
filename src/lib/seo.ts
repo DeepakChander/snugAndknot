@@ -1,4 +1,6 @@
+import type { Metadata } from 'next'
 import { absoluteUrl, SITE_URL } from '@/lib/site'
+import { DEFAULT_SETTINGS } from '@/lib/settings-defaults'
 import { plain } from '@/lib/accent'
 import type { FaqGroup } from '@/lib/faq'
 import type { JournalPost } from '@/lib/journal'
@@ -10,6 +12,53 @@ import type { Product, RatingSummary, Review, SiteSettings } from '@/types/comme
  * shipping regions or fees the shop has not published).
  */
 type Ld = Record<string, unknown>
+
+type ShareImage = { url: string; alt: string; width?: number; height?: number }
+
+/** The site-wide share image from the settings; the default one is a known 1200×630. */
+export function shareImages({ store, seo }: Pick<SiteSettings, 'store' | 'seo'>): ShareImage[] | undefined {
+  if (!seo.ogImage) return undefined
+  const size = seo.ogImage === DEFAULT_SETTINGS.seo.ogImage ? { width: 1200, height: 630 } : {}
+  return [{ url: seo.ogImage, alt: `${store.name} — ${store.tagline}`, ...size }]
+}
+
+/**
+ * A photograph for link previews, served 1200px wide by the image optimiser: the originals are
+ * several megabytes, over what X, LinkedIn and Facebook accept. Uploaded media is passed through.
+ */
+export function socialImage(src: string, alt: string): ShareImage {
+  return src.startsWith('/images/') ? { url: absoluteUrl(`/_next/image?url=${encodeURIComponent(src)}&w=1200&q=75`), alt } : { url: src, alt }
+}
+
+/**
+ * Complete metadata for a page: title, description, canonical and its own share card. A page's
+ * openGraph replaces the layout's whole block, so every page carries the full set.
+ */
+export function pageMeta(
+  s: Pick<SiteSettings, 'store' | 'seo'>,
+  opts: { title: string; description: string; path: string; images?: ShareImage[]; article?: { publishedTime: string; section?: string }; robots?: Metadata['robots'] }
+): Metadata {
+  const description = metaDescription(opts.description)
+  const images = opts.images ?? shareImages(s)
+  const shareTitle = `${opts.title} — ${s.store.name}`
+  return {
+    title: opts.title,
+    description,
+    alternates: { canonical: opts.path },
+    ...(opts.robots ? { robots: opts.robots } : {}),
+    openGraph: {
+      type: opts.article ? 'article' : 'website',
+      siteName: s.store.name,
+      locale: 'en_US',
+      url: opts.path,
+      title: shareTitle,
+      description,
+      images,
+      ...(opts.article ? { publishedTime: opts.article.publishedTime, section: opts.article.section } : {}),
+    },
+    twitter: { card: 'summary_large_image', title: shareTitle, description, images },
+  }
+}
 
 const ORG_ID = `${SITE_URL}/#organization`
 const SITE_ID = `${SITE_URL}/#website`
@@ -26,7 +75,6 @@ function countryCode(name: string): string | undefined {
 
 export function organizationLd({ store }: Pick<SiteSettings, 'store'>): Ld {
   const sameAs = Object.values(store.social).filter((u) => /^https:\/\//.test(u))
-  const country = countryCode(store.address.country)
   return {
     '@context': 'https://schema.org',
     '@type': 'OnlineStore',
@@ -37,14 +85,6 @@ export function organizationLd({ store }: Pick<SiteSettings, 'store'>): Ld {
     description: store.description,
     email: store.email || undefined,
     telephone: store.phone || undefined,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: store.address.street,
-      addressLocality: store.address.city,
-      addressRegion: store.address.state || undefined,
-      postalCode: store.address.zip,
-      addressCountry: country ?? store.address.country,
-    },
     sameAs: sameAs.length ? sameAs : undefined,
   }
 }
@@ -112,7 +152,7 @@ export function productLd(product: Product, summary: RatingSummary, reviews: Rev
     description: product.description,
     url,
     image: product.images.map((i) => absoluteUrl(i.src)),
-    sku: product.variants[0]?.sku || undefined,
+    sku: product.variants.length === 1 ? product.variants[0].sku || undefined : undefined,
     category: product.productType || undefined,
     material: product.details.fabric || undefined,
     color: product.colors.length ? product.colors.map((c) => c.name).join(', ') : undefined,
@@ -158,8 +198,8 @@ export function articleLd(post: JournalPost, { store }: Pick<SiteSettings, 'stor
     headline: post.title,
     description: post.description,
     image: [absoluteUrl(post.image)],
-    datePublished: post.date,
-    dateModified: post.date,
+    datePublished: `${post.date}T09:00:00+00:00`,
+    dateModified: `${post.date}T09:00:00+00:00`,
     articleSection: post.tag,
     mainEntityOfPage: url,
     url,
