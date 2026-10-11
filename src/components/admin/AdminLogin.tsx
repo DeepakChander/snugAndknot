@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Wordmark from '@/components/chrome/Wordmark'
@@ -50,7 +51,7 @@ export default function AdminLogin({ configured, denied }: { configured: boolean
           <h1 className="pt-6 font-display text-4xl">Sign in</h1>
           {!configured ? (
             <p className="rounded-xl border border-gold/30 bg-gold/10 p-3 text-xs leading-relaxed text-bone/80">
-              The owner account is created from the <code className="font-mono">ADMIN_EMAIL</code> and <code className="font-mono">ADMIN_PASSWORD</code> environment variables (password of 8+ characters). Set them on the server, then sign in with those values.
+              The owner account is created from the <code className="font-mono">ADMIN_EMAIL</code> and <code className="font-mono">ADMIN_PASSWORD</code> environment variables (a password of 12+ characters). Set them on the server, then sign in with those values.
             </p>
           ) : null}
           <label className="block">
@@ -69,9 +70,9 @@ export default function AdminLogin({ configured, denied }: { configured: boolean
           <button type="submit" disabled={busy} className="flex h-12 w-full items-center justify-center rounded-full bg-gold font-medium text-ink transition-colors hover:bg-gold-light disabled:opacity-60">
             {busy ? 'Signing in…' : 'Sign in'}
           </button>
-          <a href="/" className="block text-center text-xs text-bone/50 hover:text-bone">
+          <Link href="/" className="block text-center text-xs text-bone/50 hover:text-bone">
             ← Back to the store
-          </a>
+          </Link>
         </form>
       </div>
     </div>

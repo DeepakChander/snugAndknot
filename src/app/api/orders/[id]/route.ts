@@ -11,7 +11,6 @@ export const GET = route<Ctx>(async (_req, { params }) => {
   const user = await currentUser()
   if (!user) throw new HttpError(401, 'Please sign in to view this order.')
   const order = await getOrderById(id)
-  const owns = order && (order.userId === user.id || order.email.toLowerCase() === user.email.toLowerCase())
-  if (!order || (!owns && user.role !== 'admin')) throw new HttpError(404, 'Order not found.')
+  if (!order || (order.userId !== user.id && user.role !== 'admin')) throw new HttpError(404, 'Order not found.')
   return ok({ order }, { headers: { 'Cache-Control': 'no-store' } })
 })

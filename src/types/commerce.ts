@@ -95,7 +95,8 @@ export type ReviewFit = 'small' | 'true' | 'large'
 export interface Review {
   id: string
   productId: string
-  userId: string | null
+  /** Set only on reviews loaded for the admin panel; public reviews never carry account ids. */
+  userId?: string | null
   author: string
   rating: number
   title: string
@@ -175,7 +176,10 @@ export interface Order {
   couponCode: string | null
   shippingAddress: Address
   trackingNumber: string | null
+  /** The customer's own note from checkout. */
   notes: string | null
+  /** Staff-only notes. Present only on orders loaded for the admin panel. */
+  adminNotes?: string | null
   pointsEarned: number
   placedAt: string
   confirmedAt: string | null

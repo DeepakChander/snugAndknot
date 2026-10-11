@@ -14,7 +14,8 @@ interface LegacyCoupon {
   expiresAt: string
 }
 
-const MAX_QTY = 20
+/** Matches the server's per-order cap (MAX_LINE_QTY in src/server/validation.ts). */
+const MAX_QTY = 10
 
 interface CartStore {
   items: CartLine[]
@@ -87,9 +88,9 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'snug-knot-cart',
-      version: 2,
+      version: 3,
       partialize: (s) => ({ items: s.items, couponCode: s.couponCode }),
-      // v1 lines had timestamped ids; v2 keys each line by its variant.
+      // v1 lines had timestamped ids; v2 keys each line by its variant; v3 lowers the per-line cap to 10.
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as { items?: (CartLine & { size?: string; color?: string })[] }
         if (version < 2 && Array.isArray(state.items)) {
@@ -107,7 +108,8 @@ export const useCartStore = create<CartStore>()(
           }
           return { items: Array.from(merged.values()), couponCode: null }
         }
-        return state as { items: CartLine[]; couponCode: string | null }
+        const items = Array.isArray(state.items) ? state.items.map((i) => ({ ...i, quantity: Math.min(MAX_QTY, i.quantity) })) : []
+        return { ...(state as { couponCode: string | null }), items }
       },
     }
   )

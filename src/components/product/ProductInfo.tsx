@@ -187,7 +187,7 @@ export default function ProductInfo({ product, summary }: { product: Product; su
         <StockAlertForm productId={product.id} variantId={null} label={product.title} onDone={() => addToast(`We will let you know when ${product.title} is back.`)} />
       ) : (
         <div className="mt-8 flex items-center gap-3">
-          {variant ? <QtyStepper value={qty} onChange={(n) => setQty(Math.max(1, Math.min(n, variant.inventory, 20)))} max={Math.min(variant.inventory, 20)} label={product.title} /> : null}
+          {variant ? <QtyStepper value={qty} onChange={(n) => setQty(Math.max(1, Math.min(n, variant.inventory, 10)))} max={Math.min(variant.inventory, 10)} label={product.title} /> : null}
           <Button size="lg" block onClick={add} arrow magnetic className="flex-1">
             {variant ? `Add to bag — ${money(price * qty)}` : 'Add to bag'}
           </Button>

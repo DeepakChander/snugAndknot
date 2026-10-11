@@ -7,7 +7,6 @@ function mapReview(r: Row): Review {
   return {
     id: r.id,
     productId: r.product_id,
-    userId: r.user_id ?? null,
     author: r.author,
     rating: Math.trunc(num(r.rating)),
     title: r.title,
@@ -55,12 +54,13 @@ export async function findUserReview(productId: string, userId: string): Promise
   return rows[0] ? mapReview(rows[0]) : null
 }
 
-export async function hasPurchased(productId: string, userId: string, email: string): Promise<boolean> {
+/** A "verified" review needs an order placed from this account (not just the same email). */
+export async function hasPurchased(productId: string, userId: string): Promise<boolean> {
   const rows = await query(
     `SELECT 1 FROM orders o JOIN order_items i ON i.order_id = o.id
-      WHERE i.product_id = $1 AND o.status <> 'cancelled' AND (o.user_id = $2 OR lower(o.email) = lower($3))
+      WHERE i.product_id = $1 AND o.status <> 'cancelled' AND o.user_id = $2
       LIMIT 1`,
-    [productId, userId, email]
+    [productId, userId]
   )
   return rows.length > 0
 }
@@ -134,6 +134,7 @@ export async function listReviewsAdmin(status?: ReviewStatus): Promise<AdminRevi
   )
   return rows.map((r) => ({
     ...mapReview(r),
+    userId: r.user_id ?? null,
     productTitle: r.product_title,
     productHandle: r.product_handle,
     email: r.user_email ?? null,

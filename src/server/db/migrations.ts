@@ -226,6 +226,29 @@ CREATE TABLE IF NOT EXISTS media (
 );
 `,
   },
+  {
+    version: 2,
+    name: 'security',
+    sql: `
+-- Bumped on password change and role change: every session signed with an older value stops working.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version INTEGER NOT NULL DEFAULT 0;
+-- The account whose credentials live in ADMIN_EMAIL / ADMIN_PASSWORD. It can only sign in through
+-- those variables, so rotating or removing them locks out the old password and old sessions.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS managed_by_env BOOLEAN NOT NULL DEFAULT false;
+
+-- Fixed-window rate limits shared by every server instance. Keys are SHA-256 hashes, never raw
+-- emails or IP addresses.
+CREATE TABLE IF NOT EXISTS rate_limits (
+  key       TEXT PRIMARY KEY,
+  count     INTEGER NOT NULL,
+  reset_at  TIMESTAMPTZ NOT NULL
+);
+CREATE INDEX IF NOT EXISTS rate_limits_reset_at_idx ON rate_limits (reset_at);
+
+-- Staff notes live apart from the customer's checkout note, which the customer can see.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

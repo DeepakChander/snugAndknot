@@ -27,13 +27,20 @@ function check(name, cond, detail) {
   }
 }
 
+// Each run gets its own client IP so per-IP rate limits from earlier runs do not interfere.
+// (On Vercel the platform sets this header itself; a client cannot choose it there.)
+const RUN_IP = `10.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`
+const COOKIE_RE = /^(__Host-)?sk_session=/
+let cookieName = 'sk_session'
+
 class Client {
-  constructor(name) {
+  constructor(name, ip = RUN_IP) {
     this.name = name
+    this.ip = ip
     this.cookie = ''
   }
   async req(method, path, body, extraHeaders = {}) {
-    const headers = { Origin: BASE, ...extraHeaders }
+    const headers = { Origin: BASE, 'X-Real-IP': this.ip, ...extraHeaders }
     if (this.cookie) headers.Cookie = this.cookie
     let payload
     if (body instanceof FormData) payload = body
@@ -45,7 +52,10 @@ class Client {
     const set = res.headers.getSetCookie?.() ?? []
     for (const c of set) {
       const [pair] = c.split(';')
-      if (pair.startsWith('sk_session=')) this.cookie = pair.endsWith('=') ? '' : pair
+      if (COOKIE_RE.test(pair)) {
+        cookieName = pair.split('=')[0]
+        this.cookie = pair.endsWith('=') ? '' : pair
+      }
     }
     const type = res.headers.get('content-type') || ''
     const data = type.includes('json') ? await res.json() : await res.arrayBuffer()
@@ -100,7 +110,7 @@ async function main() {
   check('wrong password → 401', wrong.status === 401, wrong.status)
   const me = await shopper.get('/api/auth/me')
   check('GET /api/auth/me returns the signed-in user', me.data.user?.email === shopperEmail, me.data)
-  const forged = await new Client('forged').req('GET', '/api/auth/me', undefined, { Cookie: 'sk_session=eyJzdWIiOiJ4Iiwicm9sZSI6ImFkbWluIiwiZXhwIjo5OTk5OTk5OTk5fQ.AAAA' })
+  const forged = await new Client('forged').req('GET', '/api/auth/me', undefined, { Cookie: `${cookieName}=eyJzdWIiOiJ4Iiwicm9sZSI6ImFkbWluIiwiZXhwIjo5OTk5OTk5OTk5LCJ2IjowfQ.AAAA` })
   check('forged session cookie is rejected', forged.data.user === null, forged.data)
 
   console.log('\nCart pricing (server-side)')
@@ -334,11 +344,163 @@ async function main() {
   check('cross-site write blocked → 403', csrf.status === 403, csrf.status)
   const demote = await admin.patch(`/api/admin/customers/${adminLogin.data.user?.id}`, { role: 'customer' })
   check('admin cannot remove their own admin role', demote.status === 400, demote.status)
+  await securityChecks({ placed, guest: guest.data.order, cardigan, v1, settings })
   const logout = await shopper.post('/api/auth/logout')
   check('logout clears the session', logout.status === 200 && !shopper.cookie)
 
   console.log(`\n${passes} passed, ${failures} failed\n`)
   process.exit(failures ? 1 : 0)
+}
+
+async function securityChecks({ placed, guest, cardigan, settings }) {
+  console.log('\nSecurity: headers')
+  const home = await fetch(BASE + '/', { redirect: 'manual' })
+  const csp = home.headers.get('content-security-policy') ?? ''
+  check('CSP sent, framing forbidden, plugins off', csp.includes("frame-ancestors 'none'") && csp.includes("object-src 'none'") && csp.includes("base-uri 'self'"), csp)
+  check('X-Frame-Options: DENY', home.headers.get('x-frame-options') === 'DENY')
+  check('HSTS sent', /max-age=\d+/.test(home.headers.get('strict-transport-security') ?? ''))
+  check('Permissions-Policy sent', (home.headers.get('permissions-policy') ?? '').includes('camera=()'))
+  check('framework not advertised (no X-Powered-By)', !home.headers.get('x-powered-by'))
+  const meHdr = await anon.get('/api/auth/me')
+  check('API responses are not cacheable', meHdr.headers.get('cache-control') === 'no-store', meHdr.headers.get('cache-control'))
+
+  console.log('\nSecurity: admin area')
+  const tree = encodeURIComponent(JSON.stringify(['', { children: ['admin', { children: ['(panel)', { children: ['orders', { children: ['__PAGE__', {}, null, null] }, null, null] }, null, null] }, null, null] }, null, null, true]))
+  for (const who of [anon, shopper]) {
+    const res = await fetch(`${BASE}/admin/orders?_rsc=probe`, { headers: { RSC: '1', 'Next-Router-State-Tree': tree, ...(who.cookie ? { Cookie: who.cookie } : {}) }, redirect: 'manual' })
+    const body = await res.text()
+    check(`${who.name}: page-only (RSC) request for admin orders leaks nothing`, !body.includes(placed.orderNumber) && !body.includes('Weaver Lane'), { status: res.status, bytes: body.length })
+  }
+  const adminPage = await fetch(`${BASE}/admin/customers`, { redirect: 'manual' })
+  check('anonymous admin page → redirect to sign-in', adminPage.status === 307 && (adminPage.headers.get('location') ?? '').includes('/admin/login'), adminPage.status)
+  const custPage = await fetch(`${BASE}/admin/settings`, { headers: { Cookie: shopper.cookie }, redirect: 'manual' })
+  check('customer admin page → redirect (denied)', custPage.status === 307 && (custPage.headers.get('location') ?? '').includes('denied'), custPage.status)
+  const takeover = await anon.post('/api/auth/signup', { name: 'Not the owner', email: ADMIN_EMAIL, password: 'claiming-it-first-1' })
+  check("the owner's ADMIN_EMAIL cannot be registered as a customer", takeover.status === 409, takeover.status)
+
+  console.log('\nSecurity: request forgery & input limits')
+  const plain = await fetch(BASE + '/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'text/plain', 'X-Real-IP': RUN_IP }, body: JSON.stringify({ email: `p-${stamp}@example.com` }) })
+  check('non-JSON (form-style) body → 415', plain.status === 415, plain.status)
+  const sneaky = await fetch(BASE + '/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'text/plain;application/json', 'X-Real-IP': RUN_IP }, body: JSON.stringify({ email: `s-${stamp}@example.com` }) })
+  check('text/plain disguised as JSON → 415', sneaky.status === 415, sneaky.status)
+  const crossSite = await anon.post('/api/newsletter', { email: `x-${stamp}@example.com` }, { 'Sec-Fetch-Site': 'cross-site' })
+  check('browser cross-site request → 403', crossSite.status === 403, crossSite.status)
+  const huge = await anon.post('/api/contact', { name: 'Big', email: `b-${stamp}@example.com`, message: 'x'.repeat(1_100_000) })
+  check('oversized body → 413', huge.status === 413, huge.status)
+
+  console.log('\nSecurity: rate limits')
+  const victim = `nobody-${stamp}@example.com`
+  const attacker = new Client('attacker', `10.250.${Math.floor(Math.random() * 250)}.1`)
+  let last
+  for (let i = 0; i < 11; i++) last = await attacker.post('/api/auth/login', { email: victim, password: `guess-${i}-xyz` })
+  check('11th login attempt on one account → 429 with Retry-After', last.status === 429 && Number(last.headers.get('retry-after')) > 0, { status: last.status, retry: last.headers.get('retry-after') })
+  for (let i = 0; i < 11; i++) await attacker.post('/api/auth/login', { email: shopperEmail, password: `guess-${i}-xyz` })
+  const owner = new Client('owner-elsewhere', `10.251.${Math.floor(Math.random() * 250)}.2`)
+  const ownerIn = await owner.post('/api/auth/login', { email: shopperEmail, password: 'knit-and-purl-9' })
+  check("an attacker's failed guesses do not lock the real owner out", ownerIn.status === 200, ownerIn.status)
+
+  console.log('\nSecurity: timing does not reveal accounts')
+  const timer = new Client('timer', `10.252.${Math.floor(Math.random() * 250)}.3`)
+  const time = async (email) => {
+    const t = performance.now()
+    await timer.post('/api/auth/login', { email, password: 'definitely-wrong-1' })
+    return performance.now() - t
+  }
+  const known = [], unknown = []
+  for (let i = 0; i < 3; i++) {
+    known.push(await time(shopperEmail))
+    unknown.push(await time(`ghost-${stamp}-${i}@example.com`))
+  }
+  const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length
+  const ratio = avg(unknown) / avg(known)
+  check('unknown email takes as long as a wrong password', ratio > 0.6 && ratio < 1.6, { knownMs: Math.round(avg(known)), unknownMs: Math.round(avg(unknown)) })
+
+  console.log('\nSecurity: sessions')
+  const stolen = shopper.cookie
+  const changed = await shopper.post('/api/account/password', { currentPassword: 'knit-and-purl-9', newPassword: 'purl-and-knit-10' })
+  check('password change → 200, this device stays signed in', changed.status === 200 && (await shopper.get('/api/auth/me')).data.user?.email === shopperEmail, changed.data)
+  const replay = await new Client('thief').req('GET', '/api/auth/me', undefined, { Cookie: stolen })
+  check('a copied cookie stops working after the password change', replay.data.user === null, replay.data)
+  const common = await anon.post('/api/auth/signup', { name: 'Weak', email: `weak-${stamp}@example.com`, password: 'password123' })
+  check('very common password refused → 422', common.status === 422 && common.data.fields?.password, common.data)
+  const promoted = new Client('promoted')
+  await promoted.post('/api/auth/signup', { name: 'Promo', email: `promo-${stamp}@example.com`, password: 'promo-knit-55' })
+  const promotedId = (await promoted.get('/api/auth/me')).data.user?.id
+  const before = promoted.cookie
+  await admin.patch(`/api/admin/customers/${promotedId}`, { role: 'admin' })
+  const stillIn = await new Client('old').req('GET', '/api/auth/me', undefined, { Cookie: before })
+  check('a role change ends existing sessions (no silent upgrade)', stillIn.status === 200 && stillIn.data.user === null, stillIn.data)
+  await admin.patch(`/api/admin/customers/${promotedId}`, { role: 'customer' })
+
+  console.log('\nSecurity: who can see what')
+  const masked = await anon.post('/api/orders/lookup', { orderNumber: guest.orderNumber, email: guest.email })
+  const a = masked.data.order?.shippingAddress ?? {}
+  check('guest tracking hides street and phone', masked.status === 200 && a.line1 !== '1 Weaver Lane' && !String(a.phone ?? '').includes('0100'), a)
+  const claimer = new Client('claimer')
+  await claimer.post('/api/auth/signup', { name: 'Claimer', email: guest.email, password: 'claim-guest-77' })
+  const claimed = await claimer.get('/api/orders')
+  check("registering a guest's email does not reveal their orders", claimed.status === 200 && !claimed.data.orders.some((o) => o.id === guest.id), claimed.data.orders?.length)
+  check("…nor by order id", (await claimer.get(`/api/orders/${guest.id}`)).status === 404)
+  await admin.patch(`/api/admin/orders/${placed.id}`, { adminNotes: 'Internal: smoke test note' })
+  const custView = await shopper.get(`/api/orders/${placed.id}`)
+  check('staff notes never reach the customer', custView.status === 200 && !JSON.stringify(custView.data).includes('Internal: smoke test note'), custView.data.order?.notes)
+  const adminView = await admin.get(`/api/admin/orders/${placed.id}`)
+  check('staff notes visible in the admin', adminView.data.order?.adminNotes === 'Internal: smoke test note', adminView.data.order?.adminNotes)
+
+  console.log('\nSecurity: business rules')
+  const v2Id = placed.items[1]?.variantId
+  const bigLine = await anon.post('/api/orders', { lines: [{ variantId: v2Id, quantity: 11 }], shippingMethod: 'standard', email: `big-${stamp}@example.com`, address, paymentMethod: 'cod' })
+  check('more than 10 of one piece → 422', bigLine.status === 422, bigLine.status)
+  const pool = (await anon.get('/api/products')).data.products.flatMap((p) => p.variants).slice(0, 4)
+  const tooMany = await anon.post('/api/orders', { lines: pool.map((v) => ({ variantId: v.id, quantity: 8 })), shippingMethod: 'standard', email: `many-${stamp}@example.com`, address, paymentMethod: 'cod' })
+  check('more than 30 pieces in one order → 422', tooMany.status === 422, tooMany.status)
+  const line = placed.items[1]
+  const triple = await shopper.post('/api/returns', { orderId: placed.id, items: [1, 2, 3].map(() => ({ orderItemId: line.id, quantity: 1 })), reason: 'other' })
+  check('repeated return lines are added up (3 of 2 bought → refused)', triple.status === 400, triple.status)
+  const twice = await shopper.post('/api/returns', { orderId: placed.id, items: [{ orderItemId: line.id, quantity: 1 }, { orderItemId: line.id, quantity: 1 }], reason: 'other' })
+  const expectedRefund = Math.round(line.price * 2 * (1 - placed.discount / placed.subtotal) * 100) / 100
+  check('refund is net of the order discount', twice.status === 201 && twice.data.return.items[0].quantity === 2 && Math.abs(twice.data.return.refundAmount - expectedRefund) < 0.01, { status: twice.status, refund: twice.data.return?.refundAmount, expectedRefund })
+  const one = await shopper.post('/api/orders', { lines: [{ variantId: v2Id, quantity: 1 }], shippingMethod: 'standard', email: shopperEmail, address, paymentMethod: 'cod' })
+  await admin.patch(`/api/admin/orders/${one.data.order.id}`, { status: 'delivered' })
+  const req = { orderId: one.data.order.id, items: [{ orderItemId: one.data.order.items[0].id, quantity: 1 }], reason: 'other' }
+  const race = await Promise.all([shopper.post('/api/returns', req), shopper.post('/api/returns', req), shopper.post('/api/returns', req)])
+  check('simultaneous returns for the last unit: exactly one succeeds', race.filter((r) => r.status === 201).length === 1, race.map((r) => r.status))
+  const publicReviews = (await anon.get(`/api/products/${cardigan.handle}/reviews`)).data.reviews
+  check('public reviews carry no account ids', publicReviews.length > 0 && publicReviews.every((r) => !('userId' in r)), publicReviews[0])
+  const named = await anon.post('/api/orders/lookup', { orderNumber: guest.orderNumber, email: guest.email })
+  check('guest tracking shortens the surname', named.data.order?.customerName === 'Ada L.', named.data.order?.customerName)
+
+  console.log('\nSecurity: stored content')
+  // A deliberately malicious value: the server must refuse it.
+  // eslint-disable-next-line no-script-url
+  const js = await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, primaryCtaHref: 'javascript:alert(1)' } })
+  check('script (javascript-scheme) link refused → 422', js.status === 422, js.status)
+  const proto = await admin.put('/api/admin/settings', { section: 'announcement', value: { ...settings.announcement, link: '//evil.example/x' } })
+  check('protocol-relative link refused → 422', proto.status === 422, proto.status)
+  const social = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, social: { ...settings.store.social, instagram: 'http://insecure.example' } } })
+  check('non-https social link refused → 422', social.status === 422, social.status)
+  const cols = (await admin.get('/api/admin/collections')).data.collections
+  for (const bad of ['//evil.example/x.png', 'https://evil.example/x.png', '/\\evil.example/x.png']) {
+    const r = await admin.put(`/api/admin/collections/${cols[0].id}`, { ...cols[0], image: bad })
+    check(`image URL ${JSON.stringify(bad)} refused → 422`, r.status === 422, r.status)
+  }
+  const spoof = new FormData()
+  spoof.append('file', new Blob(['<script>alert(1)</script>'], { type: 'image/png' }), 'evil.png')
+  check('upload whose bytes are not an image → 415', (await admin.post('/api/admin/media', spoof)).status === 415)
+  await anon.post('/api/contact', { name: 'Sm\u202Eoke\u0007', email: `ctl-${stamp}@example.com`, message: 'Testing invisible \u202Ecpackage.exe characters.' })
+  const stored = (await admin.get('/api/admin/messages')).data.messages.find((x) => x.email === `ctl-${stamp}@example.com`)
+  check('invisible control characters stripped from stored text', stored && stored.name === 'Smoke' && !/[\u202E\u0007]/.test(stored.body), stored && { name: stored.name })
+  if (stored) await admin.del(`/api/admin/messages/${stored.id}`)
+  const badDate = await admin.post('/api/admin/coupons', { code: `BAD${stamp}`.toUpperCase().slice(0, 20), type: 'fixed', value: 5, expiresAt: '2026-02-31' })
+  check('impossible date refused → 422', badDate.status === 422, badDate.status)
+
+  console.log('\nSecurity: admin sign-out')
+  const second = new Client('admin-laptop')
+  await second.post('/api/auth/login', { email: ADMIN_EMAIL, password: ADMIN_PASSWORD })
+  check('admin signed in on a second device', (await admin.get('/api/admin/stats')).status === 200 && (await second.get('/api/admin/stats')).status === 200)
+  await second.post('/api/auth/logout')
+  const afterOut = await admin.get('/api/auth/me')
+  check('admin sign-out ends the other admin sessions too', afterOut.data.user === null, afterOut.data)
 }
 
 main().catch((err) => {

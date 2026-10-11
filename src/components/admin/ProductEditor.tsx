@@ -229,7 +229,7 @@ export default function ProductEditor({ product, categories }: { product: Produc
       />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card title="Basics">
             <div className="grid gap-4">
               <Input
@@ -340,8 +340,8 @@ export default function ProductEditor({ product, categories }: { product: Produc
               {d.colors.map((c, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <input type="color" value={c.hex} onChange={(e) => set('colors', d.colors.map((x, j) => (j === i ? { ...x, hex: e.target.value } : x)))} className="h-10 w-12 cursor-pointer rounded-lg border border-ink/15 bg-white p-1" aria-label="Swatch colour" />
-                  <input value={c.name} onChange={(e) => set('colors', d.colors.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} placeholder="Colour name, e.g. Ivory" className="h-10 flex-1 rounded-xl border border-ink/15 bg-white px-3 text-sm outline-none focus:border-ink/50" />
-                  <span className="w-20 font-mono text-xs text-stone">{c.hex}</span>
+                  <input value={c.name} onChange={(e) => set('colors', d.colors.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} placeholder="Colour name, e.g. Ivory" className="h-10 min-w-0 flex-1 rounded-xl border border-ink/15 bg-white px-3 text-sm outline-none focus:border-ink/50" />
+                  <span className="hidden w-20 font-mono text-xs text-stone sm:inline">{c.hex}</span>
                   <Btn size="sm" variant="ghost" className="text-error" onClick={() => set('colors', d.colors.filter((_, j) => j !== i))}>
                     Remove
                   </Btn>
@@ -449,7 +449,7 @@ export default function ProductEditor({ product, categories }: { product: Produc
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card title="Status">
             <div className="space-y-4">
               <Select label="Visibility" value={d.status} onChange={(e) => set('status', e.target.value as ProductStatus)}>

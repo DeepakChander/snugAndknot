@@ -152,12 +152,23 @@ export async function listCustomers() {
   }))
 }
 
-export async function updateCustomer(id: string, patch: { role?: 'customer' | 'admin'; points?: number }) {
-  const rows = await query(
-    `UPDATE users SET role = coalesce($2, role), points = coalesce($3, points) WHERE id = $1 RETURNING id`,
-    [id, patch.role ?? null, patch.points === undefined ? null : Math.max(0, Math.trunc(patch.points))]
+export async function updateCustomer(
+  id: string,
+  patch: { role?: 'customer' | 'admin'; points?: number }
+): Promise<'ok' | 'not-found' | 'env-admin'> {
+  const [target] = await query('SELECT role, managed_by_env FROM users WHERE id = $1', [id])
+  if (!target) return 'not-found'
+  // The ADMIN_EMAIL account is managed by environment variables, not from the admin panel.
+  if (target.managed_by_env === true && patch.role === 'customer') return 'env-admin'
+  const roleChanges = patch.role !== undefined && patch.role !== target.role
+  await query(
+    // A role change signs that person out everywhere, so no session outlives the rights it was issued with.
+    `UPDATE users SET role = coalesce($2, role), points = coalesce($3, points),
+            session_version = session_version + $4
+      WHERE id = $1`,
+    [id, patch.role ?? null, patch.points === undefined ? null : Math.max(0, Math.trunc(patch.points)), roleChanges ? 1 : 0]
   )
-  return rows.length > 0
+  return 'ok'
 }
 
 /* ─────────────────────────── Dashboard ─────────────────────────── */

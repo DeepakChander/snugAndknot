@@ -92,7 +92,12 @@ export default function CheckoutView() {
 
   const set = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((f) => ({ ...f, [k]: e.target.value }))
-    if (errors[k]) setErrors(({ [k]: _drop, ...rest }) => rest)
+    if (errors[k])
+      setErrors((prev) => {
+        const rest = { ...prev }
+        delete rest[k]
+        return rest
+      })
   }
 
   function validate(): Record<string, string> {

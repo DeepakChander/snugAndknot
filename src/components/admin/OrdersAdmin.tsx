@@ -94,7 +94,7 @@ export function OrderDetailAdmin({ order }: { order: Order }) {
   const money = useMoney()
   const { run, busy } = useMutate()
   const [tracking, setTracking] = useState(order.trackingNumber ?? '')
-  const [notes, setNotes] = useState(order.notes ?? '')
+  const [notes, setNotes] = useState(order.adminNotes ?? '')
   const next = NEXT[order.status]
   const a = order.shippingAddress
 
@@ -134,7 +134,7 @@ export function OrderDetailAdmin({ order }: { order: Order }) {
         }
       />
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card title="Progress">
             <OrderTimeline order={order} />
           </Card>
@@ -180,14 +180,19 @@ export function OrderDetailAdmin({ order }: { order: Order }) {
               </div>
             </dl>
           </Card>
-          <Card title="Internal notes & customer note">
-            <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} hint="The customer's checkout note appears here; you can edit it." />
-            <Btn size="sm" variant="outline" className="mt-3" loading={busy} onClick={() => patch({ notes: notes || null }, 'Notes saved.')}>
+          {order.notes ? (
+            <Card title="Note from the customer">
+              <p className="whitespace-pre-line text-sm">“{order.notes}”</p>
+            </Card>
+          ) : null}
+          <Card title="Internal notes">
+            <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} hint="Only staff see these. The customer never does." />
+            <Btn size="sm" variant="outline" className="mt-3" loading={busy} onClick={() => patch({ adminNotes: notes || null }, 'Notes saved.')}>
               Save notes
             </Btn>
           </Card>
         </div>
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <Card title="Customer">
             <p>{order.customerName}</p>
             <a href={`mailto:${order.email}`} className="text-sm text-burgundy underline">

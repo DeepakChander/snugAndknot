@@ -26,6 +26,15 @@ function connectionString(): string | undefined {
   return process.env.DATABASE_URL || process.env.POSTGRES_URL || undefined
 }
 
+function isLocalHost(url: string): boolean {
+  try {
+    const host = new URL(url).hostname
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]' || host === ''
+  } catch {
+    return false
+  }
+}
+
 async function createPostgres(url: string): Promise<Db> {
   const pg = await import('pg')
   const { Pool, types } = pg.default ?? pg
@@ -35,9 +44,15 @@ async function createPostgres(url: string): Promise<Db> {
 
   const pool = new Pool({
     connectionString: url,
+    // Remote databases are reached over TLS with the server certificate verified. An sslmode
+    // in the URL takes precedence over this (pg lets connection-string settings win).
+    ssl: isLocalHost(url) ? undefined : { rejectUnauthorized: true },
     max: process.env.VERCEL ? 3 : 10,
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: 10_000,
+    // No single query may hold a connection for more than 15 seconds.
+    statement_timeout: 15_000,
+    query_timeout: 20_000,
   })
 
   const db: Db = {
@@ -154,6 +169,22 @@ async function migrate(db: Db) {
   })
 }
 
+/**
+ * Marks the ADMIN_EMAIL account as managed by the environment on every cold start, so it can
+ * only sign in with ADMIN_PASSWORD. This covers rows written before that flag existed, and a
+ * customer account someone registered with the owner's address before it became the admin
+ * address. Flagging also ends that row's existing sessions. Idempotent.
+ */
+async function claimOwnerAccount(db: Db) {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase()
+  if (!email) return
+  await db.query(
+    `UPDATE users SET managed_by_env = true, session_version = session_version + 1
+      WHERE lower(email) = $1 AND managed_by_env = false`,
+    [email]
+  )
+}
+
 type GlobalWithDb = typeof globalThis & { __snugknotDb?: Promise<Db> }
 
 /** Lazily connected, migrated and seeded database handle (one per server instance). */
@@ -164,6 +195,7 @@ export function getDb(): Promise<Db> {
       const url = connectionString()
       const db = url ? await createPostgres(url) : await createPglite()
       await migrate(db)
+      await claimOwnerAccount(db)
       return db
     })().catch((err) => {
       // Allow the next request to retry rather than caching a failed connection forever.

@@ -13,7 +13,7 @@ import { BagIcon, MinusIcon, PlusIcon } from '@/components/kit/icons'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
-export function QtyStepper({ value, onChange, max = 20, label }: { value: number; onChange: (n: number) => void; max?: number; label: string }) {
+export function QtyStepper({ value, onChange, max = 10, label }: { value: number; onChange: (n: number) => void; max?: number; label: string }) {
   return (
     <div className="inline-flex h-9 items-center rounded-full border border-ink/15" role="group" aria-label={`Quantity for ${label}`}>
       <button type="button" onClick={() => onChange(value - 1)} aria-label="Decrease quantity" data-cursor="hover" className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-ink/5">

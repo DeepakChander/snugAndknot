@@ -11,6 +11,8 @@ export const PATCH = route<Ctx>(async (req, { params }) => {
   if (id === admin.id && patch.role === 'customer') {
     throw new HttpError(400, 'You cannot remove your own admin access.')
   }
-  if (!(await updateCustomer(id, patch))) throw new HttpError(404, 'Customer not found.')
+  const result = await updateCustomer(id, patch)
+  if (result === 'not-found') throw new HttpError(404, 'Customer not found.')
+  if (result === 'env-admin') throw new HttpError(400, 'This is the store owner account set by ADMIN_EMAIL. Change that variable instead.')
   return ok({ ok: true })
 })

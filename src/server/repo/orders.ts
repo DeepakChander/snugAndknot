@@ -303,6 +303,14 @@ export async function getOrderById(id: string): Promise<Order | null> {
   return (await attachItems(q, rows))[0] ?? null
 }
 
+/** The order plus staff-only fields. Only for admin pages and admin API routes. */
+export async function getOrderAdmin(id: string): Promise<Order | null> {
+  const q: Queryable = { query, exec: async () => {} }
+  const rows = await query('SELECT * FROM orders WHERE id = $1', [id])
+  const [order] = await attachItems(q, rows)
+  return order ? { ...order, adminNotes: (rows[0].admin_notes as string | null) ?? null } : null
+}
+
 export async function findOrderForGuest(orderNumber: string, email: string): Promise<Order | null> {
   const q: Queryable = { query, exec: async () => {} }
   const rows = await query('SELECT * FROM orders WHERE upper(order_number) = upper($1) AND lower(email) = lower($2)', [
@@ -312,12 +320,13 @@ export async function findOrderForGuest(orderNumber: string, email: string): Pro
   return (await attachItems(q, rows))[0] ?? null
 }
 
-export async function listOrdersForUser(userId: string, email: string): Promise<Order[]> {
+/**
+ * Orders placed while signed in to this account. Guest orders are deliberately not matched by
+ * email: accounts are not email-verified, so anyone could register someone else's address.
+ */
+export async function listOrdersForUser(userId: string): Promise<Order[]> {
   const q: Queryable = { query, exec: async () => {} }
-  const rows = await query(
-    'SELECT * FROM orders WHERE user_id = $1 OR lower(email) = lower($2) ORDER BY placed_at DESC',
-    [userId, email]
-  )
+  const rows = await query('SELECT * FROM orders WHERE user_id = $1 ORDER BY placed_at DESC', [userId])
   return attachItems(q, rows)
 }
 
@@ -349,7 +358,7 @@ const STATUS_TIMESTAMP: Partial<Record<OrderStatus, string>> = {
 
 export async function updateOrderAdmin(
   id: string,
-  patch: { status?: OrderStatus; paymentStatus?: PaymentStatus; trackingNumber?: string | null; notes?: string | null }
+  patch: { status?: OrderStatus; paymentStatus?: PaymentStatus; trackingNumber?: string | null; adminNotes?: string | null }
 ): Promise<Order | null> {
   const updated = await tx(async (q) => {
     const rows = await q.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [id])
@@ -387,7 +396,7 @@ export async function updateOrderAdmin(
     }
     if (patch.paymentStatus) set('payment_status', patch.paymentStatus)
     if (patch.trackingNumber !== undefined) set('tracking_number', patch.trackingNumber)
-    if (patch.notes !== undefined) set('notes', patch.notes)
+    if (patch.adminNotes !== undefined) set('admin_notes', patch.adminNotes)
     await q.query(`UPDATE orders SET ${sets.join(', ')} WHERE id = $1`, params)
     return true
   })
@@ -430,49 +439,61 @@ export async function listReturnsAdmin(): Promise<(ReturnRequest & { email: stri
 
 export async function createReturn(input: {
   userId: string
-  userEmail: string
   orderId: string
   items: { orderItemId: string; quantity: number }[]
   reason: ReturnReason
   comments: string | null
   returnWindowDays: number
 }): Promise<ReturnRequest> {
-  const order = await getOrderById(input.orderId)
-  if (!order || (order.userId !== input.userId && order.email.toLowerCase() !== input.userEmail.toLowerCase())) {
-    throw new CheckoutError('Order not found.', 404)
-  }
-  if (order.status !== 'delivered') throw new CheckoutError('Returns open once your order has been delivered.')
-  const deliveredAt = new Date(order.deliveredAt ?? order.placedAt).getTime()
-  if (Date.now() - deliveredAt > input.returnWindowDays * 86400_000) {
-    throw new CheckoutError(`The ${input.returnWindowDays}-day return window for this order has closed.`)
-  }
-  const existing = await query<{ items: unknown }>(
-    `SELECT items FROM returns WHERE order_id = $1 AND status <> 'rejected'`,
-    [order.id]
-  )
-  const alreadyReturned = new Map<string, number>()
-  for (const r of existing) {
-    for (const it of json<{ orderItemId: string; quantity: number }[]>(r.items, [])) {
-      alreadyReturned.set(it.orderItemId, (alreadyReturned.get(it.orderItemId) ?? 0) + it.quantity)
-    }
-  }
-  const items: ReturnRequest['items'] = []
+  // Merge repeated lines first, so [{A,1},{A,1}] counts as two of A.
+  const wanted = new Map<string, number>()
   for (const req of input.items) {
-    const it = order.items.find((i) => i.id === req.orderItemId)
     const qty = Math.trunc(req.quantity)
-    if (!it || qty <= 0) continue
-    const remaining = it.quantity - (alreadyReturned.get(it.id) ?? 0)
-    if (qty > remaining) throw new CheckoutError(`Only ${remaining} of ${it.title} can still be returned.`)
-    items.push({ orderItemId: it.id, title: it.title, quantity: qty, price: it.price, image: it.image })
+    if (qty > 0) wanted.set(req.orderItemId, (wanted.get(req.orderItemId) ?? 0) + qty)
   }
-  if (!items.length) throw new CheckoutError('Choose at least one item to return.')
-  const refund = round2(items.reduce((s, i) => s + i.price * i.quantity, 0))
-  const rows = await query(
-    `INSERT INTO returns (id, order_id, user_id, reason, comments, items, refund_amount)
-     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7) RETURNING *, $8::text AS order_number`,
-    [newId('ret'), order.id, input.userId, input.reason, input.comments, JSON.stringify(items), refund, order.orderNumber]
-  )
-  return mapReturn(rows[0])
+
+  return tx(async (q) => {
+    // Lock the order row: two simultaneous requests for the same order run one after the other.
+    const locked = await q.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [input.orderId])
+    const [order] = await attachItems(q, locked)
+    if (!order || order.userId !== input.userId) {
+      throw new CheckoutError('Order not found.', 404)
+    }
+    if (order.status !== 'delivered') throw new CheckoutError('Returns open once your order has been delivered.')
+    const deliveredAt = new Date(order.deliveredAt ?? order.placedAt).getTime()
+    if (Date.now() - deliveredAt > input.returnWindowDays * 86400_000) {
+      throw new CheckoutError(`The ${input.returnWindowDays}-day return window for this order has closed.`)
+    }
+    const existing = await q.query<{ items: unknown }>(
+      `SELECT items FROM returns WHERE order_id = $1 AND status <> 'rejected'`,
+      [order.id]
+    )
+    const alreadyReturned = new Map<string, number>()
+    for (const r of existing) {
+      for (const it of json<{ orderItemId: string; quantity: number }[]>(r.items, [])) {
+        alreadyReturned.set(it.orderItemId, (alreadyReturned.get(it.orderItemId) ?? 0) + it.quantity)
+      }
+    }
+    const items: ReturnRequest['items'] = []
+    for (const [orderItemId, qty] of wanted) {
+      const it = order.items.find((i) => i.id === orderItemId)
+      if (!it) continue
+      const remaining = it.quantity - (alreadyReturned.get(it.id) ?? 0)
+      if (qty > remaining) throw new CheckoutError(`Only ${Math.max(0, remaining)} of ${it.title} can still be returned.`)
+      items.push({ orderItemId: it.id, title: it.title, quantity: qty, price: it.price, image: it.image })
+    }
+    if (!items.length) throw new CheckoutError('Choose at least one item to return.')
+    // Refund what was actually paid for these pieces: their share of the order discount comes off.
+    const gross = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+    const paidShare = order.subtotal > 0 ? Math.max(0, 1 - order.discount / order.subtotal) : 1
+    const refund = round2(gross * paidShare)
+    const rows = await q.query(
+      `INSERT INTO returns (id, order_id, user_id, reason, comments, items, refund_amount)
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7) RETURNING *, $8::text AS order_number`,
+      [newId('ret'), order.id, input.userId, input.reason, input.comments, JSON.stringify(items), refund, order.orderNumber]
+    )
+    return mapReturn(rows[0])
+  })
 }
 
 export async function updateReturnAdmin(id: string, status: ReturnStatus): Promise<boolean> {

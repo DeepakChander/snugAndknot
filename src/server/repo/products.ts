@@ -142,7 +142,7 @@ export async function listProducts(opts: ProductQuery = {}): Promise<Product[]> 
 
   const sql = `${PRODUCT_SELECT}
     ${where.length ? `WHERE ${where.join(' AND ')}` : ''}
-    ORDER BY ${ORDER_BY[opts.sort ?? 'featured']}
+    ORDER BY ${ORDER_BY[opts.sort as SortOption] ?? ORDER_BY.featured}
     ${opts.limit ? `LIMIT ${Math.max(1, Math.min(200, Math.trunc(opts.limit)))}` : ''}`
   const rows = await query(sql, params)
   const products = rows.map(mapProduct)

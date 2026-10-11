@@ -1,6 +1,45 @@
 import type { NextConfig } from 'next'
 
+const isDev = process.env.NODE_ENV === 'development'
+
+/**
+ * Content Security Policy without nonces (nonces would force every page to render on each
+ * request). Allows this site plus the analytics it actually loads: Google Analytics and the
+ * Meta Pixel. Images come from this site or the two photo hosts the image optimiser allows.
+ */
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://*.googletagmanager.com https://connect.facebook.net`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://images.unsplash.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com https://www.facebook.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net",
+  "media-src 'self' blob:",
+  "worker-src 'self' blob:",
+  // The Meta Pixel sends some events through a hidden facebook.com iframe and form.
+  "frame-src https://www.facebook.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self' https://www.facebook.com",
+  "frame-ancestors 'none'",
+  // Only on Vercel: a local `next start` over plain http must keep working.
+  ...(process.env.VERCEL ? ['upgrade-insecure-requests'] : []),
+].join('; ')
+
+const securityHeaders = [
+  { key: 'Content-Security-Policy', value: csp },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()' },
+  // Browsers ignore this over plain http, so it is safe to send everywhere.
+  { key: 'Strict-Transport-Security', value: 'max-age=63072000' },
+]
+
 const nextConfig: NextConfig = {
+  // Do not advertise the framework and version.
+  poweredByHeader: false,
   // A stray lockfile in a parent folder must not be mistaken for the workspace root.
   turbopack: { root: process.cwd() },
   outputFileTracingRoot: process.cwd(),
@@ -25,14 +64,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      {
-        source: '/:path*',
-        headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-        ],
-      },
+      { source: '/:path*', headers: securityHeaders },
+      { source: '/admin', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/admin/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
     ]
   },

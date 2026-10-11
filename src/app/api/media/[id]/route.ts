@@ -14,6 +14,9 @@ export async function GET(_req: Request, { params }: Ctx) {
       // Media ids are immutable: a replaced image gets a new id.
       'Cache-Control': 'public, max-age=31536000, immutable',
       'X-Content-Type-Options': 'nosniff',
+      // Even if a file were mis-typed, the browser may not run anything from it.
+      'Content-Security-Policy': "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox",
+      'Cross-Origin-Resource-Policy': 'same-origin',
     },
   })
 }

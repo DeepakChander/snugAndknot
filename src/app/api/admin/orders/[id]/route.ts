@@ -1,4 +1,4 @@
-import { CheckoutError, getOrderById, updateOrderAdmin } from '@/server/repo/orders'
+import { CheckoutError, getOrderAdmin, updateOrderAdmin } from '@/server/repo/orders'
 import { invalidate } from '@/server/catalog'
 import { HttpError, ok, parseBody, requireAdmin, route } from '@/server/http'
 import { orderPatchSchema } from '@/server/validation'
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export const GET = route<Ctx>(async (_req, { params }) => {
   await requireAdmin()
-  const order = await getOrderById((await params).id)
+  const order = await getOrderAdmin((await params).id)
   if (!order) throw new HttpError(404, 'Order not found.')
   return ok({ order })
 })

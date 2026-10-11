@@ -1,5 +1,6 @@
 import { getProducts } from '@/server/catalog'
-import { ok, route } from '@/server/http'
+import { clientIp, ok, route } from '@/server/http'
+import { rateLimit } from '@/server/rate-limit'
 import type { Gender, SortOption } from '@/types/commerce'
 
 const SORTS: SortOption[] = ['featured', 'newest', 'price-asc', 'price-desc', 'rating']
@@ -7,6 +8,7 @@ const GENDERS: Gender[] = ['men', 'women', 'kids', 'unisex']
 
 export const GET = route(async (req) => {
   const sp = new URL(req.url).searchParams
+  if (sp.get('q')) await rateLimit('search', clientIp(req))
   const sort = sp.get('sort') as SortOption | null
   const gender = sp.get('gender') as Gender | null
   const limit = Number(sp.get('limit'))

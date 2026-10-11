@@ -5,9 +5,11 @@ import { getOrderById, listReturnsForUser } from '@/server/repo/orders'
 import { getSettings } from '@/server/repo/settings'
 
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
-  const user = (await currentUser())!
+  const user = await currentUser()
+  // The account layout shows the sign-in screen; render nothing here without a session.
+  if (!user) return null
   const order = await getOrderById((await params).id)
-  if (!order || (order.userId !== user.id && order.email.toLowerCase() !== user.email.toLowerCase())) notFound()
+  if (!order || order.userId !== user.id) notFound()
   const [settings, returns] = await Promise.all([getSettings(), listReturnsForUser(user.id)])
   const deliveredAt = order.deliveredAt ? new Date(order.deliveredAt).getTime() : null
   const windowOpen = order.status === 'delivered' && deliveredAt !== null && Date.now() - deliveredAt <= settings.commerce.returnWindowDays * 86400_000

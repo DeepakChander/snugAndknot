@@ -1,8 +1,17 @@
 import 'server-only'
 import { z } from 'zod'
 
-const trimmed = (max: number) => z.string().trim().max(max)
-const required = (max: number, label = 'This field') => z.string().trim().min(1, `${label} is required`).max(max)
+/**
+ * Removes characters that are invisible but dangerous in stored text: control characters
+ * (other than tab and line breaks) and the Unicode direction overrides used to disguise text
+ * ("gnp.exe" shown as "exe.png"). Also normalises to NFC so look-alike sequences compare equal.
+ * HTML needs no stripping here: React escapes every value it renders.
+ */
+const UNSAFE_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\u202A-\u202E\u2066-\u2069]/g
+export const cleanText = (v: string) => v.normalize('NFC').replace(UNSAFE_CHARS, '')
+const text = () => z.string().overwrite(cleanText)
+const trimmed = (max: number) => text().trim().max(max)
+const required = (max: number, label = 'This field') => text().trim().min(1, `${label} is required`).max(max)
 export const emailSchema = z.string().trim().toLowerCase().email('Enter a valid email address').max(254)
 const money = z.coerce.number().finite().min(0).max(1_000_000).transform((n) => Math.round(n * 100) / 100)
 const handle = z
@@ -12,18 +21,70 @@ const handle = z
   .min(2, 'Handle must be at least 2 characters')
   .max(80)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use lowercase letters, numbers and single hyphens')
-/** Local paths ("/images/…", "/api/media/…") or absolute https URLs. */
+/** A path on this site: "/x", but not "//host" or "/\\host" (browsers treat both as another site). */
+const isLocalPath = (v: string) => /^\/(?![\/\\])[^\s\\]*$/.test(v)
+/** Photo hosts the image optimiser is configured for (next.config.ts → images.remotePatterns). */
+const IMAGE_HOSTS = ['images.unsplash.com', 'images.pexels.com']
+const isAllowedImageUrl = (v: string) => {
+  try {
+    const u = new URL(v)
+    return u.protocol === 'https:' && IMAGE_HOSTS.includes(u.hostname) && !u.username && !u.password
+  } catch {
+    return false
+  }
+}
+/** Uploaded or bundled images ("/images/…", "/api/media/…") or https photos from the allowed hosts. */
 const imageUrl = z
   .string()
   .trim()
   .max(2048)
-  .refine((v) => v === '' || v.startsWith('/') || /^https:\/\//.test(v), 'Use a /path or an https:// URL')
+  .refine((v) => v === '' || isLocalPath(v) || isAllowedImageUrl(v), 'Upload the image, or use a /path or an https://images.unsplash.com or images.pexels.com URL')
+const isHttps = (v: string) => {
+  try {
+    const u = new URL(v)
+    return u.protocol === 'https:' && !u.username && !u.password
+  } catch {
+    return false
+  }
+}
+/** Where a button or banner may send people: a page on this site or an https:// address. Never javascript:, data: or the like. */
+const linkUrl = z
+  .string()
+  .trim()
+  .max(300)
+  .refine((v) => v === '' || isLocalPath(v) || isHttps(v), 'Use a /path on this site or an https:// address')
+const httpsUrl = z
+  .string()
+  .trim()
+  .max(300)
+  .refine((v) => v === '' || isHttps(v), 'Use a full https:// address')
 
-export const signupSchema = z.object({
-  name: required(80, 'Name'),
-  email: emailSchema,
-  password: z.string().min(8, 'Use at least 8 characters').max(200),
-})
+/** The most common passwords that still meet the length rule. */
+const COMMON_PASSWORDS = new Set([
+  'password', 'password1', 'password12', 'password123', 'password1234', 'passw0rd', 'p@ssw0rd', 'p@ssword',
+  '12345678', '123456789', '1234567890', '0123456789', '87654321', '11111111', '00000000', '12341234',
+  'qwertyui', 'qwertyuiop', 'qwerty123', 'qwerty12', '1q2w3e4r', '1q2w3e4r5t', 'zaq12wsx', 'asdfghjkl',
+  'iloveyou', 'iloveyou1', 'sunshine', 'princess', 'football', 'baseball', 'welcome1', 'welcome123',
+  'letmein1', 'abc12345', 'abcd1234', 'admin123', 'administrator', 'trustno1', 'superman', 'starwars',
+  'whatever', 'computer', 'michelle', 'jennifer', 'sweetheart', 'snugandknot', 'snugknot',
+])
+const newPassword = z
+  .string()
+  .min(8, 'Use at least 8 characters')
+  .max(200, 'Use at most 200 characters')
+  .refine((v) => !COMMON_PASSWORDS.has(v.toLowerCase()), 'That password is too common. Choose something harder to guess.')
+  .refine((v) => new Set(v).size >= 4, 'Use a less repetitive password')
+
+export const signupSchema = z
+  .object({
+    name: required(80, 'Name'),
+    email: emailSchema,
+    password: newPassword,
+  })
+  .refine((v) => v.password.toLowerCase() !== v.email && v.password.toLowerCase() !== v.email.split('@')[0], {
+    path: ['password'],
+    message: 'Your password cannot be your email address',
+  })
 
 export const loginSchema = z.object({
   email: emailSchema,
@@ -37,23 +98,26 @@ export const profileSchema = z.object({
 
 export const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1).max(200),
-  newPassword: z.string().min(8, 'Use at least 8 characters').max(200),
+  newPassword: newPassword,
 })
 
 export const reviewSchema = z.object({
   rating: z.coerce.number().int().min(1, 'Choose a rating').max(5),
   title: required(120, 'Title'),
-  body: z.string().trim().min(10, 'Tell us a little more (10+ characters)').max(4000),
+  body: text().trim().min(10, 'Tell us a little more (10+ characters)').max(4000),
   fit: z.enum(['small', 'true', 'large']).nullable().optional(),
 })
 
+/** Per-order caps: unpaid cash-on-delivery orders hold stock, so one order cannot empty the shelves. */
+export const MAX_LINE_QTY = 10
+export const MAX_ORDER_PIECES = 30
 const lineSchema = z.object({
   variantId: required(120),
-  quantity: z.coerce.number().int().min(1).max(20),
+  quantity: z.coerce.number().int().min(1).max(MAX_LINE_QTY, `At most ${MAX_LINE_QTY} of one piece per order`),
 })
 
 export const quoteSchema = z.object({
-  lines: z.array(lineSchema).max(50),
+  lines: z.array(lineSchema).max(20),
   couponCode: trimmed(40).nullable().optional(),
   shippingMethod: z.enum(['standard', 'express']).optional(),
 })
@@ -71,7 +135,11 @@ export const addressSchema = z.object({
 })
 
 export const orderSchema = z.object({
-  lines: z.array(lineSchema).min(1, 'Your bag is empty').max(50),
+  lines: z
+    .array(lineSchema)
+    .min(1, 'Your bag is empty')
+    .max(20, 'At most 20 different pieces per order')
+    .refine((l) => l.reduce((n, x) => n + x.quantity, 0) <= MAX_ORDER_PIECES, `Orders are limited to ${MAX_ORDER_PIECES} pieces. Contact us for larger orders.`),
   couponCode: trimmed(40).nullable().optional(),
   shippingMethod: z.enum(['standard', 'express']),
   email: emailSchema,
@@ -94,14 +162,14 @@ export const returnSchema = z.object({
 
 export const newsletterSchema = z.object({
   email: emailSchema,
-  source: trimmed(40).optional(),
+  source: trimmed(40).regex(/^[a-z0-9-]*$/i, 'Invalid source').optional(),
 })
 
 export const contactSchema = z.object({
   name: required(80, 'Name'),
   email: emailSchema,
   subject: trimmed(160).optional(),
-  message: z.string().trim().min(10, 'Message must be at least 10 characters').max(5000),
+  message: text().trim().min(10, 'Message must be at least 10 characters').max(5000),
 })
 
 export const stockAlertSchema = z.object({
@@ -211,6 +279,10 @@ export const couponSchema = z
       .string()
       .trim()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD')
+      .refine((v) => {
+        const d = new Date(`${v}T00:00:00Z`)
+        return !Number.isNaN(d.getTime()) && d.toISOString().startsWith(v)
+      }, 'That date does not exist')
       .nullable()
       .default(null),
     active: z.boolean().default(true),
@@ -222,7 +294,7 @@ export const orderPatchSchema = z.object({
   status: z.enum(['placed', 'confirmed', 'shipped', 'delivered', 'cancelled']).optional(),
   paymentStatus: z.enum(['pending', 'paid', 'refunded']).optional(),
   trackingNumber: trimmed(80).nullable().optional(),
-  notes: trimmed(1000).nullable().optional(),
+  adminNotes: trimmed(2000).nullable().optional(),
 })
 
 export const reviewPatchSchema = z.object({
@@ -254,10 +326,10 @@ export const settingsSchemas = {
       country: trimmed(80),
     }),
     social: z.object({
-      instagram: trimmed(300),
-      pinterest: trimmed(300),
-      tiktok: trimmed(300),
-      twitter: trimmed(300),
+      instagram: httpsUrl,
+      pinterest: httpsUrl,
+      tiktok: httpsUrl,
+      twitter: httpsUrl,
     }),
   }),
   commerce: z.object({
@@ -279,8 +351,8 @@ export const settingsSchemas = {
   }),
   announcement: z.object({
     enabled: z.boolean(),
-    messages: z.array(trimmed(160)).max(8),
-    link: trimmed(300),
+    messages: z.array(trimmed(160)).max(8).transform((m) => m.filter(Boolean)),
+    link: linkUrl,
   }),
   reviews: z.object({ moderation: z.enum(['manual', 'auto']) }),
   homepage: z.object({
@@ -288,9 +360,9 @@ export const settingsSchemas = {
     heroTitle: required(160, 'Hero title'),
     heroSubtitle: trimmed(400),
     primaryCtaLabel: trimmed(40),
-    primaryCtaHref: trimmed(300),
+    primaryCtaHref: linkUrl,
     secondaryCtaLabel: trimmed(40),
-    secondaryCtaHref: trimmed(300),
+    secondaryCtaHref: linkUrl,
     manifesto: trimmed(600),
   }),
   seo: z.object({

@@ -24,7 +24,7 @@ export function PageHeader({ title, description, actions, back }: { title: strin
 
 export function Card({ title, actions, children, className, pad = true }: { title?: ReactNode; actions?: ReactNode; children: ReactNode; className?: string; pad?: boolean }) {
   return (
-    <section className={cn('rounded-2xl border border-ink/10 bg-white/70 shadow-[0_1px_0_rgba(22,16,14,0.03)]', className)}>
+    <section className={cn('min-w-0 rounded-2xl border border-ink/10 bg-white/70 shadow-[0_1px_0_rgba(22,16,14,0.03)]', className)}>
       {title || actions ? (
         <div className="flex items-center justify-between gap-3 border-b border-ink/10 px-5 py-4">
           {title ? <h2 className="text-sm font-medium">{title}</h2> : <span />}

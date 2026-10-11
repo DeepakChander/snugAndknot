@@ -5,7 +5,12 @@ import { currentUser } from './auth'
 import type { PublicUser } from '@/types/commerce'
 
 export class HttpError extends Error {
-  constructor(public status: number, message: string, public fields?: Record<string, string>) {
+  constructor(
+    public status: number,
+    message: string,
+    public fields?: Record<string, string>,
+    public headers?: Record<string, string>
+  ) {
     super(message)
   }
 }
@@ -19,6 +24,8 @@ export function ok<T>(data: T, init?: ResponseInit) {
  * present it must match the host serving the request.
  */
 function assertSameOrigin(req: Request) {
+  // Browsers label every request with where it came from; a cross-site write is never ours.
+  if (req.headers.get('sec-fetch-site') === 'cross-site') throw new HttpError(403, 'Cross-site request blocked.')
   const origin = req.headers.get('origin')
   if (!origin) return
   const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host')
@@ -30,11 +37,21 @@ function assertSameOrigin(req: Request) {
   }
 }
 
+const MAX_JSON_BYTES = 1_000_000
+
 export async function parseBody<S extends z.ZodType>(req: Request, schema: S): Promise<z.infer<S>> {
   assertSameOrigin(req)
+  // Only JSON bodies: an HTML form (the classic CSRF vehicle) cannot send this content type.
+  const mediaType = req.headers.get('content-type')?.split(';')[0].trim().toLowerCase()
+  if (mediaType !== 'application/json') {
+    throw new HttpError(415, 'Request body must be JSON.')
+  }
+  if (Number(req.headers.get('content-length') ?? 0) > MAX_JSON_BYTES) throw new HttpError(413, 'Request is too large.')
+  const text = await req.text()
+  if (text.length > MAX_JSON_BYTES) throw new HttpError(413, 'Request is too large.')
   let raw: unknown
   try {
-    raw = await req.json()
+    raw = JSON.parse(text)
   } catch {
     throw new HttpError(400, 'Request body must be JSON.')
   }
@@ -68,8 +85,12 @@ export async function requireAdmin(): Promise<PublicUser> {
   return user
 }
 
+/**
+ * The visitor's IP for rate limiting. On Vercel both headers are written by the platform
+ * (client-sent values are replaced), so they cannot be spoofed to dodge limits.
+ */
 export function clientIp(req: Request): string {
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'local'
+  return req.headers.get('x-real-ip')?.trim() || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local'
 }
 
 type Handler<C> = (req: Request, ctx: C) => Promise<Response>
@@ -78,10 +99,13 @@ type Handler<C> = (req: Request, ctx: C) => Promise<Response>
 export function route<C = unknown>(handler: Handler<C>): Handler<C> {
   return async (req, ctx) => {
     try {
-      return await handler(req, ctx)
+      const res = await handler(req, ctx)
+      // API responses can carry personal data: never let a browser or CDN cache them.
+      if (!res.headers.has('Cache-Control')) res.headers.set('Cache-Control', 'no-store')
+      return res
     } catch (err) {
       if (err instanceof HttpError) {
-        return NextResponse.json({ error: err.message, fields: err.fields }, { status: err.status })
+        return NextResponse.json({ error: err.message, fields: err.fields }, { status: err.status, headers: { 'Cache-Control': 'no-store', ...err.headers } })
       }
       const status = (err as { status?: number }).status
       if (typeof status === 'number' && status >= 400 && status < 500) {

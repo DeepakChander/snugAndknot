@@ -2,6 +2,7 @@ import { CheckoutError, createReturn, listReturnsForUser } from '@/server/repo/o
 import { getSettings } from '@/server/repo/settings'
 import { HttpError, ok, parseBody, requireUser, route } from '@/server/http'
 import { returnSchema } from '@/server/validation'
+import { rateLimit } from '@/server/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,11 +14,11 @@ export const GET = route(async () => {
 export const POST = route(async (req) => {
   const user = await requireUser()
   const input = await parseBody(req, returnSchema)
+  await rateLimit('returnRequest', user.id)
   const settings = await getSettings()
   try {
     const request = await createReturn({
       userId: user.id,
-      userEmail: user.email,
       orderId: input.orderId,
       items: input.items,
       reason: input.reason,
