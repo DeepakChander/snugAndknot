@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { gsap, SplitText, useGSAP, prefersReducedMotion, whenPageReady } from '@/lib/motion/gsap'
 import { getLenis } from '@/lib/motion/lenis'
 import { useSettings } from '@/components/providers/SettingsProvider'
@@ -23,12 +23,28 @@ export default function WordmarkHero({ frames, cover }: { frames: string[]; cove
   // Until the intro has played only the first two frames exist, so the rest do not compete with the
   // first paint for bandwidth.
   const [warm, setWarm] = useState(false)
+  // The full-bleed cover is only needed once the scroll starts; mounting it later keeps it from
+  // competing with the first frame for bandwidth.
+  const [showCover, setShowCover] = useState(false)
+  // Frames that have finished loading: the flip-book only ever shows one of these, never a blank card.
+  const loaded = useRef(new Set<number>())
+  const markLoaded = useCallback((i: number) => loaded.current.add(i), [])
   const [first, second] = store.name.includes('&') ? store.name.split('&') : [store.name, '']
 
   // Flip-book: a new piece every 260ms while the card is small; it settles once it starts to grow.
   useEffect(() => {
     if (!warm || !flipping || frames.length < 2 || prefersReducedMotion()) return
-    const t = setInterval(() => setFrame((f) => (f + 1) % frames.length), 260)
+    const t = setInterval(
+      () =>
+        setFrame((f) => {
+          for (let step = 1; step < frames.length; step++) {
+            const next = (f + step) % frames.length
+            if (loaded.current.has(next)) return next
+          }
+          return f
+        }),
+      260
+    )
     return () => clearInterval(t)
   }, [warm, flipping, frames.length])
 
@@ -63,6 +79,7 @@ export default function WordmarkHero({ frames, cover }: { frames: string[]; cove
         wordA.classList.remove('split-pending')
         wordB.classList.remove('split-pending')
         gsap.set([shell, railIn], { autoAlpha: 1 })
+        setShowCover(true)
         gsap.set(card, { clipPath: full, rotation: 0 })
         gsap.set([wordA, wordB, rail], { autoAlpha: 0 })
         gsap.set(coverImg, { autoAlpha: 1 })
@@ -79,13 +96,16 @@ export default function WordmarkHero({ frames, cover }: { frames: string[]; cove
       gsap.set(chars, { yPercent: 115 })
       wordA.classList.remove('split-pending')
       wordB.classList.remove('split-pending')
-      gsap.set(shell, { scale: 0.55, autoAlpha: 0, y: 60 })
       gsap.set(railIn, { autoAlpha: 0, y: 12 })
       const unsub = whenPageReady(() => {
         gsap
-          .timeline({ onComplete: () => setWarm(true) })
+          .timeline({
+            onComplete: () => {
+              setWarm(true)
+              setShowCover(true)
+            },
+          })
           .to(chars, { yPercent: 0, duration: 1.3, ease: 'expo.out', stagger: 0.05 })
-          .to(shell, { scale: 1, autoAlpha: 1, y: 0, duration: 1.4, ease: 'expo.out' }, 0.25)
           .to(railIn, { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out' }, 0.6)
       })
 
@@ -105,6 +125,7 @@ export default function WordmarkHero({ frames, cover }: { frames: string[]; cove
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             setFlipping(self.progress < 0.08)
+            if (self.progress > 0.005) setShowCover(true)
             el.dataset.navTheme = self.progress > 0.55 ? 'dark' : 'light'
           },
         },
@@ -154,7 +175,7 @@ export default function WordmarkHero({ frames, cover }: { frames: string[]; cove
         </div>
 
         {/* The card */}
-        <div data-card-shell className="invisible absolute inset-0 z-[2] opacity-0">
+        <div data-card-shell className="absolute inset-0 z-[2]">
           <div
             data-card
             className="absolute inset-0 rotate-[-9deg] overflow-hidden bg-parchment will-change-[clip-path,transform] [--ch:calc(var(--cw)*1.28)] [--cw:min(56vw,400px)] [clip-path:inset(calc(50%_-_var(--ch)/2)_calc(50%_-_var(--cw)/2)_round_18px)] md:[--cw:min(25vw,400px)]"
@@ -169,13 +190,14 @@ export default function WordmarkHero({ frames, cover }: { frames: string[]; cove
                   fill
                   sizes="(min-width: 768px) 25vw, 56vw"
                   preload={i === 0}
+                  onLoad={() => markLoaded(i)}
                   className={cn('object-cover', i === frame ? 'opacity-100' : 'opacity-0')}
                 />
               ))}
             </div>
             <div data-media className="absolute inset-0">
               <div data-cover className="invisible absolute inset-0 opacity-0">
-                <Image src={cover} alt="A hand resting on a hand-finished cable knit" fill sizes="(max-aspect-ratio: 11/6) 184vh, 100vw" className="object-cover object-[38%_50%]" />
+                {showCover ? <Image src={cover} alt="A hand resting on a hand-finished cable knit" fill sizes="(max-aspect-ratio: 11/6) 184vh, 100vw" className="object-cover object-[38%_50%]" /> : null}
               </div>
             </div>
             <div data-shade className="invisible absolute inset-0 bg-gradient-to-t from-noir/75 via-noir/15 to-noir/10 opacity-0" />

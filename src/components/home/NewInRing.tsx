@@ -30,8 +30,8 @@ export default function NewInRing({ products }: { products: Product[] }) {
   const inView = useInView(section, '100px 0px')
   // three.js, the canvas and the textures load only once the section is within a screen and a half.
   const near = useInView(section, '150% 0px', true)
-  // Keyboard focus on the facing piece's link holds the ring still.
-  const hold = useRef(false)
+  // Keyboard focus inside the facing piece's bar holds the ring still.
+  const hold = useRef<HTMLDivElement>(null)
   const [gl, setGl] = useState<boolean | null>(null)
   const [active, setActive] = useState(0)
 
@@ -120,8 +120,7 @@ export default function NewInRing({ products }: { products: Product[] }) {
       {/* The piece facing you */}
       {current ? (
         <div
-          onFocus={() => (hold.current = true)}
-          onBlur={() => (hold.current = false)}
+          ref={hold}
           className="container-wide relative z-[1] grid items-end gap-6 pb-[clamp(2.5rem,5vw,4rem)] lg:grid-cols-12"
         >
           <div className="flex items-center gap-4 lg:col-span-3">

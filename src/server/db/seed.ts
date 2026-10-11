@@ -152,7 +152,7 @@ const PRODUCTS: SeedProduct[] = [
     handle: 'terracotta-textured-cardigan',
     title: 'Terracotta Textured Cardigan',
     description:
-      'Discover the perfect fusion of warmth and sophistication in our Terracotta Textured Cardigan. This stunning piece captures the essence of autumn with its rich, earthy terracotta hue — a color that flatters every skin tone and pairs beautifully with your existing wardrobe. The subtle diamond-textured knit creates visual interest without overwhelming, while the premium cotton-blend yarn ensures breathability and comfort throughout the day. Featuring our signature wooden button detailing, this cardigan is designed for the modern woman who values quality craftsmanship and understated elegance.',
+      'Discover the perfect fusion of warmth and sophistication in our Terracotta Textured Cardigan. This stunning piece captures the essence of autumn with its rich, earthy terracotta hue — a color that flatters every skin tone and pairs beautifully with your existing wardrobe. The subtle diamond-textured knit creates visual interest without overwhelming, while the premium cotton-blend yarn ensures breathability and comfort throughout the day. Finished with a row of pale buttons down the front, this cardigan is designed for the modern woman who values quality craftsmanship and understated elegance.',
     details: {
       fabric: '70% Premium Cotton, 30% Cashmere Blend',
       fit: 'Classic fit with round neckline',
@@ -160,7 +160,7 @@ const PRODUCTS: SeedProduct[] = [
       sustainability: 'Crafted using eco-friendly dyeing processes and sustainable cotton',
       features: [
         'Diamond-textured knit pattern',
-        'Natural wooden button closure',
+        'Button-front closure',
         'Soft cotton-cashmere blend',
         'Breathable and comfortable',
         'Versatile layering piece',
@@ -201,7 +201,7 @@ const CATEGORIES = [
   {
     slug: 'cardigans',
     title: 'Cardigans',
-    description: 'Cable, texture and heritage stitches, finished with natural wooden buttons.',
+    description: 'Cable, diamond and heritage stitches, buttoned down the front.',
     image: '/images/products/women/ivory-cable-cardigan-1.jpg',
   },
 ]

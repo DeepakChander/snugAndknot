@@ -288,6 +288,22 @@ UPDATE collections SET image = '/images/collection-home/Artisan''s.png', updated
  WHERE handle = 'the-artisan-edit' AND image = '/images/Collections-Hero/Artisan.png';
 `,
   },
+  {
+    version: 4,
+    name: 'terracotta-button-copy',
+    // The terracotta cardigan's photographs show pale buttons, not the wooden ones its seeded copy
+    // promised. Only the seeded wording is changed; text edited in the admin is left alone.
+    sql: `
+UPDATE products SET description = replace(description, 'Featuring our signature wooden button detailing, this cardigan', 'Finished with a row of pale buttons down the front, this cardigan'), updated_at = now()
+ WHERE handle = 'terracotta-textured-cardigan' AND description LIKE '%Featuring our signature wooden button detailing, this cardigan%';
+UPDATE products SET details = jsonb_set(details, '{features}', (
+         SELECT jsonb_agg(CASE WHEN f = to_jsonb('Natural wooden button closure'::text) THEN to_jsonb('Button-front closure'::text) ELSE f END ORDER BY n)
+           FROM jsonb_array_elements(details->'features') WITH ORDINALITY AS t(f, n))), updated_at = now()
+ WHERE handle = 'terracotta-textured-cardigan' AND details->'features' @> '["Natural wooden button closure"]'::jsonb;
+UPDATE categories SET description = 'Cable, diamond and heritage stitches, buttoned down the front.'
+ WHERE slug = 'cardigans' AND description = 'Cable, texture and heritage stitches, finished with natural wooden buttons.';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

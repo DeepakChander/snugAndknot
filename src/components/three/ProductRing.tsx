@@ -161,7 +161,7 @@ function Ring({
 }: {
   items: RingItem[]
   scroll: React.RefObject<number>
-  hold?: React.RefObject<boolean>
+  hold?: React.RefObject<HTMLElement | null>
   onActive: (i: number) => void
   onOpen: (i: number) => void
   setCursor: (v: 'drag' | 'view' | 'default') => void
@@ -185,7 +185,12 @@ function Ring({
   const hovered = useRef<number>(-1)
   const drag = useRef({ active: false, x: 0, last: 0, velocity: 0, idleAt: 0 })
   const lastActive = useRef(-1)
-  const { size, gl } = useThree()
+  const { size, gl, scene, camera } = useThree()
+
+  // Compile the shaders while the ring is still off-screen, so its first visible frame does not stall.
+  useEffect(() => {
+    gl.compile(scene, camera)
+  }, [gl, scene, camera])
 
 
   // Drag anywhere on the canvas to spin; release settles on the nearest piece.
@@ -222,7 +227,8 @@ function Ring({
     const now = performance.now()
     // Gentle auto-advance one piece at a time when nobody is interacting.
     // Held while the piece's name or button has keyboard focus, so the link does not change under it.
-    if (!drag.current.active && hovered.current < 0 && !hold?.current && now - drag.current.idleAt > 3800) {
+    const held = !!hold?.current && hold.current.contains(document.activeElement)
+    if (!drag.current.active && hovered.current < 0 && !held && now - drag.current.idleAt > 3800) {
       target.current = Math.round(target.current / step) * step + step
       drag.current.idleAt = now
     }
@@ -293,8 +299,8 @@ export default function ProductRing({
 }: {
   items: RingItem[]
   scroll: React.RefObject<number>
-  /** While true the ring does not auto-advance. */
-  hold?: React.RefObject<boolean>
+  /** While keyboard focus is inside this element the ring does not auto-advance. */
+  hold?: React.RefObject<HTMLElement | null>
   active: boolean
   onActive: (i: number) => void
   onOpen: (i: number) => void
@@ -305,6 +311,8 @@ export default function ProductRing({
       flat
       dpr={[1, 1.75]}
       frameloop={active ? 'always' : 'never'}
+      // Measure without waiting for scrolling to stop, so the renderer exists before the ring is in view.
+      resize={{ debounce: 0, scroll: false }}
       camera={{ fov: 32, near: 0.1, far: 60 }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       style={{ touchAction: 'pan-y' }}
