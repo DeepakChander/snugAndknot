@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '@/lib/api'
 import { useCartStore } from '@/stores/cart-store'
+import { useCurrency } from '@/components/providers/SettingsProvider'
 import type { Quote, ShippingMethod } from '@/types/commerce'
 
 /**
@@ -14,13 +15,15 @@ export function useCartQuote(opts: { enabled?: boolean; shippingMethod?: Shippin
   const items = useCartStore((s) => s.items)
   const storeCoupon = useCartStore((s) => s.couponCode)
   const couponCode = opts.couponCode === undefined ? storeCoupon : opts.couponCode
+  // Re-priced whenever the shopper switches currency; local lines then take the new prices.
+  const currency = useCurrency().currency.code
   const [quote, setQuote] = useState<Quote | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notices, setNotices] = useState<string[]>([])
   const seq = useRef(0)
 
-  const key = JSON.stringify([items.map((i) => [i.variantId, i.quantity]), couponCode, shippingMethod])
+  const key = JSON.stringify([items.map((i) => [i.variantId, i.quantity]), couponCode, shippingMethod, currency])
 
   useEffect(() => {
     if (!enabled) return
@@ -34,7 +37,7 @@ export function useCartQuote(opts: { enabled?: boolean; shippingMethod?: Shippin
     const t = setTimeout(async () => {
       try {
         const { quote: q } = await api<{ quote: Quote }>('/api/cart/quote', {
-          body: { lines: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })), couponCode, shippingMethod },
+          body: { lines: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })), couponCode, shippingMethod, currency },
           signal: ctrl.signal,
         })
         if (id !== seq.current) return

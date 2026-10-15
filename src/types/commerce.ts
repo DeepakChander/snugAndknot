@@ -27,6 +27,18 @@ export interface ProductDetails {
   features?: string[]
 }
 
+/** A price in one of the store's additional currencies. */
+export interface CurrencyPrice {
+  price: number
+  compareAtPrice: number | null
+}
+
+/**
+ * Prices in the additional currencies, keyed by ISO code (e.g. { INR: { price: 11999, compareAtPrice: null } }).
+ * The base currency's price lives in `price` / `compareAtPrice` as before.
+ */
+export type PriceBook = Record<string, CurrencyPrice>
+
 export interface Variant {
   id: string
   title: string
@@ -38,6 +50,8 @@ export interface Variant {
   inventory: number
   available: boolean
   position: number
+  /** Overrides of the product's additional-currency prices for this variant only. */
+  prices: PriceBook
 }
 
 export interface Product {
@@ -53,6 +67,8 @@ export interface Product {
   tags: string[]
   price: number
   compareAtPrice: number | null
+  /** Prices in the additional currencies. A currency missing here is not sold in that currency yet. */
+  prices: PriceBook
   images: ProductImage[]
   colors: ColorSwatch[]
   sizes: string[]
@@ -131,6 +147,11 @@ export interface Coupon {
   active: boolean
   usageLimit: number | null
   usedCount: number
+  /**
+   * The code in the additional currencies: the fixed amount off (fixed codes) and the minimum spend.
+   * A fixed code with no amount for a currency cannot be used in it.
+   */
+  amounts: Record<string, { value: number | null; minPurchase: number }>
 }
 
 /** 'pending_payment': paid online, stock held, waiting for the payment to be confirmed. Customers never see it. */
@@ -174,6 +195,8 @@ export interface Order {
   paymentMethod: string
   paymentStatus: PaymentStatus
   shippingMethod: ShippingMethod
+  /** ISO code of the currency every amount on this order is in. */
+  currency: string
   subtotal: number
   shipping: number
   discount: number
@@ -212,6 +235,8 @@ export interface ReturnRequest {
   comments: string | null
   items: { orderItemId: string; title: string; quantity: number; price: number; image: string }[]
   refundAmount: number
+  /** The order's currency, which the refund is in. */
+  currency: string
   createdAt: string
 }
 
@@ -244,6 +269,8 @@ export interface CartLine {
 }
 
 export interface Quote {
+  /** The currency every amount in the quote is in. */
+  currency: string
   lines: (CartLine & { available: number; lineTotal: number })[]
   subtotal: number
   discount: number
@@ -270,7 +297,20 @@ export interface StoreSettings {
   social: { instagram: string; pinterest: string; tiktok: string; twitter: string }
 }
 
+/** An additional currency the shop sells in, with its own prices, shipping and points. */
+export interface CurrencySettings {
+  code: string
+  locale: string
+  freeShippingThreshold: number
+  standardShippingRate: number
+  expressShippingRate: number
+  pointsPerUnit: number
+  /** ISO 3166 country codes (e.g. IN) whose shoppers see this currency first. */
+  countries: string[]
+}
+
 export interface CommerceSettings {
+  /** The base currency: every price, rate and threshold below is in it. */
   currency: string
   locale: string
   freeShippingThreshold: number
@@ -286,6 +326,8 @@ export interface CommerceSettings {
    * only while the switch is on AND the Razorpay keys are set on the server.
    */
   onlinePaymentsEnabled: boolean
+  /** More currencies, each priced separately by the owner (e.g. INR next to USD). */
+  extraCurrencies: CurrencySettings[]
 }
 
 export interface AnnouncementSettings {

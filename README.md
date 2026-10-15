@@ -21,6 +21,7 @@ With no `DATABASE_URL`, the site uses a built-in PGlite database saved under `.d
 | `npm run build` / `npm start` | Production build and server |
 | `npm run lint` | ESLint (Next.js rules plus security rules) |
 | `node scripts/api-smoke.mjs` | End-to-end API and security test. Needs `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; writes test rows, so never point it at production |
+| `node scripts/currency-smoke.mjs` | End-to-end test of a second currency (INR): settings, prices, quotes, coupons, orders, returns and reports. Needs `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; writes test rows |
 | `node scripts/razorpay-smoke.mjs` | End-to-end test of online payments against a local stand-in for the Razorpay API (see [Online payments](#online-payments-razorpay)). Local only |
 
 ## Environment variables
@@ -53,6 +54,18 @@ Set these in Vercel → Project → Settings → Environment Variables. Never co
 5. Set `GMAIL_USER`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET` and `GMAIL_REFRESH_TOKEN` in Vercel, redeploy, and use **Admin → Emails → Send test email**.
 
 The site never asks visitors to sign in with Google, so it needs no callback URL of its own. If emails start failing with `invalid_grant`, the refresh token was revoked or expired: repeat step 4.
+
+## Selling in more than one currency
+
+The store has a **base currency** (USD by default): every price, shipping rate and threshold in **Admin → Settings → Commerce** is in it. Under **More currencies** you can add up to three more, for example INR. Each currency has its own shipping rates, free-shipping threshold, loyalty points rate, and the countries whose shoppers see it first (e.g. `IN`).
+
+- **Prices are set by hand, never converted.** In **Products → edit → Pricing**, each extra currency has a price and an optional compare-at price; the variant table has a column per currency for size-specific prices (empty = the product's price). A piece with no price in a currency shows "Not in INR yet" and cannot be bought in it; the settings page counts the pieces still missing one.
+- **Discount codes:** a percentage code works in every currency. A fixed-amount code needs its amount per currency (and a minimum spend set in the base currency must be restated per currency), or it is refused in that currency.
+- **Shoppers** see their country's currency first (from Vercel's `x-vercel-ip-country`, asked once via `/api/geo`) and can switch in the footer or the mobile menu. Their choice is kept in a cookie. Pages are pre-rendered in the base currency; for a shopper in another currency, prices stay hidden for the moment it takes to switch them, so the wrong currency never shows.
+- **Orders** are priced, stored, emailed and charged in the currency the shopper saw (Razorpay charges INR orders in rupees, so UPI and Indian cards work). Orders, returns and refunds always show their own currency. The dashboard's revenue, chart and top products are in the base currency, with other currencies listed apart; customer spend is shown per currency. The shop's price filter and price sorting use the base price.
+- If most shoppers use one currency, make it the base one, so pre-rendered pages already show it. Changing the base currency does not convert existing prices: re-enter them.
+
+`scripts/currency-smoke.mjs` tests all of this end to end against a development database.
 
 ## Online payments (Razorpay)
 

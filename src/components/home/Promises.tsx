@@ -1,6 +1,6 @@
 'use client'
 
-import { useMoney, useSettings } from '@/components/providers/SettingsProvider'
+import { useMoney, useSettings, useCurrency } from '@/components/providers/SettingsProvider'
 import { RevealGroup, RevealItem } from '@/components/motion/Reveal'
 import { NeedleIcon, ReturnIcon, ShieldIcon, TruckIcon } from '@/components/kit/icons'
 
@@ -8,11 +8,13 @@ import { NeedleIcon, ReturnIcon, ShieldIcon, TruckIcon } from '@/components/kit/
 export default function Promises() {
   const { commerce } = useSettings()
   const money = useMoney()
+  const { currency: cur } = useCurrency()
   const items = [
     {
       Icon: TruckIcon,
-      title: commerce.freeShippingThreshold > 0 ? `Free shipping over ${money(commerce.freeShippingThreshold)}` : 'Shipping at cost',
-      body: `Standard delivery ${money(commerce.standardShippingRate)} below that, express ${money(commerce.expressShippingRate)}.`,
+      title: cur.freeShippingThreshold > 0 ? `Free shipping over ${money(cur.freeShippingThreshold)}` : 'Shipping at cost',
+      body: `Standard delivery ${money(cur.standardShippingRate)} below that, express ${money(cur.expressShippingRate)}.`,
+      money: true,
     },
     { Icon: ReturnIcon, title: `${commerce.returnWindowDays}-day returns`, body: 'Start a return from your account once your order arrives.' },
     { Icon: NeedleIcon, title: 'Hand-finished', body: 'Buttons, seams and labels finished by hand in small batches.' },
@@ -25,10 +27,10 @@ export default function Promises() {
   return (
     <section className="border-t border-ink/10 bg-ivory text-ink" aria-label="Our promises">
       <RevealGroup className="container-wide grid grid-cols-1 divide-y divide-ink/10 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
-        {items.map(({ Icon, title, body }) => (
+        {items.map(({ Icon, title, body, money: hasMoney }) => (
           <RevealItem key={title} className="flex gap-4 py-8 sm:px-6 lg:py-12 lg:first:pl-0">
             <Icon size={26} className="shrink-0 text-burgundy" />
-            <div>
+            <div data-money={hasMoney ? '' : undefined}>
               <p className="font-display text-2xl leading-tight">{title}</p>
               <p className="mt-2 text-sm text-stone">{body}</p>
             </div>

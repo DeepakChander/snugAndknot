@@ -6,6 +6,7 @@ import { UNPAID_ONLINE } from '@/server/repo/orders'
 import { notify, type Field, type Section } from '@/server/notify'
 import { mailConfig } from '@/server/mail'
 import { formatMoney } from '@/lib/format'
+import { findCurrency } from '@/lib/currency'
 import type { Coupon, Order, Product, PublicUser, ReturnRequest, Review } from '@/types/commerce'
 
 /**
@@ -28,9 +29,11 @@ function safely<A extends unknown[]>(name: string, build: (...args: A) => Promis
   }
 }
 
-async function money() {
+/** Formats amounts in `currency` (an order's own), else the base currency, with that currency's locale. */
+async function money(currency?: string) {
   const { commerce } = await getSettings()
-  return (n: number) => formatMoney(n, commerce.currency, commerce.locale, { cents: true })
+  const c = (currency && findCurrency(commerce, currency)) || null
+  return (n: number) => formatMoney(n, currency ?? commerce.currency, c?.locale ?? commerce.locale, { cents: true })
 }
 
 const addressLines = (o: Order) => {
@@ -46,7 +49,7 @@ const paymentLabel = (method: string) => (method === 'cod' ? 'Cash on delivery' 
 
 /** A new order. Flags: first order, guest, coupon, express, high value, customer note, large order. */
 export const orderPlaced = safely('orderPlaced', async (order: Order) => {
-  const m = await money()
+  const m = await money(order.currency)
   const { commerce } = await getSettings()
   const [{ n }] = await query<{ n: number }>(`SELECT count(*)::int AS n FROM orders WHERE lower(email) = lower($1) AND NOT ${UNPAID_ONLINE}`, [order.email])
   const pieces = order.items.reduce((s, i) => s + i.quantity, 0)
@@ -101,7 +104,7 @@ export const orderPlaced = safely('orderPlaced', async (order: Order) => {
 
 /** Status, payment and tracking changes made in the admin, one email per kind of change. */
 export const orderUpdated = safely('orderUpdated', async (before: Order, after: Order, by: string) => {
-  const m = await money()
+  const m = await money(after.currency)
   const base = { replyTo: after.email, action: { label: 'Open the order', path: `/admin/orders/${after.id}` } }
   const who: Field = ['Changed by', by]
   const summary: Field[] = [['Order', after.orderNumber], ['Customer', `${after.customerName} <${after.email}>`], ['Total', m(after.total)]]
@@ -180,7 +183,7 @@ const razorpayLink = (o: Order): Field => ['Razorpay payment', o.paymentReferenc
  * meanwhile, so the order stays cancelled and the customer must be refunded in Razorpay.
  */
 export const latePayment = safely('latePayment', async (order: Order, kind: 'reinstated' | 'refund-needed') => {
-  const m = await money()
+  const m = await money(order.currency)
   const refund = kind === 'refund-needed'
   await notify({
     type: refund ? 'payment.refund_needed' : 'payment.late_reinstated',
@@ -197,7 +200,7 @@ export const latePayment = safely('latePayment', async (order: Order, kind: 'rei
 
 /** An online checkout that was not paid: the customer closed it, it could not start, or it ran past the hold. Its stock is back. */
 export const checkoutAbandoned = safely('checkoutAbandoned', async (order: Order, reason: 'closed' | 'expired' | 'start-failed') => {
-  const m = await money()
+  const m = await money(order.currency)
   const why = {
     closed: 'The customer closed the payment window without paying.',
     expired: 'The payment was not completed within 30 minutes.',
@@ -229,7 +232,7 @@ export const paymentMismatch = safely('paymentMismatch', async (orderId: string,
 
 /** A full refund made in the Razorpay dashboard, reported by the webhook. */
 export const paymentRefunded = safely('paymentRefunded', async (order: Order) => {
-  const m = await money()
+  const m = await money(order.currency)
   await notify({
     type: 'order.refunded',
     subject: `Order ${order.orderNumber} refunded — ${m(order.total)}`,
@@ -344,7 +347,7 @@ export const restockedWithWaitlist = safely('restockedWithWaitlist', async (befo
 /* ───────────────────────── Returns ───────────────────────── */
 
 export const returnRequested = safely('returnRequested', async (ret: ReturnRequest, customer: { email: string; name: string }) => {
-  const m = await money()
+  const m = await money(ret.currency)
   const urgent = ret.reason === 'defective' || ret.reason === 'not-as-described'
   await notify({
     type: 'return.requested',
@@ -363,7 +366,7 @@ export const returnRequested = safely('returnRequested', async (ret: ReturnReque
 
 export const returnUpdated = safely('returnUpdated', async (before: ReturnRequest & { email: string; customerName: string }, status: string, by: string) => {
   if (before.status === status) return
-  const m = await money()
+  const m = await money(before.currency)
   const copy: Record<string, string> = {
     approved: 'The return was approved. The customer can send the pieces back.',
     rejected: 'The return was declined.',

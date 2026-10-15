@@ -123,7 +123,7 @@ export function ReviewsAdmin({ reviews, moderation }: { reviews: AdminReview[]; 
   )
 }
 
-type Customer = { id: string; email: string; name: string; role: 'customer' | 'admin'; points: number; orders: number; spent: number; createdAt: string; lastLoginAt: string | null }
+type Customer = { id: string; email: string; name: string; role: 'customer' | 'admin'; points: number; orders: number; spent: { currency: string; amount: number }[]; createdAt: string; lastLoginAt: string | null }
 
 function tierFor(points: number) {
   return points >= 3000 ? 'tapestry' : points >= 1500 ? 'weave' : points >= 500 ? 'stitch' : 'thread'
@@ -165,7 +165,7 @@ export function CustomersAdmin({ customers, selfId }: { customers: Customer[]; s
                   </td>
                   <td className="px-3 py-3 text-stone">{formatDate(c.createdAt)}</td>
                   <td className="px-3 py-3 tabular-nums">{c.orders}</td>
-                  <td className="px-3 py-3 tabular-nums">{money(c.spent)}</td>
+                  <td className="px-3 py-3 tabular-nums">{c.spent.length ? c.spent.map((s) => money(s.amount, { currency: s.currency })).join(' + ') : money(0)}</td>
                   <td className="px-3 py-3">
                     {editing === c.id ? (
                       <span className="flex items-center gap-1">

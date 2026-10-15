@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMoney } from '@/components/providers/SettingsProvider'
+import { useCurrency, useMoney } from '@/components/providers/SettingsProvider'
 import { useUIStore } from '@/stores/ui-store'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { Badge, Btn, Card, Empty, Input, PageHeader, Select, Textarea, Toggle, confirmAction, useMutate } from './ui'
@@ -241,6 +241,12 @@ export function CategoriesAdmin({ categories, counts }: { categories: Category[]
 
 function CouponEditor({ coupon, onClose }: { coupon: Coupon | null; onClose: () => void }) {
   const { run, busy, fieldErrors } = useMutate()
+  const { all } = useCurrency()
+  const extra = all.slice(1)
+  // Per additional currency: fixed amount (fixed codes) and minimum spend, as typed.
+  const [amounts, setAmounts] = useState<Record<string, { value: string; minPurchase: string }>>(() =>
+    Object.fromEntries(Object.entries(coupon?.amounts ?? {}).map(([k, a]) => [k, { value: a.value ? String(a.value) : '', minPurchase: a.minPurchase ? String(a.minPurchase) : '' }]))
+  )
   const [c, setC] = useState({
     code: coupon?.code ?? '',
     type: coupon?.type ?? ('percentage' as Coupon['type']),
@@ -252,7 +258,13 @@ function CouponEditor({ coupon, onClose }: { coupon: Coupon | null; onClose: () 
     usageLimit: coupon?.usageLimit ? String(coupon.usageLimit) : '',
   })
   async function save() {
-    const body = { ...c, value: Number(c.value), minPurchase: Number(c.minPurchase) || 0, expiresAt: c.expiresAt || null, usageLimit: c.usageLimit ? Number(c.usageLimit) : null }
+    const amountsBody = Object.fromEntries(
+      extra
+        .map((x) => [x.code, amounts[x.code]] as const)
+        .filter(([, a]) => a && (a.value.trim() !== '' || a.minPurchase.trim() !== ''))
+        .map(([code, a]) => [code, { value: a!.value.trim() === '' ? null : Number(a!.value), minPurchase: Number(a!.minPurchase) || 0 }])
+    )
+    const body = { ...c, value: Number(c.value), minPurchase: Number(c.minPurchase) || 0, expiresAt: c.expiresAt || null, usageLimit: c.usageLimit ? Number(c.usageLimit) : null, amounts: amountsBody }
     const res = coupon ? await run('PUT', `/api/admin/coupons/${encodeURIComponent(coupon.code)}`, body, 'Code saved.') : await run('POST', '/api/admin/coupons', body, 'Code created.')
     if (res) onClose()
   }
@@ -271,7 +283,21 @@ function CouponEditor({ coupon, onClose }: { coupon: Coupon | null; onClose: () 
           </Select>
           <Input label={c.type === 'percentage' ? 'Percent' : 'Amount'} type="number" min={0} step="0.01" value={c.value} error={fieldErrors.value} onChange={(e) => setC({ ...c, value: e.target.value })} />
         </div>
-        <Input label="Minimum spend" type="number" min={0} step="0.01" value={c.minPurchase} onChange={(e) => setC({ ...c, minPurchase: e.target.value })} />
+        <Input label={extra.length ? `Minimum spend (${all[0].code})` : 'Minimum spend'} type="number" min={0} step="0.01" value={c.minPurchase} onChange={(e) => setC({ ...c, minPurchase: e.target.value })} />
+        {extra.map((x) => {
+          const a = amounts[x.code] ?? { value: '', minPurchase: '' }
+          const setA = (patch: Partial<typeof a>) => setAmounts({ ...amounts, [x.code]: { ...a, ...patch } })
+          return (
+            <div key={x.code} className="grid grid-cols-2 gap-4 rounded-xl bg-ink/[0.03] p-3">
+              {c.type === 'fixed' ? (
+                <Input label={`Amount (${x.code})`} type="number" min={0} step="0.01" value={a.value} error={fieldErrors[`amounts.${x.code}.value`]} onChange={(e) => setA({ value: e.target.value })} hint={a.value.trim() ? undefined : `Empty: the code cannot be used in ${x.code}.`} />
+              ) : (
+                <p className="self-center text-xs text-stone">The percentage applies in {x.code} too.</p>
+              )}
+              <Input label={`Minimum spend (${x.code})`} type="number" min={0} step="0.01" value={a.minPurchase} onChange={(e) => setA({ minPurchase: e.target.value })} hint={c.type === 'percentage' && Number(c.minPurchase) > 0 && !a.minPurchase.trim() ? `Set one, or the code cannot be used in ${x.code}.` : undefined} />
+            </div>
+          )
+        })}
         <Input label="Description (shown to customers)" value={c.description} onChange={(e) => setC({ ...c, description: e.target.value })} placeholder="10% off your first order" />
         <div className="grid grid-cols-2 gap-4">
           <Input label="Expires on (optional)" type="date" value={c.expiresAt} error={fieldErrors.expiresAt} onChange={(e) => setC({ ...c, expiresAt: e.target.value })} />

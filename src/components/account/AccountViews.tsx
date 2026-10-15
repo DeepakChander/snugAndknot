@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'motion/react'
-import { useMoney, useSettings } from '@/components/providers/SettingsProvider'
+import { useCurrency, useMoney, useSettings } from '@/components/providers/SettingsProvider'
 import { useWishlistStore } from '@/stores/wishlist-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUIStore } from '@/stores/ui-store'
@@ -34,7 +34,7 @@ function Panel({ title, action, children, className }: { title: string; action?:
 }
 
 function OrderRow({ order }: { order: Order }) {
-  const money = useMoney()
+  const money = useMoney(order.currency)
   return (
     <Link href={`/account/orders/${order.id}`} className="group flex flex-wrap items-center gap-4 rounded-2xl border border-ink/10 bg-ivory/60 p-4 transition-colors hover:border-ink/30 md:flex-nowrap">
       <div className="flex -space-x-3">
@@ -213,7 +213,7 @@ export function ReturnsList({ returns, eligible }: { returns: ReturnRequest[]; e
                   <p className="mt-1 text-sm">{r.items.map((i) => `${i.quantity}× ${i.title}`).join(', ')}</p>
                 </div>
                 <StatusPill status={r.status} />
-                <span className="font-mono text-sm">{money(r.refundAmount)}</span>
+                <span className="font-mono text-sm">{money(r.refundAmount, { currency: r.currency })}</span>
               </li>
             ))}
           </ul>
@@ -286,7 +286,7 @@ export function NewReturn({ orders, initialOrderId }: { orders: Order[]; initial
                 <span className="min-w-0 flex-1">
                   <span className="block font-display text-xl leading-tight">{it.title}</span>
                   <span className="text-xs text-stone">
-                    {[it.size, it.color].filter(Boolean).join(' · ')} · bought {it.quantity} · {money(it.price)}
+                    {[it.size, it.color].filter(Boolean).join(' · ')} · bought {it.quantity} · {money(it.price, { currency: order.currency })}
                   </span>
                 </span>
                 <label className="flex items-center gap-2 text-sm">
@@ -322,7 +322,7 @@ export function NewReturn({ orders, initialOrderId }: { orders: Order[]; initial
       ) : null}
       <div className="flex flex-wrap items-center gap-6">
         <Button type="submit" size="lg" loading={busy} disabled={!chosen.length} arrow>
-          Request return{refund ? ` — ${money(refund)}` : ''}
+          Request return{refund ? ` — ${money(refund, { currency: order?.currency })}` : ''}
         </Button>
         <p className="text-sm text-stone">Refund amount is confirmed once we receive the pieces.</p>
       </div>
@@ -331,7 +331,7 @@ export function NewReturn({ orders, initialOrderId }: { orders: Order[]; initial
 }
 
 export function Rewards({ user, orders }: { user: PublicUser; orders: Order[] }) {
-  const { commerce } = useSettings()
+  const { all } = useCurrency()
   const activity = [
     ...orders.filter((o) => o.pointsEarned > 0).map((o) => ({ id: o.id, label: `Order ${o.orderNumber}${o.status === 'cancelled' ? ' (cancelled — points removed)' : ''}`, points: o.status === 'cancelled' ? 0 : o.pointsEarned, date: o.placedAt })),
     { id: 'welcome', label: 'Welcome bonus', points: 100, date: user.createdAt },
@@ -344,7 +344,16 @@ export function Rewards({ user, orders }: { user: PublicUser; orders: Order[] })
           <h2 className="font-display text-4xl">How points work</h2>
           <ul className="mt-5 space-y-3 text-stone">
             <li>
-              Earn <span className="text-ink">{commerce.pointsPerDollar} point{commerce.pointsPerDollar === 1 ? '' : 's'}</span> for every {commerce.currency === 'USD' ? 'dollar' : 'unit'} you spend when signed in.
+              {all.map((c, i) => (
+                <span key={c.code}>
+                  {i ? ' · ' : 'Earn '}
+                  <span className="text-ink">
+                    {c.pointsPerUnit} point{c.pointsPerUnit === 1 ? '' : 's'}
+                  </span>{' '}
+                  per {c.code === 'USD' ? 'dollar' : c.code === 'INR' ? 'rupee' : `unit of ${c.code}`}
+                </span>
+              ))}{' '}
+              you spend when signed in.
             </li>
             <li>
               <span className="text-ink">100 points</span> welcome bonus when you join.

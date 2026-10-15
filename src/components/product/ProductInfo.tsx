@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useCartStore } from '@/stores/cart-store'
 import { useUIStore } from '@/stores/ui-store'
 import { useRecentlyViewedStore } from '@/stores/recently-viewed-store'
-import { useMoney, useSettings } from '@/components/providers/SettingsProvider'
+import { useMoney, useSettings, useCurrency, useProductPrice, useVariantPrice } from '@/components/providers/SettingsProvider'
 import { Button } from '@/components/kit/Button'
 import { Field } from '@/components/kit/Field'
 import { Stars } from '@/components/kit/Stars'
@@ -25,6 +25,9 @@ const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'One Size']
 
 export default function ProductInfo({ product, summary }: { product: Product; summary: RatingSummary }) {
   const money = useMoney()
+  const { currency: cur } = useCurrency()
+  const productPriceOf = useProductPrice()
+  const variantPriceOf = useVariantPrice()
   const { commerce } = useSettings()
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
@@ -52,8 +55,10 @@ export default function ProductInfo({ product, summary }: { product: Product; su
   useEffect(() => remember(product.handle), [product.handle, remember])
 
   const variant = product.variants.find((v) => v.id === variantId) ?? null
-  const price = variant?.price ?? product.price
-  const compareAt = variant?.compareAtPrice ?? product.compareAtPrice
+  // In the shopper's currency. Null: this piece has no price in it yet and cannot be bought in it.
+  const priced = variant ? variantPriceOf(product, variant) : productPriceOf(product)
+  const price = priced?.price ?? 0
+  const compareAt = priced?.compareAtPrice ?? null
   const allSoldOut = product.variants.every((v) => !v.available)
   const low = variant && variant.available && variant.inventory <= 5
   const swatch = (name: string) => product.colors.find((c) => c.name === name)?.hex ?? '#bfa88e'
@@ -63,14 +68,14 @@ export default function ProductInfo({ product, summary }: { product: Product; su
       setSizeError(true)
       return
     }
-    if (!variant.available) return
+    if (!variant.available || !priced) return
     addItem({
       productId: product.id,
       variantId: variant.id,
       handle: product.handle,
       title: product.title,
       image: product.images[0]?.src ?? '',
-      price: variant.price,
+      price: priced.price,
       size: variant.size,
       color: variant.color,
       quantity: Math.min(qty, variant.inventory),
@@ -94,7 +99,13 @@ export default function ProductInfo({ product, summary }: { product: Product; su
       <h1 className="mt-5 text-[clamp(2.6rem,4.6vw,4.4rem)] leading-[0.95] tracking-[-0.025em]">{product.title}</h1>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-        <Price price={price} compareAt={compareAt} showSaving className="text-xl" />
+        {priced ? (
+          <Price price={price} compareAt={compareAt} showSaving className="text-xl" />
+        ) : (
+          <span data-money className="font-mono text-sm text-stone">
+            Not available in {cur.code} yet
+          </span>
+        )}
         {summary.count > 0 ? (
           <a href="#reviews" className="flex items-center gap-2 text-sm text-stone hover:text-ink">
             <Stars value={summary.average} size={14} />
@@ -108,7 +119,11 @@ export default function ProductInfo({ product, summary }: { product: Product; su
           </a>
         )}
       </div>
-      {discountPercent(price, compareAt) > 0 ? <p className="mt-2 text-xs text-burgundy">You save {money((compareAt ?? price) - price)}</p> : null}
+      {priced && discountPercent(price, compareAt) > 0 ? (
+        <p data-money className="mt-2 text-xs text-burgundy">
+          You save {money((compareAt ?? price) - price)}
+        </p>
+      ) : null}
 
       <p className="mt-6 max-w-prose text-[0.95rem] leading-relaxed text-stone">{product.description.split('. ').slice(0, 2).join('. ')}.</p>
 
@@ -188,8 +203,8 @@ export default function ProductInfo({ product, summary }: { product: Product; su
       ) : (
         <div className="mt-8 flex items-center gap-3">
           {variant ? <QtyStepper value={qty} onChange={(n) => setQty(Math.max(1, Math.min(n, variant.inventory, 10)))} max={Math.min(variant.inventory, 10)} label={product.title} /> : null}
-          <Button size="lg" block onClick={add} arrow magnetic className="flex-1">
-            {variant ? `Add to bag — ${money(price * qty)}` : 'Add to bag'}
+          <Button size="lg" block onClick={add} arrow magnetic className="flex-1" disabled={!priced}>
+            {!priced ? `Not sold in ${cur.code} yet` : variant ? <span data-money>{`Add to bag — ${money(price * qty)}`}</span> : 'Add to bag'}
           </Button>
           <WishlistButton handle={product.handle} title={product.title} className="h-14 w-14 shrink-0 border border-ink/15" />
         </div>
@@ -199,7 +214,9 @@ export default function ProductInfo({ product, summary }: { product: Product; su
       <ul className="mt-8 grid gap-3 rounded-[1.25rem] bg-parchment/50 p-5 text-sm">
         <li className="flex items-center gap-3">
           <TruckIcon size={18} className="text-burgundy" />
-          {commerce.freeShippingThreshold > 0 ? <>Free shipping over {money(commerce.freeShippingThreshold)}; otherwise {money(commerce.standardShippingRate)}.</> : <>Standard shipping {money(commerce.standardShippingRate)}.</>}
+          <span data-money>
+          {cur.freeShippingThreshold > 0 ? <>Free shipping over {money(cur.freeShippingThreshold)}; otherwise {money(cur.standardShippingRate)}.</> : <>Standard shipping {money(cur.standardShippingRate)}.</>}
+          </span>
         </li>
         <li className="flex items-center gap-3">
           <ReturnIcon size={18} className="text-burgundy" /> {commerce.returnWindowDays}-day returns from your account.
@@ -251,9 +268,9 @@ export default function ProductInfo({ product, summary }: { product: Product; su
           </Link>
         </AccordionItem>
         <AccordionItem title="Shipping & returns">
-          <p>
-            Standard delivery {money(commerce.standardShippingRate)}
-            {commerce.freeShippingThreshold > 0 ? <>, free over {money(commerce.freeShippingThreshold)}</> : null}; express {money(commerce.expressShippingRate)}. Returns are accepted within {commerce.returnWindowDays} days of delivery — start one from your account.
+          <p data-money>
+            Standard delivery {money(cur.standardShippingRate)}
+            {cur.freeShippingThreshold > 0 ? <>, free over {money(cur.freeShippingThreshold)}</> : null}; express {money(cur.expressShippingRate)}. Returns are accepted within {commerce.returnWindowDays} days of delivery — start one from your account.
           </p>
           <Link href="/shipping-returns" className="link-wipe mt-3 inline-block">
             Shipping & returns policy

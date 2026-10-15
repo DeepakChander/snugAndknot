@@ -79,7 +79,7 @@ export function OrdersList({ orders, initialStatus }: { orders: Order[]; initial
                     <span className="ml-1.5 text-xs text-stone">{o.paymentMethod === 'cod' ? 'COD' : o.paymentMethod === 'razorpay' ? 'online' : o.paymentMethod}</span>
                   </td>
                   <td className="px-3 py-3 tabular-nums">{o.items.reduce((s, i) => s + i.quantity, 0)}</td>
-                  <td className="px-4 py-3 text-right tabular-nums">{money(o.total)}</td>
+                  <td className="px-4 py-3 text-right tabular-nums">{money(o.total, { currency: o.currency })}</td>
                 </tr>
               ))}
             </tbody>
@@ -99,7 +99,7 @@ const NEXT: Partial<Record<OrderStatus, { to: OrderStatus; label: string }>> = {
 }
 
 export function OrderDetailAdmin({ order }: { order: Order }) {
-  const money = useMoney()
+  const money = useMoney(order.currency)
   const { run, busy } = useMutate()
   const [tracking, setTracking] = useState(order.trackingNumber ?? '')
   const [notes, setNotes] = useState(order.adminNotes ?? '')
@@ -299,7 +299,7 @@ export function ReturnsAdmin({ returns }: { returns: (ReturnRequest & { email: s
                 </div>
                 <div className="text-right">
                   <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>
-                  <p className="mt-2 text-lg font-semibold tabular-nums">{money(r.refundAmount)}</p>
+                  <p className="mt-2 text-lg font-semibold tabular-nums">{money(r.refundAmount, { currency: r.currency })}</p>
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-2 border-t border-ink/10 pt-4">

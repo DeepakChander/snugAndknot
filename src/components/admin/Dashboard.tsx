@@ -12,6 +12,8 @@ type Stats = {
   orders: number
   awaitingFulfilment: number
   averageOrderValue: number
+  /** Orders in the additional currencies, never added to the base-currency revenue. */
+  otherCurrencies: { currency: string; revenue: number; orders: number }[]
   customers: number
   pendingReviews: number
   newMessages: number
@@ -68,7 +70,11 @@ export default function Dashboard({ stats, recent, userName }: { stats: Stats; r
       )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Tile label="Revenue (all time)" value={money(stats.revenue)} />
+        <Tile
+          label="Revenue (all time)"
+          value={money(stats.revenue)}
+          note={stats.otherCurrencies.length ? `+ ${stats.otherCurrencies.map((c) => money(c.revenue, { currency: c.currency })).join(' + ')} in other currencies` : undefined}
+        />
         <Tile label="Orders" value={stats.orders.toLocaleString()} href="/admin/orders" note={`${money(stats.averageOrderValue)} average`} />
         <Tile label="Customers" value={stats.customers.toLocaleString()} href="/admin/customers" note={`${stats.subscribers} newsletter subscribers`} />
         <Tile label="Average rating" value={stats.averageRating ? `${stats.averageRating.toFixed(1)} ★` : '—'} href="/admin/reviews" note={`${stats.activeProducts} active products`} />

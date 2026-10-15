@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useCartStore } from '@/stores/cart-store'
 import { useCartQuote } from '@/hooks/use-cart-quote'
 import { useHydrated } from '@/hooks/use-hydrated'
-import { useMoney, useNavData, useSettings } from '@/components/providers/SettingsProvider'
+import { useMoney, useNavData, useCurrency, useProductPrice } from '@/components/providers/SettingsProvider'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { ButtonLink } from '@/components/kit/Button'
 import { BagIcon, MinusIcon, PlusIcon } from '@/components/kit/icons'
@@ -62,14 +62,18 @@ export default function CartDrawer() {
   const hydrated = useHydrated()
   const { items, isOpen, closeCart, removeItem, updateQuantity } = useCartStore()
   const { quote, loading, notices } = useCartQuote({ enabled: isOpen })
-  const settings = useSettings()
   const nav = useNavData()
-  const money = useMoney()
+  // Bag amounts are in the quote's currency; suggestions in the shopper's.
+  const money = useMoney(quote?.currency)
+  const moneyNow = useMoney()
+  const priceOf = useProductPrice()
+  const { currency: cur } = useCurrency()
+
   const lines = hydrated ? items : []
   const count = lines.reduce((s, i) => s + i.quantity, 0)
   const localSubtotal = lines.reduce((s, i) => s + i.price * i.quantity, 0)
   const subtotal = quote?.subtotal ?? localSubtotal
-  const remaining = quote?.freeShippingRemaining ?? Math.max(0, settings.commerce.freeShippingThreshold - localSubtotal)
+  const remaining = quote?.freeShippingRemaining ?? Math.max(0, cur.freeShippingThreshold - localSubtotal)
 
   return (
     <Overlay open={isOpen} onClose={closeCart} label="Shopping bag" side="right" className="flex flex-col bg-ivory text-ink">
@@ -101,7 +105,7 @@ export default function CartDrawer() {
                       {p.images[0] ? <Image src={p.images[0].src} alt={p.images[0].alt} fill sizes="200px" className="object-cover transition-transform duration-700 group-hover:scale-105" /> : null}
                     </div>
                     <p className="mt-2 truncate text-sm">{p.title}</p>
-                    <p className="font-mono text-xs text-stone">{money(p.price)}</p>
+                    <p className="font-mono text-xs text-stone">{priceOf(p) ? moneyNow(priceOf(p)!.price) : '—'}</p>
                   </Link>
                 ))}
               </div>
@@ -111,7 +115,7 @@ export default function CartDrawer() {
       ) : (
         <>
           <div className="border-b border-ink/10 px-6 py-5">
-            <FreeShippingMeter remaining={remaining} threshold={settings.commerce.freeShippingThreshold} />
+            <FreeShippingMeter remaining={remaining} threshold={cur.freeShippingThreshold} />
           </div>
 
           <AnimatePresence initial={false}>

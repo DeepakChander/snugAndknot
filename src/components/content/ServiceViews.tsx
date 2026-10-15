@@ -7,12 +7,13 @@ import Reveal, { RevealGroup, RevealItem } from '@/components/motion/Reveal'
 import { ButtonLink } from '@/components/kit/Button'
 import { AccordionItem } from '@/components/kit/Accordion'
 import SizeGuideTable from '@/components/product/SizeGuideTable'
-import { useMoney, useSettings } from '@/components/providers/SettingsProvider'
+import { useMoney, useSettings, useCurrency } from '@/components/providers/SettingsProvider'
 import { PackageIcon, ReturnIcon, TruckIcon } from '@/components/kit/icons'
 
 export function ShippingView() {
   const { commerce, store } = useSettings()
   const money = useMoney()
+  const { currency: cur } = useCurrency()
   const steps = [
     { title: 'Order placed', body: 'You receive an order number straight away. Keep it to track your parcel.' },
     { title: 'Prepared by hand', body: 'Each piece is checked, folded and packed in the atelier.' },
@@ -35,13 +36,13 @@ export function ShippingView() {
             <RevealItem className="rounded-[1.75rem] bg-noir p-8 text-bone">
               <TruckIcon size={28} className="text-gold" />
               <p className="mt-8 text-eyebrow text-bone/50">Standard</p>
-              <p className="mt-2 font-display text-5xl">{money(commerce.standardShippingRate)}</p>
-              {commerce.freeShippingThreshold > 0 ? <p className="mt-3 text-sm text-bone/60">Free on orders over {money(commerce.freeShippingThreshold)} (after discounts).</p> : null}
+              <p data-money className="mt-2 font-display text-5xl">{money(cur.standardShippingRate)}</p>
+              {cur.freeShippingThreshold > 0 ? <p data-money className="mt-3 text-sm text-bone/60">Free on orders over {money(cur.freeShippingThreshold)} (after discounts).</p> : null}
             </RevealItem>
             <RevealItem className="rounded-[1.75rem] border border-ink/10 p-8">
               <PackageIcon size={28} className="text-burgundy" />
               <p className="mt-8 text-eyebrow text-stone">Express</p>
-              <p className="mt-2 font-display text-5xl">{money(commerce.expressShippingRate)}</p>
+              <p data-money className="mt-2 font-display text-5xl">{money(cur.expressShippingRate)}</p>
               <p className="mt-3 text-sm text-stone">Priority dispatch, chosen at checkout.</p>
             </RevealItem>
             <RevealItem className="rounded-[1.75rem] border border-ink/10 p-8">

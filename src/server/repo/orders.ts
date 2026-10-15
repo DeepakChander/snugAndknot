@@ -16,7 +16,9 @@ import type {
   ShippingMethod,
 } from '@/types/commerce'
 import { couponDiscount, couponProblem, getCoupon } from './coupons'
+import { priceBook } from './products'
 import { iso, isoOrNull, json, newId, num, round2 } from './util'
+import { couponIn, findCurrency, variantPriceIn, baseCurrency, type ResolvedCurrency } from '@/lib/currency'
 
 export class CheckoutError extends Error {
   constructor(message: string, public status = 400) {
@@ -37,14 +39,16 @@ interface PricedVariant {
   image: string
   size: string | null
   color: string | null
-  price: number
+  /** In the requested currency; null when the piece has no price in it yet. */
+  price: number | null
   inventory: number
 }
 
-async function loadVariants(q: Queryable, ids: string[]): Promise<Map<string, PricedVariant>> {
+async function loadVariants(q: Queryable, ids: string[], currency: ResolvedCurrency): Promise<Map<string, PricedVariant>> {
   if (!ids.length) return new Map()
   const rows = await q.query(
-    `SELECT v.id, v.product_id, v.size, v.color, v.price, v.inventory, p.title, p.handle, p.images
+    `SELECT v.id, v.product_id, v.size, v.color, v.price, v.compare_at_price, v.prices AS variant_prices, v.inventory,
+            p.title, p.handle, p.images, p.price AS product_price, p.compare_at_price AS product_compare_at, p.prices AS product_prices
        FROM variants v JOIN products p ON p.id = v.product_id
       WHERE v.id = ANY($1::text[]) AND p.status = 'active'`,
     [ids]
@@ -60,7 +64,12 @@ async function loadVariants(q: Queryable, ids: string[]): Promise<Map<string, Pr
         image: json<{ src: string }[]>(r.images, [])[0]?.src ?? '',
         size: r.size ?? null,
         color: r.color ?? null,
-        price: num(r.price),
+        price:
+          variantPriceIn(
+            { price: num(r.product_price), compareAtPrice: null, prices: priceBook(r.product_prices) },
+            { price: num(r.price), compareAtPrice: null, prices: priceBook(r.variant_prices) },
+            currency
+          )?.price ?? null,
         inventory: Math.trunc(num(r.inventory)),
       },
     ])
@@ -79,15 +88,17 @@ function mergeLines(lines: LineRequest[]): LineRequest[] {
 
 /**
  * Price a cart entirely on the server. Client-supplied prices are never trusted:
- * every figure here comes from the database and the commerce settings.
+ * every figure here comes from the database and the commerce settings, in `opts.currency`
+ * (an unknown or missing currency means the base currency).
  */
 export async function quoteCart(
   lines: LineRequest[],
-  opts: { couponCode?: string | null; shippingMethod?: ShippingMethod; commerce: CommerceSettings },
+  opts: { couponCode?: string | null; shippingMethod?: ShippingMethod; commerce: CommerceSettings; currency?: string | null },
   q: Queryable = { query, exec: async () => {} }
 ): Promise<Quote> {
+  const currency = findCurrency(opts.commerce, opts.currency) ?? baseCurrency(opts.commerce)
   const requested = mergeLines(lines)
-  const variants = await loadVariants(q, requested.map((l) => l.variantId))
+  const variants = await loadVariants(q, requested.map((l) => l.variantId), currency)
   const issues: string[] = []
   const priced: Quote['lines'] = []
 
@@ -98,6 +109,11 @@ export async function quoteCart(
       continue
     }
     let quantity = l.quantity
+    if (v.price === null) {
+      issues.push(`${v.title} is not sold in ${currency.code} yet and was removed. Switch currency to buy it.`)
+      continue
+    }
+    const price = v.price
     if (v.inventory <= 0) {
       issues.push(`${v.title}${v.size ? ` (${v.size})` : ''} is sold out.`)
       continue
@@ -113,12 +129,12 @@ export async function quoteCart(
       handle: v.handle,
       title: v.title,
       image: v.image,
-      price: v.price,
+      price,
       size: v.size,
       color: v.color,
       quantity,
       available: v.inventory,
-      lineTotal: round2(v.price * quantity),
+      lineTotal: round2(price * quantity),
     })
   }
 
@@ -129,18 +145,20 @@ export async function quoteCart(
   let discount = 0
   if (opts.couponCode?.trim()) {
     const found = await getCoupon(opts.couponCode, q)
+    const terms = found ? couponIn(found, currency) : null
     if (!found) couponError = 'That code was not recognised.'
+    else if (!terms) couponError = `That code cannot be used for orders in ${currency.code}.`
     else {
-      const problem = couponProblem(found, subtotal)
+      const problem = couponProblem(found, subtotal, new Date(), terms)
       if (problem) couponError = problem
       else {
         coupon = found
-        discount = couponDiscount(found, subtotal)
+        discount = couponDiscount(terms, subtotal)
       }
     }
   }
 
-  const c = opts.commerce
+  const c = currency
   const afterDiscount = round2(subtotal - discount)
   const method = opts.shippingMethod ?? 'standard'
   let shipping = 0
@@ -148,10 +166,11 @@ export async function quoteCart(
     if (method === 'express') shipping = c.expressShippingRate
     else shipping = afterDiscount >= c.freeShippingThreshold ? 0 : c.standardShippingRate
   }
-  const tax = round2((afterDiscount * Math.max(0, c.taxRate)) / 100)
+  const tax = round2((afterDiscount * Math.max(0, opts.commerce.taxRate)) / 100)
   const total = round2(afterDiscount + shipping + tax)
 
   return {
+    currency: currency.code,
     lines: priced,
     subtotal,
     discount,
@@ -193,6 +212,7 @@ function mapOrder(r: Row, items: OrderItem[]): Order {
     paymentMethod: r.payment_method,
     paymentStatus: r.payment_status as PaymentStatus,
     shippingMethod: r.shipping_method as ShippingMethod,
+    currency: (r.currency as string | null) ?? 'USD',
     subtotal: num(r.subtotal),
     shipping: num(r.shipping),
     discount: num(r.discount),
@@ -237,6 +257,8 @@ export interface PlaceOrderInput {
   userId: string | null
   paymentMethod: PaymentMethod
   commerce: CommerceSettings
+  /** Must be one of the shop's currencies (the route checks); defaults to the base currency. */
+  currency?: string | null
 }
 
 /**
@@ -253,7 +275,7 @@ export const UNPAID_ONLINE = "(payment_method = 'razorpay' AND paid_at IS NULL)"
 export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
   return tx(async (q) => {
     const quote = await quoteCart(input.lines, input, q)
-    if (!quote.lines.length) throw new CheckoutError('Your bag is empty or every item is sold out.')
+    if (!quote.lines.length) throw new CheckoutError(quote.issues[0] ?? 'Your bag is empty or every item is sold out.')
     const requested = mergeLines(input.lines)
     // Refuse rather than silently changing what the customer agreed to pay for.
     for (const r of requested) {
@@ -283,18 +305,19 @@ export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
     const seq = await q.query<{ n: number }>("SELECT nextval('order_number_seq')::int AS n")
     const orderNumber = `SK-${new Date().getFullYear()}-${String(seq[0].n).padStart(5, '0')}`
     const id = newId('ord')
-    const points = input.userId ? Math.floor(quote.total * Math.max(0, input.commerce.pointsPerDollar)) : 0
+    const currency = findCurrency(input.commerce, quote.currency) ?? baseCurrency(input.commerce)
+    const points = input.userId ? Math.floor(quote.total * Math.max(0, currency.pointsPerUnit)) : 0
     const name = `${input.address.firstName} ${input.address.lastName}`.trim()
     const status: OrderStatus = input.paymentMethod === 'razorpay' ? 'pending_payment' : 'placed'
 
     await q.query(
       `INSERT INTO orders (id, order_number, user_id, email, customer_name, status, payment_method, payment_status,
-         shipping_method, subtotal, shipping, discount, tax, total, coupon_code, shipping_address, notes, points_earned)
-       VALUES ($1, $2, $3, lower($4), $5, $17, $6, 'pending', $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15, $16)`,
+         shipping_method, subtotal, shipping, discount, tax, total, coupon_code, shipping_address, notes, points_earned, currency)
+       VALUES ($1, $2, $3, lower($4), $5, $17, $6, 'pending', $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15, $16, $18)`,
       [
         id, orderNumber, input.userId, input.email.trim(), name, input.paymentMethod, input.shippingMethod,
         quote.subtotal, quote.shipping, quote.discount, quote.tax, quote.total, quote.coupon?.code ?? null,
-        JSON.stringify(input.address), input.notes, points, status,
+        JSON.stringify(input.address), input.notes, points, status, quote.currency,
       ]
     )
     for (const [i, l] of quote.lines.entries()) {
@@ -321,8 +344,8 @@ export async function setRazorpayOrderId(id: string, razorpayOrderId: string): P
 /** The payment fields of one order, for the payment routes. Never sent to the browser as is. */
 export async function getPaymentState(where: { id: string } | { razorpayOrderId: string }) {
   const [r] = 'id' in where
-    ? await query('SELECT id, status, payment_method, payment_status, total, razorpay_order_id, paid_at FROM orders WHERE id = $1', [where.id])
-    : await query('SELECT id, status, payment_method, payment_status, total, razorpay_order_id, paid_at FROM orders WHERE razorpay_order_id = $1', [where.razorpayOrderId])
+    ? await query('SELECT id, status, payment_method, payment_status, total, currency, razorpay_order_id, paid_at FROM orders WHERE id = $1', [where.id])
+    : await query('SELECT id, status, payment_method, payment_status, total, currency, razorpay_order_id, paid_at FROM orders WHERE razorpay_order_id = $1', [where.razorpayOrderId])
   if (!r) return null
   return {
     id: r.id as string,
@@ -330,6 +353,7 @@ export async function getPaymentState(where: { id: string } | { razorpayOrderId:
     paymentMethod: r.payment_method as string,
     paymentStatus: r.payment_status as PaymentStatus,
     total: num(r.total),
+    currency: (r.currency as string | null) ?? 'USD',
     razorpayOrderId: (r.razorpay_order_id as string | null) ?? null,
     paid: r.paid_at !== null && r.paid_at !== undefined,
   }
@@ -556,13 +580,14 @@ function mapReturn(r: Row): ReturnRequest {
     comments: r.comments ?? null,
     items: json(r.items, []),
     refundAmount: num(r.refund_amount),
+    currency: (r.currency as string | null) ?? 'USD',
     createdAt: iso(r.created_at),
   }
 }
 
 export async function listReturnsForUser(userId: string): Promise<ReturnRequest[]> {
   const rows = await query(
-    `SELECT r.*, o.order_number FROM returns r JOIN orders o ON o.id = r.order_id
+    `SELECT r.*, o.order_number, o.currency FROM returns r JOIN orders o ON o.id = r.order_id
       WHERE r.user_id = $1 ORDER BY r.created_at DESC`,
     [userId]
   )
@@ -571,7 +596,7 @@ export async function listReturnsForUser(userId: string): Promise<ReturnRequest[
 
 export async function listReturnsAdmin(): Promise<(ReturnRequest & { email: string; customerName: string })[]> {
   const rows = await query(
-    `SELECT r.*, o.order_number, o.email, o.customer_name FROM returns r JOIN orders o ON o.id = r.order_id
+    `SELECT r.*, o.order_number, o.currency, o.email, o.customer_name FROM returns r JOIN orders o ON o.id = r.order_id
       ORDER BY (r.status = 'pending') DESC, r.created_at DESC`
   )
   return rows.map((r) => ({ ...mapReturn(r), email: r.email, customerName: r.customer_name }))
@@ -629,8 +654,8 @@ export async function createReturn(input: {
     const refund = round2(gross * paidShare)
     const rows = await q.query(
       `INSERT INTO returns (id, order_id, user_id, reason, comments, items, refund_amount)
-       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7) RETURNING *, $8::text AS order_number`,
-      [newId('ret'), order.id, input.userId, input.reason, input.comments, JSON.stringify(items), refund, order.orderNumber]
+       VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7) RETURNING *, $8::text AS order_number, $9::text AS currency`,
+      [newId('ret'), order.id, input.userId, input.reason, input.comments, JSON.stringify(items), refund, order.orderNumber, order.currency]
     )
     return mapReturn(rows[0])
   })
@@ -639,7 +664,7 @@ export async function createReturn(input: {
 /** One return with the order's customer, for the admin and its notifications. */
 export async function getReturnAdmin(id: string): Promise<(ReturnRequest & { email: string; customerName: string }) | null> {
   const rows = await query(
-    `SELECT r.*, o.order_number, o.email, o.customer_name FROM returns r JOIN orders o ON o.id = r.order_id WHERE r.id = $1`,
+    `SELECT r.*, o.order_number, o.currency, o.email, o.customer_name FROM returns r JOIN orders o ON o.id = r.order_id WHERE r.id = $1`,
     [id]
   )
   return rows[0] ? { ...mapReturn(rows[0]), email: rows[0].email, customerName: rows[0].customer_name } : null

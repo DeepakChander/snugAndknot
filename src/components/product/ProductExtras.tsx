@@ -9,8 +9,8 @@ import Parallax from '@/components/motion/Parallax'
 import { useRecentlyViewedStore } from '@/stores/recently-viewed-store'
 import { useHydrated } from '@/hooks/use-hydrated'
 import { api } from '@/lib/api'
-import { useMoney } from '@/components/providers/SettingsProvider'
-import type { Product, ProductDetails } from '@/types/commerce'
+import { ProductPrice } from '@/components/kit/Price'
+import type { PriceBook, Product, ProductDetails } from '@/types/commerce'
 
 /** Editorial band about the yarn, using the product's own fabric details. */
 export function FabricStory({ details, image, title }: { details: ProductDetails; image: string; title: string }) {
@@ -82,8 +82,7 @@ export function RecentlyViewed({ current }: { current: string }) {
 }
 
 /** Mobile buy bar that appears once the main button scrolls away. */
-export function StickyBuyBar({ title, price, image, targetId }: { title: string; price: number; image: string; targetId: string }) {
-  const money = useMoney()
+export function StickyBuyBar({ title, product, image, targetId }: { title: string; product: { price: number; compareAtPrice: number | null; prices: PriceBook }; image: string; targetId: string }) {
   const [show, setShow] = useState(false)
   useEffect(() => {
     const el = document.getElementById(targetId)
@@ -107,7 +106,7 @@ export function StickyBuyBar({ title, price, image, targetId }: { title: string;
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm">{title}</span>
-            <span className="font-mono text-xs text-bone/60">{money(price)}</span>
+            <ProductPrice product={product} showCompareAt={false} className="text-xs text-bone/60" />
           </span>
           <button
             type="button"

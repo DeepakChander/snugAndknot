@@ -22,7 +22,7 @@ export default function CartView({ suggestions }: { suggestions: CardProduct[] }
   const addWish = useWishlistStore((s) => s.addItem)
   const addToast = useUIStore((s) => s.addToast)
   const { quote, loading, notices } = useCartQuote()
-  const money = useMoney()
+  const money = useMoney(quote?.currency)
   const lines = hydrated ? items : []
   const count = lines.reduce((s, l) => s + l.quantity, 0)
 

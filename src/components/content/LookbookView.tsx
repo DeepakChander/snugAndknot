@@ -7,7 +7,8 @@ import { gsap, useGSAP, prefersReducedMotion } from '@/lib/motion/gsap'
 import { scrollToTarget } from '@/lib/motion/lenis'
 import SplitReveal from '@/components/motion/SplitReveal'
 import { ButtonLink } from '@/components/kit/Button'
-import Price from '@/components/kit/Price'
+import { ProductPrice } from '@/components/kit/Price'
+import type { PriceBook } from '@/types/commerce'
 import { accent, plain } from '@/lib/accent'
 import { cn } from '@/lib/format'
 
@@ -19,7 +20,7 @@ export interface Spread {
   season: string
   tone: string
   images: { src: string; alt: string }[]
-  pieces: { handle: string; title: string; price: number; image: string }[]
+  pieces: { handle: string; title: string; price: number; compareAtPrice: number | null; prices: PriceBook; image: string }[]
 }
 
 const TONES: Record<string, { bg: string; text: string; muted: string; nav: 'dark' | 'light' }> = {
@@ -150,7 +151,7 @@ export default function LookbookView({ spreads }: { spreads: Spread[] }) {
                                 {p.image ? <Image src={p.image} alt="" fill sizes="40px" className="object-cover" /> : null}
                               </span>
                               <span className="min-w-0 flex-1 truncate font-display text-[0.98rem] font-semibold tracking-[-0.02em]">{p.title}</span>
-                              <Price price={p.price} className="text-[0.78rem]" />
+                              <ProductPrice product={p} showCompareAt={false} className="text-[0.78rem]" />
                               <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
                             </Link>
                           </li>

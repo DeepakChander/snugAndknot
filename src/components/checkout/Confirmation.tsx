@@ -14,9 +14,9 @@ import type { Order } from '@/types/commerce'
 const EASE = [0.16, 1, 0.3, 1] as const
 
 export default function Confirmation({ orderNumber }: { orderNumber: string }) {
-  const money = useMoney()
   const user = useAuthStore((s) => s.user)
   const [order, setOrder] = useState<Order | null | undefined>(undefined)
+  const money = useMoney(order?.currency)
 
   useEffect(() => {
     try {

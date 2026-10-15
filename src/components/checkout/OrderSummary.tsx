@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCartStore } from '@/stores/cart-store'
-import { useMoney, useSettings } from '@/components/providers/SettingsProvider'
+import { useMoney, useSettings, useCurrency } from '@/components/providers/SettingsProvider'
 import { FreeShippingMeter } from '@/components/chrome/CartDrawer'
 import { XIcon } from '@/components/kit/icons'
 import { cn } from '@/lib/format'
@@ -77,7 +77,8 @@ export function CouponForm({ quote }: { quote: Quote | null }) {
 }
 
 export default function OrderSummary({ quote, loading, compact = false, children }: { quote: Quote | null; loading: boolean; compact?: boolean; children?: React.ReactNode }) {
-  const money = useMoney()
+  const money = useMoney(quote?.currency)
+  const { currency: cur } = useCurrency()
   const { commerce } = useSettings()
   const lines = quote?.lines ?? []
   return (
@@ -131,7 +132,7 @@ export default function OrderSummary({ quote, loading, compact = false, children
       </dl>
       {quote ? (
         <div className="mt-6">
-          <FreeShippingMeter remaining={quote.freeShippingRemaining} threshold={commerce.freeShippingThreshold} />
+          <FreeShippingMeter remaining={quote.freeShippingRemaining} threshold={cur.freeShippingThreshold} />
         </div>
       ) : null}
       {children ? <div className="mt-8">{children}</div> : null}

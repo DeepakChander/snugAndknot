@@ -30,6 +30,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     pointsPerDollar: 1,
     codEnabled: true,
     onlinePaymentsEnabled: false,
+    extraCurrencies: [],
   },
   announcement: {
     enabled: true,

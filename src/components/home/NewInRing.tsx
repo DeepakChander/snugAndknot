@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import SplitReveal from '@/components/motion/SplitReveal'
 import { ButtonLink } from '@/components/kit/Button'
-import { useMoney } from '@/components/providers/SettingsProvider'
+import { ProductPrice } from '@/components/kit/Price'
 import { hasWebGL, useInView } from '@/hooks/use-in-view'
 import { ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/motion/gsap'
 import type { RingItem } from '@/components/three/ProductRing'
@@ -23,7 +23,6 @@ const EASE = [0.16, 1, 0.3, 1] as const
  */
 export default function NewInRing({ products }: { products: Product[] }) {
   const router = useRouter()
-  const money = useMoney()
   const section = useRef<HTMLElement>(null)
   const stage = useRef<HTMLDivElement>(null)
   const scroll = useRef(0)
@@ -145,10 +144,7 @@ export default function NewInRing({ products }: { products: Product[] }) {
             </AnimatePresence>
           </div>
           <div className="flex items-center gap-4 lg:col-span-3 lg:justify-end">
-            <span className="font-mono text-sm tabular-nums">
-              {current.compareAtPrice && current.compareAtPrice > current.price ? <s className="mr-2 text-bone/40">{money(current.compareAtPrice)}</s> : null}
-              {money(current.price)}
-            </span>
+            <ProductPrice product={current} className="text-sm [&_s]:text-bone/40 [&_s]:opacity-100" />
             <ButtonLink href={`/product/${current.handle}`} variant="light" size="sm" arrow className="shrink-0">
               View piece
             </ButtonLink>

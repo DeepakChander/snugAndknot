@@ -12,6 +12,7 @@ export const POST = route(async (req) => {
     couponCode: input.couponCode,
     shippingMethod: input.shippingMethod,
     commerce: settings.commerce,
+    currency: input.currency,
   })
   return ok({ quote })
 })

@@ -309,7 +309,8 @@ async function main() {
   const cancel7 = await admin.patch(`/api/admin/orders/${p7.data.order.id}`, { status: 'cancelled' })
   check('admin can cancel it, stock back', cancel7.status === 200 && (await stock(vF.id)) === stockF + 1)
   const stats = (await admin.get('/api/admin/stats')).data.stats
-  const [{ revenue }] = await sql(`SELECT coalesce(sum(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment')), 0)::float8 AS revenue FROM orders`)
+  // The dashboard's revenue is in the base currency; other currencies are reported apart.
+  const [{ revenue }] = await sql(`SELECT coalesce(sum(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment') AND currency = $1), 0)::float8 AS revenue FROM orders`, [original.currency])
   check('dashboard revenue leaves out unpaid online orders', Math.abs(stats.revenue - revenue) < 0.001, { stats: stats.revenue, revenue })
 
   console.log('\nHolds that run out (sweep)')
@@ -343,6 +344,26 @@ async function main() {
   check('sold out meanwhile → stays cancelled, payment recorded, refund due', r10.data.refundDue === true && (await orderRow(p10.data.order.id)).status === 'cancelled' && (await orderRow(p10.data.order.id)).payment_status === 'paid', r10.data)
   check('store told to refund it', (await eventually(() => notices('payment.refund_needed', p10.data.order.orderNumber))) === 1)
   await sql('UPDATE variants SET inventory = $2 WHERE id = $1', [vD.id, savedD])
+
+  console.log('\nPaying in a second currency (INR)')
+  await setCommerce({ onlinePaymentsEnabled: true, extraCurrencies: [{ code: 'INR', locale: 'en-IN', countries: ['IN'], standardShippingRate: 99, expressShippingRate: 299, freeShippingThreshold: 50000, pointsPerUnit: 0.01 }] })
+  const adminB = (await admin.get(`/api/admin/products/${vB.productId}`)).data.product
+  await admin.put(`/api/admin/products/${vB.productId}`, { ...adminB, prices: { INR: { price: 8999, compareAtPrice: null } } })
+  const inr = await anon.post('/api/orders', { ...orderBody(vB), currency: 'INR' })
+  const inrRzp = inr.data.payment && rzp.orders.get(inr.data.payment.razorpayOrderId)
+  check('INR order held → 201', inr.status === 201 && inr.data.order.currency === 'INR' && inr.data.order.subtotal === 8999, inr.data)
+  check('Razorpay order is in INR, in paise', inrRzp?.currency === 'INR' && inrRzp.amount === Math.round(inr.data.order.total * 100) && inr.data.payment.currency === 'INR', inrRzp)
+  const { proof: inrProof } = pay(inr.data.payment.razorpayOrderId, { status: 'captured' })
+  const inrOk = await anon.post(`/api/orders/${inr.data.order.id}/payment`, inrProof)
+  check('INR payment confirmed and placed', inrOk.data.confirmed === true && inrOk.data.order.currency === 'INR', inrOk.data)
+  const inrWrong = await anon.post('/api/orders', { ...orderBody(vB), currency: 'INR' })
+  const { proof: usdProof } = pay(inrWrong.data.payment.razorpayOrderId, { status: 'captured' })
+  rzp.payments.get(usdProof.razorpayPaymentId).currency = 'USD'
+  const inrMismatch = await anon.post(`/api/orders/${inrWrong.data.order.id}/payment`, usdProof)
+  check('a payment in the wrong currency is not accepted', inrMismatch.data.confirmed === false && (await orderRow(inrWrong.data.order.id)).status === 'pending_payment', inrMismatch.data)
+  await admin.patch(`/api/admin/orders/${inrWrong.data.order.id}`, { status: 'cancelled' })
+  await admin.put(`/api/admin/products/${vB.productId}`, { ...adminB, prices: adminB.prices ?? {} })
+  await setCommerce({ onlinePaymentsEnabled: true })
 
   console.log('\nCash on delivery alongside online payment')
   const cod = await anon.post('/api/orders', { ...orderBody(vA), paymentMethod: 'cod' })

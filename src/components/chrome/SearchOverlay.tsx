@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useUIStore } from '@/stores/ui-store'
-import { useMoney } from '@/components/providers/SettingsProvider'
+import { ProductPrice } from '@/components/kit/Price'
 import { useDialogBehaviour } from '@/components/kit/Overlay'
 import { api } from '@/lib/api'
 import { ArrowRight, SearchIcon, XIcon } from '@/components/kit/icons'
@@ -34,7 +34,6 @@ function saveRecent(q: string) {
 export default function SearchOverlay() {
   const { isSearchOpen, closeSearch } = useUIStore()
   const router = useRouter()
-  const money = useMoney()
   const ref = useRef<HTMLDivElement>(null)
   const [q, setQ] = useState('')
   const [results, setResults] = useState<Product[] | null>(null)
@@ -193,7 +192,7 @@ export default function SearchOverlay() {
                           {p.images[0] ? <Image src={p.images[0].src} alt={p.images[0].alt} fill sizes="(min-width:768px) 25vw, 50vw" className="object-cover transition-transform duration-1000 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105" /> : null}
                         </div>
                         <p className="mt-3 font-display text-xl leading-tight">{p.title}</p>
-                        <p className="font-mono text-sm text-taupe">{money(p.price)}</p>
+                        <p><ProductPrice product={p} showCompareAt={false} className="text-sm text-taupe" /></p>
                       </Link>
                     </motion.li>
                   ))}
