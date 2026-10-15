@@ -271,6 +271,8 @@ export const categorySchema = z.object({
   description: trimmed(1000).default(''),
   image: imageUrl.default(''),
   position: z.coerce.number().int().min(0).max(10_000).default(0),
+  badge: trimmed(24).default(''),
+  showOnHome: z.boolean().default(true),
 })
 
 export const couponSchema = z

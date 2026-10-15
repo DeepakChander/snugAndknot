@@ -192,7 +192,11 @@ function CategoryRow({ category, isNew, onDone }: { category: Category; isNew?: 
           />
           <Input label="Slug" prefix="/" value={c.slug} disabled={!isNew} error={fieldErrors.slug} hint={isNew ? `/shop/${c.slug || '…'}` : 'Products point at the slug, so it cannot change.'} onChange={(e) => (setTouched(true), setC({ ...c, slug: e.target.value.toLowerCase() }))} />
           <Textarea label="Description" rows={2} value={c.description} onChange={(e) => setC({ ...c, description: e.target.value })} />
-          <Input label="Order" type="number" min={0} value={c.position} onChange={(e) => setC({ ...c, position: Number(e.target.value) || 0 })} />
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Badge" maxLength={24} value={c.badge} error={fieldErrors.badge} placeholder="3XL TO 6XL" hint="Optional, e.g. 3XL TO 6XL. Shown beside the name on the home page." onChange={(e) => setC({ ...c, badge: e.target.value })} />
+            <Input label="Order" type="number" min={0} value={c.position} onChange={(e) => setC({ ...c, position: Number(e.target.value) || 0 })} hint="Lower shows first." />
+          </div>
+          <Toggle checked={c.showOnHome} onChange={(v) => setC({ ...c, showOnHome: v })} label="Show on home page" description="Gives this category a tile in the home page's category grid, once it has active pieces." />
         </div>
         <ImageField label="Image" value={c.image} onChange={(v) => setC({ ...c, image: v })} />
         <div className="flex flex-row gap-2 lg:flex-col">
@@ -218,9 +222,9 @@ export function CategoriesAdmin({ categories, counts }: { categories: Category[]
   const [adding, setAdding] = useState(false)
   return (
     <>
-      <PageHeader title="Categories" description="Categories group pieces by type (e.g. cardigans) and get their own page at /shop/slug. Only categories with active pieces are shown to customers." actions={!adding ? <Btn onClick={() => setAdding(true)}>New category</Btn> : undefined} />
+      <PageHeader title="Categories" description="Categories group pieces by type (e.g. cardigans) and get their own page at /shop/slug. Only categories with active pieces are shown to customers. The home page grid shows them in order, using each image: a cut-out garment on a transparent background looks best." actions={!adding ? <Btn onClick={() => setAdding(true)}>New category</Btn> : undefined} />
       <div className="space-y-3">
-        {adding ? <CategoryRow isNew category={{ slug: '', title: '', description: '', image: '', position: categories.length }} onDone={() => setAdding(false)} /> : null}
+        {adding ? <CategoryRow isNew category={{ slug: '', title: '', description: '', image: '', position: categories.length, badge: '', showOnHome: true }} onDone={() => setAdding(false)} /> : null}
         {categories.map((c) => (
           <div key={c.slug}>
             <p className="mb-1 px-1 text-xs text-stone">{counts[c.slug] ?? 0} product(s)</p>

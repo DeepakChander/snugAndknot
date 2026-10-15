@@ -302,6 +302,7 @@ async function main() {
   await admin.put(`/api/admin/collections/${col.id}`, col)
   const catDel = await admin.del('/api/admin/categories/cardigans')
   check('category in use cannot be deleted → 409', catDel.status === 409, catDel.data)
+  await categoryGridChecks()
   const settings = (await admin.get('/api/admin/settings')).data.settings
   const ann = await admin.put('/api/admin/settings', { section: 'announcement', value: { ...settings.announcement, messages: ['Smoke test banner'] } })
   check('save announcement settings', ann.status === 200 && ann.data.value.messages[0] === 'Smoke test banner', ann.data)
@@ -350,6 +351,57 @@ async function main() {
 
   console.log(`\n${passes} passed, ${failures} failed\n`)
   process.exit(failures ? 1 : 0)
+}
+
+/** The home page's "Shop by category" section as HTML, '' when it is not rendered, null when the page failed. */
+async function homeCategoryGrid() {
+  const res = await fetch(BASE + '/', { headers: { 'X-Real-IP': RUN_IP } })
+  if (res.status !== 200) return null
+  const html = await res.text()
+  const start = html.indexOf('aria-labelledby="category-grid-title"')
+  return start === -1 ? '' : html.slice(start, html.indexOf('</section>', start))
+}
+
+/** Re-reads the home page until `ok(grid)` holds; a save revalidates the page, which may take a request or two. */
+async function waitForHome(ok, tries = 10) {
+  let grid = null
+  for (let i = 0; i < tries; i++) {
+    grid = await homeCategoryGrid()
+    if (grid !== null && ok(grid)) return { ok: true, grid }
+    await new Promise((r) => setTimeout(r, 500))
+  }
+  return { ok: false, grid: grid ?? 'home page did not return 200' }
+}
+
+async function categoryGridChecks() {
+  console.log('\nAdmin: home page category grid')
+  const cats = (await admin.get('/api/admin/categories')).data.categories
+  const original = cats.find((c) => c.slug === 'cardigans')
+  check('categories carry badge and showOnHome', original && typeof original.badge === 'string' && typeof original.showOnHome === 'boolean', original)
+  if (!original) return
+  const url = '/api/admin/categories/cardigans'
+  const tile = 'href="/shop/cardigans"'
+  try {
+    const withBadge = await admin.put(url, { ...original, badge: '  3XL TO 6XL  ', showOnHome: true })
+    check('admin sets a badge (trimmed) → 200', withBadge.status === 200 && withBadge.data.category?.badge === '3XL TO 6XL' && withBadge.data.category?.showOnHome === true, withBadge.data)
+    const shown = await waitForHome((g) => g.includes(tile) && g.includes('3XL TO 6XL'))
+    check('home grid shows the category tile with its badge', shown.ok, shown.grid.slice(0, 300))
+    const max = await admin.put(url, { ...original, badge: 'X'.repeat(24) })
+    check('24-character badge accepted → 200', max.status === 200 && max.data.category?.badge.length === 24, max.data)
+    const tooLong = await admin.put(url, { ...original, badge: 'X'.repeat(25) })
+    check('badge longer than 24 characters → 422', tooLong.status === 422, tooLong.data)
+    const hidden = await admin.put(url, { ...original, badge: '3XL TO 6XL', showOnHome: false })
+    check('admin hides a category from the home page → 200', hidden.status === 200 && hidden.data.category?.showOnHome === false, hidden.data)
+    const gone = await waitForHome((g) => !g.includes(tile))
+    check('hidden category has no tile on the home grid', gone.ok, gone.grid.slice(0, 300))
+    const page = await anon.get('/shop/cardigans')
+    check('hidden category keeps its own page → 200', page.status === 200, page.status)
+    const bare = await admin.put(url, { slug: original.slug, title: original.title, description: original.description, image: original.image, position: original.position })
+    check('omitted fields fall back to no badge, shown on home', bare.status === 200 && bare.data.category?.badge === '' && bare.data.category?.showOnHome === true, bare.data)
+  } finally {
+    const restore = await admin.put(url, original)
+    check('restore the category', restore.status === 200 && restore.data.category?.badge === original.badge && restore.data.category?.showOnHome === original.showOnHome, restore.data)
+  }
 }
 
 async function securityChecks({ placed, guest, cardigan, settings }) {

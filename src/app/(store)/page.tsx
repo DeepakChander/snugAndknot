@@ -1,4 +1,5 @@
 import WordmarkHero from '@/components/home/WordmarkHero'
+import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
 import MaterialRows from '@/components/home/MaterialRows'
 import NewInRing from '@/components/home/NewInRing'
 import CollectionSheets from '@/components/home/CollectionSheets'
@@ -61,10 +62,23 @@ export default async function HomePage() {
   }
   rows.push({ label: 'All pieces', href: '/shop', meta: pieces(products.length), image: LOOKS[2] })
 
+  // "Shop by category" tiles: categories with active pieces (getCategories) that the admin left on
+  // the home page, in their admin order. A category without its own image shows one of its pieces.
+  // A cached read from before the badge/showOnHome columns lacks both, so missing means "shown, no badge".
+  const tiles: CategoryTile[] = categories
+    .filter((c) => c.showOnHome !== false)
+    .map((c) => ({
+      slug: c.slug,
+      title: c.title,
+      badge: c.badge ?? '',
+      image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
+    }))
+
   return (
     <>
       <JsonLd data={[organizationLd(settings), websiteLd(settings)]} />
       <WordmarkHero frames={frames.slice(0, 14)} cover={COVER} />
+      <CategoryGrid tiles={tiles} />
       <MaterialRows />
       <NewInRing products={products.slice(0, 8)} />
       <CollectionSheets collections={collections} products={products} />
