@@ -63,6 +63,15 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     // 1200×630, the size link previews expect: three of the real pieces side by side.
     ogImage: '/images/og/snugandknot.jpg',
   },
+  // The home page video wall stays hidden until it is switched on with at least one playable clip.
+  videos: {
+    enabled: false,
+    heading: '#SnugAndKnot',
+    intro: 'Show us how you wear yours. Tag @snugandknot and #SnugAndKnot for a chance to be featured here.',
+    ctaLabel: 'Follow @snugandknot',
+    ctaHref: 'https://instagram.com/snugandknot',
+    items: [],
+  },
 }
 
 export function mergeSettings<T extends object>(base: T, override: unknown): T {

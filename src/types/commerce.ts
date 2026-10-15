@@ -357,6 +357,27 @@ export interface SeoSettings {
   ogImage: string
 }
 
+/** One clip on the home page video wall. `url` is a video file, a YouTube link or an Instagram post. */
+export interface VideoWallItem {
+  id: string
+  url: string
+  /** Still shown before the clip plays (and instead of it for Instagram). Optional for YouTube. */
+  poster: string
+  caption: string
+  /** Who made it, e.g. "@handle". */
+  credit: string
+  productIds: string[]
+}
+
+export interface VideoWallSettings {
+  enabled: boolean
+  heading: string
+  intro: string
+  ctaLabel: string
+  ctaHref: string
+  items: VideoWallItem[]
+}
+
 export interface SiteSettings {
   store: StoreSettings
   commerce: CommerceSettings
@@ -364,6 +385,7 @@ export interface SiteSettings {
   reviews: ReviewSettings
   homepage: HomepageSettings
   seo: SeoSettings
+  videos: VideoWallSettings
 }
 
 export type SettingsKey = keyof SiteSettings

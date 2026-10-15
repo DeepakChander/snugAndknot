@@ -743,7 +743,7 @@ export const settingsUpdated = safely('settingsUpdated', async (section: string,
     tags: inboxMoved ? ['Security', 'Inbox changed'] : [],
     alsoTo: inboxMoved ? was : null,
     sections: [{ fields: [['Section', section], ...changes, ['By', by]] }],
-    action: { label: 'Open settings', path: `/admin/settings?tab=${section}` },
+    action: { label: 'Open settings', path: section === 'videos' ? '/admin/videos' : `/admin/settings?tab=${section}` },
   })
 })
 

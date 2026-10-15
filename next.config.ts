@@ -12,13 +12,16 @@ const buildCsp = (extra: { script?: string; img?: string; connect?: string; fram
     "default-src 'self'",
     `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://*.googletagmanager.com https://connect.facebook.net${extra.script ?? ''}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: https://images.unsplash.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net${extra.img ?? ''}`,
+    // i.ytimg.com: YouTube's own thumbnails, the poster of a home page video wall clip with none set.
+    `img-src 'self' data: blob: https://images.unsplash.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net https://i.ytimg.com${extra.img ?? ''}`,
     "font-src 'self' data:",
     `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net${extra.connect ?? ''}`,
-    "media-src 'self' blob:",
+    // The home page video wall plays .mp4/.webm/.mov files the admin links from any https host.
+    "media-src 'self' blob: https:",
     "worker-src 'self' blob:",
     // The Meta Pixel sends some events through a hidden facebook.com iframe and form.
-    `frame-src https://www.facebook.com${extra.frame ?? ''}`,
+    // The video wall embeds YouTube clips through the privacy-enhanced youtube-nocookie.com player.
+    `frame-src https://www.facebook.com https://www.youtube-nocookie.com${extra.frame ?? ''}`,
     "object-src 'none'",
     "base-uri 'self'",
     `form-action 'self' https://www.facebook.com${extra.form ?? ''}`,
@@ -32,7 +35,7 @@ const buildCsp = (extra: { script?: string; img?: string; connect?: string; fram
  * payment runs in an api.razorpay.com frame, and a bank's 3-D Secure page may open in a pop-up that
  * must be able to report back (hence `same-origin-allow-popups`). It applies to every page, not just
  * /checkout, because the shop navigates client-side: a visitor who reaches checkout from the bag keeps
- * the headers of the page they arrived on. Without the key the headers are exactly as before.
+ * the headers of the page they arrived on. Without the key none of this is added.
  */
 const razorpay = /^rzp_(test|live)_/.test(process.env.SNUGKNOT_RAZORPAY_KEY_ID?.trim() ?? '')
 const RZP = ' https://*.razorpay.com'

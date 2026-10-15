@@ -1,5 +1,6 @@
 import 'server-only'
 import { z } from 'zod'
+import { MAX_WALL_PRODUCTS, MAX_WALL_VIDEOS, detectVideo } from '@/lib/video'
 
 /**
  * Removes characters that are invisible but dangerous in stored text: control characters
@@ -341,6 +342,41 @@ export const customerPatchSchema = z.object({
 export const messagePatchSchema = z.object({ status: z.enum(['new', 'read', 'archived']) })
 export const returnPatchSchema = z.object({ status: z.enum(['pending', 'approved', 'rejected', 'received', 'refunded']) })
 
+const VIDEO_URL_HELP = 'Use an https:// link to an .mp4, .webm or .mov file, a YouTube video or Short, or an Instagram post or reel'
+const wallItem = z
+  .object({
+    id: z.string().trim().regex(/^[A-Za-z0-9_-]{1,40}$/, 'Invalid id'),
+    url: z.string().trim().min(1, 'Paste a video link').max(500).refine((v) => detectVideo(v) !== null, VIDEO_URL_HELP),
+    poster: imageUrl.default(''),
+    caption: trimmed(200).default(''),
+    credit: trimmed(60).default(''),
+    productIds: z
+      .array(required(120))
+      .max(MAX_WALL_PRODUCTS, `Tag at most ${MAX_WALL_PRODUCTS} pieces in one video`)
+      .default([])
+      .transform((ids) => [...new Set(ids)]),
+  })
+  .superRefine((v, ctx) => {
+    // Instagram cannot be played inline, so the poster is all that shows.
+    if (detectVideo(v.url)?.kind === 'instagram' && !v.poster) ctx.addIssue({ code: 'custom', path: ['poster'], message: 'Instagram posts need a poster image' })
+  })
+export const videoWallSchema = z
+  .object({
+    enabled: z.boolean(),
+    heading: trimmed(60),
+    intro: trimmed(300),
+    ctaLabel: trimmed(40),
+    ctaHref: httpsUrl,
+    items: z.array(wallItem).max(MAX_WALL_VIDEOS, `At most ${MAX_WALL_VIDEOS} videos`),
+  })
+  .superRefine((v, ctx) => {
+    const seen = new Set<string>()
+    v.items.forEach((it, i) => {
+      if (seen.has(it.id)) ctx.addIssue({ code: 'custom', path: ['items', i, 'id'], message: 'Duplicate video id' })
+      seen.add(it.id)
+    })
+  })
+
 const nonNegative = z.coerce.number().finite().min(0).max(1_000_000)
 export const settingsSchemas = {
   store: z.object({
@@ -437,4 +473,5 @@ export const settingsSchemas = {
     description: trimmed(320),
     ogImage: imageUrl,
   }),
+  videos: videoWallSchema,
 } as const

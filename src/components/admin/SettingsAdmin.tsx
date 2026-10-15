@@ -18,7 +18,7 @@ const TABS: { key: SettingsKey; label: string; blurb: string }[] = [
   { key: 'seo', label: 'Search & sharing', blurb: 'How the site appears in Google results and when a link is shared.' },
 ]
 
-function Section({ title, description, children }: { title: string; description?: ReactNode; children: ReactNode }) {
+export function Section({ title, description, children }: { title: string; description?: ReactNode; children: ReactNode }) {
   return (
     <div className="grid gap-6 border-b border-ink/10 py-8 first:pt-0 last:border-0 last:pb-0 lg:grid-cols-[16rem_1fr]">
       <div>
@@ -30,11 +30,11 @@ function Section({ title, description, children }: { title: string; description?
   )
 }
 
-function Counter({ value, max }: { value: string; max: number }) {
+export function Counter({ value, max }: { value: string; max: number }) {
   return <span className={cn('tabular-nums', value.length > max && 'text-error')}>{value.length} / {max}</span>
 }
 
-function SaveBar({ dirty, busy, onSave, onReset }: { dirty: boolean; busy: boolean; onSave: () => void; onReset: () => void }) {
+export function SaveBar({ dirty, busy, onSave, onReset }: { dirty: boolean; busy: boolean; onSave: () => void; onReset: () => void }) {
   return (
     <div className="sticky bottom-4 z-10 mt-8 flex items-center justify-end gap-3 rounded-full border border-ink/10 bg-white/90 p-2 pl-5 shadow-lg backdrop-blur">
       <p className="mr-auto text-xs text-stone">{dirty ? 'You have unsaved changes.' : 'All changes saved.'}</p>
@@ -49,7 +49,7 @@ function SaveBar({ dirty, busy, onSave, onReset }: { dirty: boolean; busy: boole
 }
 
 /** One form per section: keeps a draft, saves just that section, reports errors at the field. */
-function useSection<K extends SettingsKey>(key: K, initial: SiteSettings[K]) {
+export function useSection<K extends SettingsKey>(key: K, initial: SiteSettings[K]) {
   const { run, busy, fieldErrors } = useMutate()
   const [saved, setSaved] = useState(initial)
   const [draft, setDraft] = useState(initial)
