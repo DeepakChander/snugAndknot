@@ -4,10 +4,21 @@ import { cn } from '@/lib/format'
  * Snug&Knot wordmark.
  * - `mark`: grotesk capitals with the ampersand set in the italic serif, in signal red.
  * - `chip`: compact capitals for the navigation chip, the ampersand drawn as a star stitch.
+ * - `spaced`: light, widely tracked capitals ("SNUG & KNOT") for the header and footer.
  */
-export default function Wordmark({ className, name = 'Snug&Knot', variant = 'mark' }: { className?: string; name?: string; variant?: 'mark' | 'chip' }) {
+export default function Wordmark({ className, name = 'Snug&Knot', variant = 'mark' }: { className?: string; name?: string; variant?: 'mark' | 'chip' | 'spaced' }) {
   const hasAmp = name.includes('&')
   const [a, b] = hasAmp ? name.split('&') : [name, '']
+
+  if (variant === 'spaced') {
+    return (
+      <span className={cn('inline-flex items-center whitespace-nowrap font-display font-normal uppercase leading-none tracking-[0.24em]', className)}>
+        {a.trim()}
+        {hasAmp ? <span className="mx-[0.5em] tracking-normal">&amp;</span> : null}
+        {b.trim()}
+      </span>
+    )
+  }
 
   if (variant === 'chip') {
     return (

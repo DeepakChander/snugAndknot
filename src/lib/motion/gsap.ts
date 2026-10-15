@@ -34,10 +34,11 @@ export const isTouch = () =>
   typeof window !== 'undefined' && window.matchMedia('(hover: none), (pointer: coarse)').matches
 
 /* ─────────────── Page-ready signal ───────────────
-   Intro animations wait until the preloader or page transition has cleared,
-   so nothing animates behind a curtain. */
+   Intro animations wait until anything covering the page has cleared, so nothing animates behind a
+   curtain. Nothing covers the page any more (no preloader, no page-transition curtain), so it is ready
+   from the start; setPageReady(false) is still there for any future overlay that needs it. */
 
-let ready = false
+let ready = true
 const subscribers = new Set<() => void>()
 
 export function whenPageReady(cb: () => void): () => void {

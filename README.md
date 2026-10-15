@@ -55,6 +55,12 @@ Set these in Vercel → Project → Settings → Environment Variables. Never co
 
 The site never asks visitors to sign in with Google, so it needs no callback URL of its own. If emails start failing with `invalid_grant`, the refresh token was revoked or expired: repeat step 4.
 
+## The home page
+
+Every word and photograph on the home page is edited in **Admin → Settings → Home page**: the hero (wide photograph, about 3:1, with the people on the right half), the category cards' department photos, up to four promises, the "Our story" section and the seasonal banner. The category cards are Men, Women and Kids while they have pieces, then the categories set to "Show on home page" in **Catalog → Categories**. New arrivals are the four newest active pieces.
+
+Only state promises that hold for every order (shipping, manufacturing, sustainability): they appear on every visit.
+
 ## Selling in more than one currency
 
 The store has a **base currency** (USD by default): every price, shipping rate and threshold in **Admin → Settings → Commerce** is in it. Under **More currencies** you can add up to three more, for example INR. Each currency has its own shipping rates, free-shipping threshold, loyalty points rate, and the countries whose shoppers see it first (e.g. `IN`).

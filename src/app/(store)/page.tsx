@@ -1,88 +1,68 @@
-import WordmarkHero from '@/components/home/WordmarkHero'
-import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
-import MaterialRows from '@/components/home/MaterialRows'
-import NewInRing from '@/components/home/NewInRing'
-import CollectionSheets from '@/components/home/CollectionSheets'
-import ShopIndex, { type IndexRow } from '@/components/home/ShopIndex'
-import Statement from '@/components/home/Statement'
-import CraftCards from '@/components/home/CraftCards'
-import ClientReviews from '@/components/home/ClientReviews'
+import HomeHero from '@/components/home/premium/HomeHero'
+import CategoryCards, { type HomeCard } from '@/components/home/premium/CategoryCards'
+import FeatureStrip from '@/components/home/premium/FeatureStrip'
+import NewArrivals from '@/components/home/premium/NewArrivals'
+import StorySplit from '@/components/home/premium/StorySplit'
+import SeasonBanner from '@/components/home/premium/SeasonBanner'
 import VideoWall from '@/components/home/VideoWall'
-import JournalCards from '@/components/home/JournalCards'
-import Promises from '@/components/home/Promises'
 import type { Metadata } from 'next'
-import { getCategories, getCollections, getLatestReviews, getProducts, getStoreSettings } from '@/server/catalog'
+import { getCategories, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { organizationLd, websiteLd } from '@/lib/seo'
-import { JOURNAL } from '@/lib/journal'
 import { buildWall } from '@/lib/video'
 import type { Product } from '@/types/commerce'
 
-/** Knitwear-only editorial frames, the fallback images for the "Shop by" index. */
-const LOOKS = [
-  '/images/lookbook/soft-focus-2.png',
-  '/images/lookbook/quiet-luxury-1.png',
-  '/images/Collections-Hero/Winter.png',
-]
-
 export const metadata: Metadata = { alternates: { canonical: '/', types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: 'Snug&Knot Journal' }] } } }
 
-const pieces = (n: number) => `${n} piece${n === 1 ? '' : 's'}`
+const DEPARTMENTS = [
+  ['men', 'Men'],
+  ['women', 'Women'],
+  ['kids', 'Kids'],
+] as const
 
+/**
+ * Home: a photograph hero, department and category cards, the promise strip, the newest pieces, the
+ * brand story and a seasonal banner. Every word and photograph comes from Admin → Settings → Home page;
+ * the cards follow the catalogue (departments with pieces, then categories marked for the home page).
+ */
 export default async function HomePage() {
-  const [products, collections, categories, latest, settings] = await Promise.all([
-    getProducts({ sort: 'featured' }),
-    getCollections(),
-    getCategories(),
-    getLatestReviews(6),
-    getStoreSettings(),
-  ])
-
-  // "Shop by": departments that have pieces, then the active categories, then everything.
-  const forDept = (d: 'women' | 'men' | 'kids') =>
-    products.filter((p) => p.gender === d || (d !== 'kids' && p.gender === 'unisex'))
-  const firstImage = (list: Product[], fallback: string) => list.find((p) => p.images[0])?.images[0].src ?? fallback
-  const rows: IndexRow[] = []
-  for (const [id, label] of [['women', 'Women'], ['men', 'Men'], ['kids', 'Kids']] as const) {
-    const list = forDept(id)
-    if (list.length) rows.push({ label, href: `/shop/${id}`, meta: pieces(list.length), image: firstImage(list, LOOKS[0]) })
+  const [products, categories, settings] = await Promise.all([getProducts({ sort: 'featured' }), getCategories(), getStoreSettings()])
+  const home = settings.homepage
+  // A card without its own photograph takes one from its pieces, never one another card already shows.
+  const used = new Set<string>()
+  // Main photographs first (a different piece reads better than another shot of the same one).
+  const firstImage = (list: Product[]) =>
+    [...list.map((p) => p.images[0]?.src), ...list.flatMap((p) => p.images.slice(1).map((i) => i.src))].find((src) => src && !used.has(src)) ?? ''
+  const take = (src: string) => {
+    if (src) used.add(src)
+    return src
   }
-  for (const c of categories) {
-    const list = products.filter((p) => p.category === c.slug)
-    rows.push({ label: c.title, href: `/shop/${c.slug}`, meta: pieces(c.productCount), image: c.image || firstImage(list, LOOKS[1]) })
+
+  const cards: HomeCard[] = []
+  for (const [id, label] of DEPARTMENTS) {
+    const list = products.filter((p) => p.gender === id || (id !== 'kids' && p.gender === 'unisex'))
+    if (list.length) cards.push({ label, href: `/shop/${id}`, image: take(home.departmentImages[id] || firstImage(list)) })
   }
-  rows.push({ label: 'All pieces', href: '/shop', meta: pieces(products.length), image: LOOKS[2] })
+  // getCategories lists only categories with active pieces. A cached read from before the
+  // badge/showOnHome columns lacks both, so missing means "shown, no badge".
+  for (const c of categories.filter((c) => c.showOnHome !== false)) {
+    cards.push({ label: c.title, href: `/shop/${c.slug}`, image: take(c.image && !used.has(c.image) ? c.image : firstImage(products.filter((p) => p.category === c.slug)) || c.image), badge: c.badge || undefined })
+  }
 
-  // "Shop by category" tiles: categories with active pieces (getCategories) that the admin left on
-  // the home page, in their admin order. A category without its own image shows one of its pieces.
-  // A cached read from before the badge/showOnHome columns lacks both, so missing means "shown, no badge".
-  const tiles: CategoryTile[] = categories
-    .filter((c) => c.showOnHome !== false)
-    .map((c) => ({
-      slug: c.slug,
-      title: c.title,
-      badge: c.badge ?? '',
-      image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
-    }))
-
+  const newest = [...products].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   // Video wall: nothing renders until the admin switches it on with at least one playable clip.
   const wall = settings.videos.enabled ? buildWall(settings.videos.items, products) : []
 
   return (
     <>
       <JsonLd data={[organizationLd(settings), websiteLd(settings)]} />
-      <WordmarkHero />
-      <CategoryGrid tiles={tiles} />
-      <MaterialRows />
-      <NewInRing products={products.slice(0, 8)} />
-      <CollectionSheets collections={collections} products={products} />
-      <ShopIndex rows={rows} />
-      <Statement />
-      <CraftCards />
-      <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} />
+      <HomeHero home={home} storeName={settings.store.name} />
+      <CategoryCards cards={cards} />
+      <FeatureStrip features={home.features} />
+      <NewArrivals products={newest} />
+      <StorySplit home={home} />
+      <SeasonBanner home={home} />
       {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} /> : null}
-      <JournalCards posts={JOURNAL} />
-      <Promises />
     </>
   )
 }

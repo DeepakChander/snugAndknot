@@ -366,10 +366,20 @@ function ReviewsForm({ initial }: { initial: SiteSettings['reviews'] }) {
   )
 }
 
+const FEATURE_ICONS: { id: SiteSettings['homepage']['features'][number]['icon']; label: string }[] = [
+  { id: 'fabric', label: 'Fabric' },
+  { id: 'factory', label: 'Workshop' },
+  { id: 'leaf', label: 'Leaf' },
+  { id: 'truck', label: 'Delivery' },
+  { id: 'returns', label: 'Returns' },
+  { id: 'needle', label: 'Needle' },
+]
+
 function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
   const s = useSection('homepage', initial)
   const d = s.draft
   const set = (patch: Partial<typeof d>) => s.setDraft({ ...d, ...patch })
+  const setFeature = (i: number, patch: Partial<(typeof d.features)[number]>) => set({ features: d.features.map((f, j) => (j === i ? { ...f, ...patch } : f)) })
   return (
     <>
       <Card>
@@ -377,25 +387,84 @@ function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
           title="Hero"
           description={
             <>
-              The first screen of the home page. Products in the 3D ring come from your active products and collections.{' '}
+              The first screen: a wide photograph with this copy on its left. Use a landscape photo (about 3:1) with the people on the right half.{' '}
               <Link href="/" target="_blank" className="underline">
                 Open the home page ↗
               </Link>
             </>
           }
         >
-          <Input label="Eyebrow" value={d.heroEyebrow} error={s.err.heroEyebrow} onChange={(e) => set({ heroEyebrow: e.target.value })} hint="The small line above the title." />
+          <ImageField label="Hero photograph" value={d.heroImage} onChange={(v) => set({ heroImage: v })} aspect="aspect-[3/1]" />
+          <Input label="Photo description" value={d.heroImageAlt} error={s.err.heroImageAlt} onChange={(e) => set({ heroImageAlt: e.target.value })} hint="Read aloud to people who cannot see the photo." />
+          <Input label="Eyebrow" value={d.heroEyebrow} error={s.err.heroEyebrow} onChange={(e) => set({ heroEyebrow: e.target.value })} hint="The small spaced line above the title." />
           <Input label="Title" value={d.heroTitle} error={s.err.heroTitle} onChange={(e) => set({ heroTitle: e.target.value })} />
-          <Textarea label="Subtitle" rows={2} value={d.heroSubtitle} error={s.err.heroSubtitle} onChange={(e) => set({ heroSubtitle: e.target.value })} />
+          <Input label="Line under the title" value={d.heroSubtitle} error={s.err.heroSubtitle} onChange={(e) => set({ heroSubtitle: e.target.value })} />
           <div className="grid gap-4 sm:grid-cols-2">
-            <Input label="Main button label" value={d.primaryCtaLabel} error={s.err.primaryCtaLabel} onChange={(e) => set({ primaryCtaLabel: e.target.value })} />
-            <Input label="Main button link" value={d.primaryCtaHref} error={s.err.primaryCtaHref} onChange={(e) => set({ primaryCtaHref: e.target.value })} placeholder="/shop" />
-            <Input label="Second button label" value={d.secondaryCtaLabel} error={s.err.secondaryCtaLabel} onChange={(e) => set({ secondaryCtaLabel: e.target.value })} hint="Leave empty to hide it." />
-            <Input label="Second button link" value={d.secondaryCtaHref} error={s.err.secondaryCtaHref} onChange={(e) => set({ secondaryCtaHref: e.target.value })} placeholder="/collections" />
+            <Input label="Button label" value={d.primaryCtaLabel} error={s.err.primaryCtaLabel} onChange={(e) => set({ primaryCtaLabel: e.target.value })} />
+            <Input label="Button link" value={d.primaryCtaHref} error={s.err.primaryCtaHref} onChange={(e) => set({ primaryCtaHref: e.target.value })} placeholder="/shop" />
           </div>
         </Section>
-        <Section title="Manifesto" description="The large statement that reveals word by word as visitors scroll.">
-          <Textarea label="Manifesto" rows={4} value={d.manifesto} error={s.err.manifesto} onChange={(e) => set({ manifesto: e.target.value })} hint={<Counter value={d.manifesto} max={600} />} />
+        <Section title="Category cards" description="Men, Women and Kids show while they have pieces, followed by the categories set to “Show on home page” (Catalog → Categories). Empty uses a product photo.">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {(['men', 'women', 'kids'] as const).map((k) => (
+              <ImageField key={k} label={k[0].toUpperCase() + k.slice(1)} value={d.departmentImages[k]} onChange={(v) => set({ departmentImages: { ...d.departmentImages, [k]: v } })} />
+            ))}
+          </div>
+        </Section>
+        <Section title="Promises" description="Up to four short promises under the cards. Only state what is true for every order.">
+          <div className="space-y-3">
+            {d.features.map((f, i) => (
+              <div key={i} className="grid gap-3 rounded-xl border border-ink/10 p-3 sm:grid-cols-[140px_1fr_1fr_auto] sm:items-end">
+                <label className="text-sm">
+                  <span className="mb-1 block text-xs text-stone">Icon</span>
+                  <select value={f.icon} onChange={(e) => setFeature(i, { icon: e.target.value as typeof f.icon })} className="h-10 w-full rounded-lg border border-ink/15 bg-white px-2 text-sm">
+                    {FEATURE_ICONS.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <Input label="Title" value={f.title} error={s.err[`features.${i}.title`]} onChange={(e) => setFeature(i, { title: e.target.value })} />
+                <Input label="Line" value={f.body} error={s.err[`features.${i}.body`]} onChange={(e) => setFeature(i, { body: e.target.value })} />
+                <Btn size="sm" variant="ghost" className="text-error" onClick={() => set({ features: d.features.filter((_, j) => j !== i) })}>
+                  Remove
+                </Btn>
+              </div>
+            ))}
+            {d.features.length < 4 ? (
+              <Btn size="sm" variant="outline" onClick={() => set({ features: [...d.features, { icon: 'fabric', title: '', body: '' }] })}>
+                Add a promise
+              </Btn>
+            ) : null}
+          </div>
+        </Section>
+        <Section title="Our story" description="A photograph on one half and your story on the other. Leave the title and text empty to hide the section.">
+          <ImageField label="Story photograph" value={d.storyImage} onChange={(v) => set({ storyImage: v })} aspect="aspect-[5/4]" />
+          <Input label="Photo description" value={d.storyImageAlt} error={s.err.storyImageAlt} onChange={(e) => set({ storyImageAlt: e.target.value })} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label="Eyebrow" value={d.storyEyebrow} error={s.err.storyEyebrow} onChange={(e) => set({ storyEyebrow: e.target.value })} />
+            <Input label="Title" value={d.storyTitle} error={s.err.storyTitle} onChange={(e) => set({ storyTitle: e.target.value })} />
+          </div>
+          <Textarea label="Story" rows={4} value={d.storyBody} error={s.err.storyBody} onChange={(e) => set({ storyBody: e.target.value })} hint={<Counter value={d.storyBody} max={800} />} />
+          <Input label="Signature line" value={d.storySignature} error={s.err.storySignature} onChange={(e) => set({ storySignature: e.target.value })} hint="Set in italic under the story, and in the footer." />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label="Button label" value={d.storyCtaLabel} error={s.err.storyCtaLabel} onChange={(e) => set({ storyCtaLabel: e.target.value })} />
+            <Input label="Button link" value={d.storyCtaHref} error={s.err.storyCtaHref} onChange={(e) => set({ storyCtaHref: e.target.value })} placeholder="/about" />
+          </div>
+        </Section>
+        <Section title="Seasonal banner" description="A wide photograph with a short message, near the end of the page. Leave the title empty to hide it.">
+          <ImageField label="Banner photograph" value={d.bannerImage} onChange={(v) => set({ bannerImage: v })} aspect="aspect-[4/1]" />
+          <Input label="Photo description" value={d.bannerImageAlt} error={s.err.bannerImageAlt} onChange={(e) => set({ bannerImageAlt: e.target.value })} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label="Eyebrow" value={d.bannerEyebrow} error={s.err.bannerEyebrow} onChange={(e) => set({ bannerEyebrow: e.target.value })} />
+            <Input label="Title" value={d.bannerTitle} error={s.err.bannerTitle} onChange={(e) => set({ bannerTitle: e.target.value })} />
+          </div>
+          <Input label="Line" value={d.bannerBody} error={s.err.bannerBody} onChange={(e) => set({ bannerBody: e.target.value })} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label="Button label" value={d.bannerCtaLabel} error={s.err.bannerCtaLabel} onChange={(e) => set({ bannerCtaLabel: e.target.value })} />
+            <Input label="Button link" value={d.bannerCtaHref} error={s.err.bannerCtaHref} onChange={(e) => set({ bannerCtaHref: e.target.value })} placeholder="/shop" />
+          </div>
         </Section>
       </Card>
       <SaveBar dirty={s.dirty} busy={s.busy} onSave={s.save} onReset={s.reset} />

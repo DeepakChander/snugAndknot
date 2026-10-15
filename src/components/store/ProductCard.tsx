@@ -9,6 +9,7 @@ import { useWishlistStore } from '@/stores/wishlist-store'
 import { useUIStore } from '@/stores/ui-store'
 import { useHydrated } from '@/hooks/use-hydrated'
 import { ProductPrice } from '@/components/kit/Price'
+import { useVariantPrice } from '@/components/providers/SettingsProvider'
 import { Stars } from '@/components/kit/Stars'
 import { HeartIcon, PlusIcon, XIcon } from '@/components/kit/icons'
 import { cn, discountPercent } from '@/lib/format'
@@ -53,6 +54,9 @@ export function WishlistButton({ handle, title, className, tone = 'light' }: { h
   )
 }
 
+/** Small square labels on the photograph. */
+const BADGE = 'px-2 py-1 text-[0.62rem] font-medium uppercase tracking-[0.12em]'
+
 export default function ProductCard({
   product,
   index = 0,
@@ -71,6 +75,7 @@ export default function ProductCard({
   const [quick, setQuick] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const openCart = useCartStore((s) => s.openCart)
+  const variantPrice = useVariantPrice()
   const [primary, secondary] = product.images
   const pct = discountPercent(product.price, product.compareAtPrice)
   const sizeVariants = product.variants.filter((v) => v.size)
@@ -79,14 +84,16 @@ export default function ProductCard({
 
   function add(variantId: string) {
     const v = product.variants.find((x) => x.id === variantId)
-    if (!v || !v.available) return
+    // In the shopper's currency; a piece with no price in it cannot be added.
+    const priced = v ? variantPrice(product, v) : null
+    if (!v || !v.available || !priced) return
     addItem({
       productId: product.id,
       variantId: v.id,
       handle: product.handle,
       title: product.title,
       image: primary?.src ?? '',
-      price: v.price,
+      price: priced.price,
       size: v.size,
       color: v.color,
       quantity: 1,
@@ -105,7 +112,7 @@ export default function ProductCard({
       onPointerLeave={() => setQuick(false)}
       className={cn('group/card relative', className)}
     >
-      <div className={cn('relative overflow-hidden rounded-[1.1rem]', tone, aspect)}>
+      <div className={cn('relative overflow-hidden', tone, aspect)}>
         <Link href={`/product/${product.handle}`} className="absolute inset-0 z-[1]" data-cursor="view" data-cursor-label="View" aria-label={product.title}>
           {primary ? (
             <Image
@@ -128,10 +135,10 @@ export default function ProductCard({
         </Link>
 
         <div className="pointer-events-none absolute left-3 top-3 z-[2] flex flex-col items-start gap-1.5">
-          {soldOut ? <span className="rounded-full bg-ink px-2.5 py-1 text-eyebrow text-bone">Sold out</span> : null}
-          {!soldOut && product.isNew ? <span className="rounded-full bg-butter px-2.5 py-1 text-eyebrow text-ink">New</span> : null}
-          {!soldOut && pct > 0 ? <span className="rounded-full bg-burgundy-deep px-2.5 py-1 text-eyebrow text-bone">−{pct}%</span> : null}
-          {!soldOut && !product.isNew && !(pct > 0) && product.bestseller ? <span className="rounded-full bg-ivory/90 px-2.5 py-1 text-eyebrow text-ink">Bestseller</span> : null}
+          {soldOut ? <span className={cn(BADGE, 'bg-ink text-bone')}>Sold out</span> : null}
+          {!soldOut && product.isNew ? <span className={cn(BADGE, 'bg-bone text-ink')}>New</span> : null}
+          {!soldOut && pct > 0 ? <span className={cn(BADGE, 'bg-burgundy text-bone')}>−{pct}%</span> : null}
+          {!soldOut && !product.isNew && !(pct > 0) && product.bestseller ? <span className={cn(BADGE, 'bg-bone text-ink')}>Bestseller</span> : null}
         </div>
         <WishlistButton handle={product.handle} title={product.title} className="absolute right-3 top-3 z-[2]" />
 
@@ -145,10 +152,10 @@ export default function ProductCard({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="rounded-2xl bg-ink p-2 text-bone"
+                  className="bg-ink p-2 text-bone"
                 >
                   <div className="flex items-center justify-between px-1 pb-2">
-                    <p className="text-eyebrow slash text-bone/60">Pick a size</p>
+                    <p className="text-[0.68rem] uppercase tracking-[0.14em] text-bone/60">Pick a size</p>
                     <button type="button" onClick={() => setQuick(false)} className="rounded-full p-1 text-bone/60 hover:text-bone" aria-label="Close sizes">
                       <XIcon size={12} />
                     </button>
@@ -161,7 +168,7 @@ export default function ProductCard({
                         disabled={!v.available}
                         onClick={() => add(v.id)}
                         data-cursor="hover"
-                        className="min-w-10 rounded-full bg-bone/10 px-2.5 py-1.5 font-mono text-xs transition-colors hover:bg-burgundy-deep disabled:cursor-not-allowed disabled:opacity-30 disabled:line-through"
+                        className="min-w-10 bg-bone/10 px-2.5 py-1.5 text-xs transition-colors hover:bg-bone hover:text-ink disabled:cursor-not-allowed disabled:opacity-30 disabled:line-through"
                         aria-label={`Add size ${v.size} to bag${v.available ? '' : ' (sold out)'}`}
                       >
                         {v.size}
@@ -176,7 +183,7 @@ export default function ProductCard({
                 type="button"
                 onClick={() => setQuick(true)}
                 data-cursor="hover"
-                className="ml-auto flex h-10 items-center gap-2 rounded-full bg-ink px-3.5 font-display text-[0.8rem] font-semibold text-bone transition-all duration-500 hover:bg-burgundy-deep md:translate-y-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100 md:focus-visible:translate-y-0 md:focus-visible:opacity-100"
+                className="ml-auto flex h-10 items-center gap-2 bg-ink px-3.5 text-[0.72rem] font-medium uppercase tracking-[0.12em] text-bone transition-all duration-500 hover:bg-burgundy-deep md:translate-y-3 md:opacity-0 md:group-hover/card:translate-y-0 md:group-hover/card:opacity-100 md:focus-visible:translate-y-0 md:focus-visible:opacity-100"
                 aria-label={`Quick add ${product.title}`}
               >
                 <PlusIcon size={13} /> <span className="hidden sm:inline">Quick add</span>
@@ -187,8 +194,8 @@ export default function ProductCard({
       </div>
 
       <div className="mt-3.5">
-        <div className="flex items-center justify-between gap-3 text-label text-stone">
-          <span className="slash truncate">{product.productType}</span>
+        <div className="flex items-center justify-between gap-3 text-[0.68rem] uppercase tracking-[0.14em] text-stone">
+          <span className="truncate">{product.productType}</span>
           {product.colors.length ? (
             <span className="flex shrink-0 items-center gap-1" aria-label={`Colours: ${product.colors.map((c) => c.name).join(', ')}`}>
               {product.colors.slice(0, 4).map((c) => (
@@ -201,11 +208,11 @@ export default function ProductCard({
         <div className="mt-1.5 flex items-start justify-between gap-3">
           <Link
             href={`/product/${product.handle}`}
-            className="min-w-0 font-display text-[1.12rem] font-semibold leading-[1.08] tracking-[-0.035em] text-ink [background:linear-gradient(currentColor,currentColor)_0_100%/0_1px_no-repeat] transition-[background-size] duration-500 group-hover/card:[background-size:100%_1px] sm:text-[1.25rem]"
+            className="min-w-0 text-[0.95rem] leading-snug text-ink [background:linear-gradient(currentColor,currentColor)_0_100%/0_1px_no-repeat] transition-[background-size] duration-500 group-hover/card:[background-size:100%_1px]"
           >
             {product.title}
           </Link>
-          <ProductPrice product={product} className="shrink-0 pt-1 text-[0.8rem]" />
+          <ProductPrice product={product} className="shrink-0 text-[0.9rem]" />
         </div>
         {product.reviewCount > 0 ? (
           <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone">

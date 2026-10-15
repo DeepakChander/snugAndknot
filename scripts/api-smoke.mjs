@@ -358,7 +358,7 @@ async function homeCategoryGrid() {
   const res = await fetch(BASE + '/', { headers: { 'X-Real-IP': RUN_IP } })
   if (res.status !== 200) return null
   const html = await res.text()
-  const start = html.indexOf('aria-labelledby="category-grid-title"')
+  const start = html.indexOf('aria-labelledby="home-cards-title"')
   return start === -1 ? '' : html.slice(start, html.indexOf('</section>', start))
 }
 

@@ -340,6 +340,13 @@ export interface ReviewSettings {
   moderation: 'manual' | 'auto'
 }
 
+/** One of the promises in the strip under the home page categories. */
+export interface HomeFeature {
+  icon: 'fabric' | 'factory' | 'leaf' | 'truck' | 'returns' | 'needle'
+  title: string
+  body: string
+}
+
 export interface HomepageSettings {
   heroEyebrow: string
   heroTitle: string
@@ -349,6 +356,27 @@ export interface HomepageSettings {
   secondaryCtaLabel: string
   secondaryCtaHref: string
   manifesto: string
+  /** Wide photograph behind the hero copy (the copy sits on its left third). */
+  heroImage: string
+  heroImageAlt: string
+  /** Card photographs for the departments; empty uses a product photo. */
+  departmentImages: { men: string; women: string; kids: string }
+  features: HomeFeature[]
+  storyEyebrow: string
+  storyTitle: string
+  storyBody: string
+  storySignature: string
+  storyCtaLabel: string
+  storyCtaHref: string
+  storyImage: string
+  storyImageAlt: string
+  bannerEyebrow: string
+  bannerTitle: string
+  bannerBody: string
+  bannerCtaLabel: string
+  bannerCtaHref: string
+  bannerImage: string
+  bannerImageAlt: string
 }
 
 export interface SeoSettings {

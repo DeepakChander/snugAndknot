@@ -19,7 +19,7 @@ export default function Price({
   const money = useMoney()
   const pct = discountPercent(price, compareAt)
   return (
-    <span data-money className={cn('inline-flex items-baseline gap-2 font-mono tabular-nums', className)}>
+    <span data-money className={cn('inline-flex items-baseline gap-2 tabular-nums', className)}>
       <span>{money(price)}</span>
       {pct > 0 && compareAt ? (
         <>
