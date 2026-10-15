@@ -6,6 +6,8 @@ import { clientIp, HttpError, ok, parseBody, requireUser, route } from '@/server
 import { rateLimit } from '@/server/rate-limit'
 import { orderSchema } from '@/server/validation'
 import { inventoryAfterOrder, orderPlaced } from '@/server/notify-events'
+import { onlinePaymentsAvailable, startOnlinePayment, sweepUnpaidOrders } from '@/server/payments'
+import { after } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +22,11 @@ export const POST = route(async (req) => {
   await rateLimit('order', clientIp(req))
   await rateLimit('orderEmail', input.email)
   const settings = await getSettings()
-  if (!settings.commerce.codEnabled) throw new HttpError(400, 'Checkout is temporarily unavailable.')
+  const online = input.paymentMethod === 'razorpay'
+  if (!online && !settings.commerce.codEnabled) throw new HttpError(400, 'Checkout is temporarily unavailable.')
+  if (online && !onlinePaymentsAvailable(settings.commerce)) throw new HttpError(400, 'Online payment is not available right now. Please choose another way to pay.')
+  // Expired holds from abandoned online checkouts go back on sale.
+  after(sweepUnpaidOrders)
   const user = await currentUser()
   let order
   try {
@@ -41,6 +47,11 @@ export const POST = route(async (req) => {
   }
   // Inventory changed — product pages must show the new stock.
   invalidate('products')
+  if (online) {
+    // Held, not placed: the store hears about it once the payment is confirmed.
+    const payment = await startOnlinePayment(order, settings.commerce, settings.store)
+    return ok({ order, payment }, { status: 201 })
+  }
   await orderPlaced(order)
   await inventoryAfterOrder(order)
   return ok({ order }, { status: 201 })

@@ -14,7 +14,16 @@ export function faqGroups({ commerce, store, reviews }: Pick<SiteSettings, 'comm
       name: 'Ordering',
       items: [
         { q: 'How do I place an order?', a: 'Choose your size on a product page, add it to your bag and go to checkout. You can check out as a guest or sign in to earn points and see your orders in one place.' },
-        { q: 'How do I pay?', a: commerce.codEnabled ? 'Orders are paid on delivery — you pay the courier when your parcel arrives. Online card payments are coming soon.' : 'Available payment options are shown at checkout.' },
+        {
+          q: 'How do I pay?',
+          a: commerce.onlinePaymentsEnabled
+            ? commerce.codEnabled
+              ? 'Pay online at checkout, by card or the other methods shown there, through Razorpay. Or choose pay on delivery and pay the courier when your parcel arrives. Card details go straight to Razorpay and never reach this website.'
+              : 'Pay online at checkout, by card or the other methods shown there, through Razorpay. Card details go straight to Razorpay and never reach this website.'
+            : commerce.codEnabled
+              ? 'Orders are paid on delivery — you pay the courier when your parcel arrives. Online card payments are coming soon.'
+              : 'Available payment options are shown at checkout.',
+        },
         { q: 'Can I change or cancel my order?', a: `Contact us at ${store.email} as soon as possible with your order number. If your order has not shipped yet we will do our best to change or cancel it.` },
         { q: 'Do you have discount codes?', a: 'Codes are entered in your bag or at checkout. Each code shows its conditions — like a minimum spend or an expiry date — if it cannot be applied.' },
       ],

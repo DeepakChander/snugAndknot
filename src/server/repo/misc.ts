@@ -144,8 +144,8 @@ export async function deleteMedia(id: string): Promise<string | null> {
 export async function listCustomers() {
   const rows = await query(
     `SELECT u.id, u.email, u.name, u.role, u.points, u.created_at, u.last_login_at,
-            count(o.id)::int AS orders,
-            coalesce(sum(o.total) FILTER (WHERE o.status <> 'cancelled'), 0) AS spent
+            count(o.id) FILTER (WHERE NOT (o.payment_method = 'razorpay' AND o.paid_at IS NULL))::int AS orders,
+            coalesce(sum(o.total) FILTER (WHERE o.status NOT IN ('cancelled', 'pending_payment')), 0) AS spent
        FROM users u LEFT JOIN orders o ON o.user_id = u.id
       GROUP BY u.id ORDER BY u.created_at DESC`
   )
@@ -185,10 +185,10 @@ export async function updateCustomer(
 
 export async function dashboardStats() {
   const [totals] = await query(
-    `SELECT coalesce(sum(total) FILTER (WHERE status <> 'cancelled'), 0) AS revenue,
-            count(*) FILTER (WHERE status <> 'cancelled')::int AS orders,
+    `SELECT coalesce(sum(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment')), 0) AS revenue,
+            count(*) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment'))::int AS orders,
             count(*) FILTER (WHERE status = 'placed')::int AS awaiting,
-            coalesce(avg(total) FILTER (WHERE status <> 'cancelled'), 0) AS aov
+            coalesce(avg(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment')), 0) AS aov
        FROM orders`
   )
   const [counts] = await query(
@@ -202,8 +202,8 @@ export async function dashboardStats() {
   )
   const daily = await query(
     `SELECT to_char(d::date, 'YYYY-MM-DD') AS day,
-            coalesce(sum(o.total) FILTER (WHERE o.status <> 'cancelled'), 0) AS revenue,
-            count(o.id) FILTER (WHERE o.status <> 'cancelled')::int AS orders
+            coalesce(sum(o.total) FILTER (WHERE o.status NOT IN ('cancelled', 'pending_payment')), 0) AS revenue,
+            count(o.id) FILTER (WHERE o.status NOT IN ('cancelled', 'pending_payment'))::int AS orders
        FROM generate_series(current_date - 29, current_date, interval '1 day') d
        LEFT JOIN orders o ON o.placed_at::date = d::date
       GROUP BY d ORDER BY d`
@@ -216,7 +216,7 @@ export async function dashboardStats() {
   const top = await query(
     `SELECT i.title, i.handle, sum(i.quantity)::int AS units, sum(i.price * i.quantity) AS revenue
        FROM order_items i JOIN orders o ON o.id = i.order_id
-      WHERE o.status <> 'cancelled' GROUP BY i.title, i.handle ORDER BY units DESC LIMIT 5`
+      WHERE o.status NOT IN ('cancelled', 'pending_payment') GROUP BY i.title, i.handle ORDER BY units DESC LIMIT 5`
   )
   return {
     revenue: num(totals.revenue),

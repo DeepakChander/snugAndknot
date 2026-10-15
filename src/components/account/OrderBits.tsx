@@ -13,6 +13,7 @@ const STATUS_STYLE: Record<string, string> = {
   shipped: 'bg-ink/10 text-ink',
   delivered: 'bg-success/15 text-success',
   cancelled: 'bg-error/10 text-error',
+  pending_payment: 'bg-gold/20 text-gold-deep',
   pending: 'bg-gold/20 text-gold-deep',
   approved: 'bg-success/15 text-success',
   rejected: 'bg-error/10 text-error',
@@ -21,7 +22,7 @@ const STATUS_STYLE: Record<string, string> = {
 }
 
 export function StatusPill({ status }: { status: OrderStatus | ReturnStatus | string }) {
-  return <span className={cn('inline-flex rounded-full px-3 py-1 text-eyebrow', STATUS_STYLE[status] ?? 'bg-ink/10')}>{status}</span>
+  return <span className={cn('inline-flex rounded-full px-3 py-1 text-eyebrow', STATUS_STYLE[status] ?? 'bg-ink/10')}>{status === 'pending_payment' ? 'awaiting payment' : status}</span>
 }
 
 const STEPS: { id: OrderStatus; label: string; key: keyof Order }[] = [
@@ -37,6 +38,13 @@ export function OrderTimeline({ order, tone = 'light' }: { order: Order; tone?: 
     return (
       <p className="rounded-2xl bg-error/10 p-4 text-sm text-error">
         This order was cancelled{order.cancelledAt ? ` on ${formatDate(order.cancelledAt)}` : ''}.
+      </p>
+    )
+  }
+  if (order.status === 'pending_payment') {
+    return (
+      <p className="rounded-2xl bg-gold/15 p-4 text-sm text-gold-deep">
+        Waiting for the online payment to be confirmed. The pieces are held for 30 minutes; if it is not paid by then, they go back on sale.
       </p>
     )
   }
@@ -126,7 +134,7 @@ export function OrderTotals({ order }: { order: Order }) {
       <div className="flex justify-between text-xs opacity-60">
         <dt>Payment</dt>
         <dd>
-          {order.paymentMethod === 'cod' ? 'Pay on delivery' : order.paymentMethod} · {order.paymentStatus}
+          {order.paymentMethod === 'cod' ? 'Pay on delivery' : order.paymentMethod === 'razorpay' ? 'Paid online' : order.paymentMethod} · {order.paymentStatus}
         </dd>
       </div>
     </dl>

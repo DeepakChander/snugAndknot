@@ -58,7 +58,7 @@ export async function findUserReview(productId: string, userId: string): Promise
 export async function hasPurchased(productId: string, userId: string): Promise<boolean> {
   const rows = await query(
     `SELECT 1 FROM orders o JOIN order_items i ON i.order_id = o.id
-      WHERE i.product_id = $1 AND o.status <> 'cancelled' AND o.user_id = $2
+      WHERE i.product_id = $1 AND o.status NOT IN ('cancelled', 'pending_payment') AND o.user_id = $2
       LIMIT 1`,
     [productId, userId]
   )

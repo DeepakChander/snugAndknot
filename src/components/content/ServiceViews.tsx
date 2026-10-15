@@ -17,7 +17,14 @@ export function ShippingView() {
     { title: 'Order placed', body: 'You receive an order number straight away. Keep it to track your parcel.' },
     { title: 'Prepared by hand', body: 'Each piece is checked, folded and packed in the atelier.' },
     { title: 'On its way', body: 'A tracking number appears in your account (or on Track an order) once it ships.' },
-    { title: 'Delivered', body: commerce.codEnabled ? 'Pay the courier on delivery. Your return window opens.' : 'Your return window opens.' },
+    {
+      title: 'Delivered',
+      body: commerce.codEnabled
+        ? commerce.onlinePaymentsEnabled
+          ? 'If you chose pay on delivery, pay the courier now. Your return window opens.'
+          : 'Pay the courier on delivery. Your return window opens.'
+        : 'Your return window opens.',
+    },
   ]
   return (
     <>

@@ -3,7 +3,7 @@ import { ok, requireAdmin, route } from '@/server/http'
 import type { OrderStatus } from '@/types/commerce'
 
 export const dynamic = 'force-dynamic'
-const STATUSES: OrderStatus[] = ['placed', 'confirmed', 'shipped', 'delivered', 'cancelled']
+const STATUSES: OrderStatus[] = ['pending_payment', 'placed', 'confirmed', 'shipped', 'delivered', 'cancelled']
 
 export const GET = route(async (req) => {
   await requireAdmin()

@@ -21,6 +21,7 @@ With no `DATABASE_URL`, the site uses a built-in PGlite database saved under `.d
 | `npm run build` / `npm start` | Production build and server |
 | `npm run lint` | ESLint (Next.js rules plus security rules) |
 | `node scripts/api-smoke.mjs` | End-to-end API and security test. Needs `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; writes test rows, so never point it at production |
+| `node scripts/razorpay-smoke.mjs` | End-to-end test of online payments against a local stand-in for the Razorpay API (see [Online payments](#online-payments-razorpay)). Local only |
 
 ## Environment variables
 
@@ -38,6 +39,8 @@ Set these in Vercel → Project → Settings → Environment Variables. Never co
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | For email (option 2) | Or send through any SMTP mailbox (Hostinger: `smtp.hostinger.com`, port `465`). Used only when the Gmail variables are not set. Without either, notices are only logged in Admin → Emails. |
 | `MAIL_FROM` | Optional | Sender shown on notices; defaults to `Snug&Knot <GMAIL_USER or SMTP_USER>`. |
 | `NOTIFY_EMAIL` | Optional | Inbox that receives notices. Defaults to `GMAIL_USER`, else the store email in Settings. Setting it means a change in the admin panel cannot redirect notices. |
+| `SNUGKNOT_RAZORPAY_KEY_ID`, `SNUGKNOT_RAZORPAY_KEY_SECRET` | For online payments | Razorpay API keys (`rzp_test_…` or `rzp_live_…`). Then switch on **Admin → Settings → Commerce → Accept online payments**. Redeploy after adding them. |
+| `SNUGKNOT_RAZORPAY_WEBHOOK_SECRET` | Recommended with Razorpay | The secret you choose for the Razorpay webhook (see below). |
 | `GOOGLE_SITE_VERIFICATION` | Optional | The code Google Search Console gives you for the HTML-tag method; it is added as a meta tag. |
 | `BING_SITE_VERIFICATION` | Optional | The `msvalidate.01` code from Bing Webmaster Tools. |
 
@@ -50,6 +53,30 @@ Set these in Vercel → Project → Settings → Environment Variables. Never co
 5. Set `GMAIL_USER`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET` and `GMAIL_REFRESH_TOKEN` in Vercel, redeploy, and use **Admin → Emails → Send test email**.
 
 The site never asks visitors to sign in with Google, so it needs no callback URL of its own. If emails start failing with `invalid_grant`, the refresh token was revoked or expired: repeat step 4.
+
+## Online payments (Razorpay)
+
+Checkout can take payments online through [Razorpay Standard Checkout](https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/), next to (or instead of) cash on delivery. Card details are entered in Razorpay's window and never reach this site.
+
+The variables start with `SNUGKNOT_` on purpose: the Vercel project also holds another app's `RAZORPAY_*` keys, and this shop must never use that account.
+
+1. In the Razorpay dashboard, **Account & Settings → API keys**: generate a key pair. Start with **Test mode** keys (`rzp_test_…`).
+2. In Vercel, set `SNUGKNOT_RAZORPAY_KEY_ID` and `SNUGKNOT_RAZORPAY_KEY_SECRET`, then redeploy.
+3. **Webhooks → Add new webhook**: URL `https://www.snugandknot.com/api/webhooks/razorpay` (the `www` address: the bare domain redirects, and webhooks do not follow redirects). Choose a secret, and tick `payment.authorized`, `payment.captured`, `order.paid` and `refund.processed`. Set the same secret as `SNUGKNOT_RAZORPAY_WEBHOOK_SECRET` and redeploy.
+4. **Account & Settings → Payment capture**: automatic capture is recommended (the shop also captures an authorised payment itself).
+5. Prices are in the store currency (USD by default). Charging in anything other than INR needs **International payments** enabled on the Razorpay account.
+6. In the admin, **Settings → Commerce → Accept online payments**. Place a test order with a [Razorpay test card](https://razorpay.com/docs/payments/payments/test-card-details/). When it works, swap in the live keys and redeploy.
+
+How an online order works:
+
+- The order is saved as **awaiting payment** with its pieces held, and a Razorpay order is created for its total.
+- It becomes **placed** only after Razorpay confirms a captured payment of exactly that amount and currency. The browser's report is checked with its signature, the webhook with its own, and the payment is always read back from Razorpay.
+- Closing the payment window releases the pieces at once. A checkout left open is released after 30 minutes; before releasing, the shop asks Razorpay whether a payment went through.
+- A payment that arrives after the release still places the order if every piece is in stock; otherwise the store is emailed to refund it.
+- Unpaid online orders are hidden from customers and left out of sales figures. Refunds are made in the Razorpay dashboard; with the webhook, a full refund marks the order refunded.
+- Turning the admin switch off (or removing the keys) takes online payment out of checkout straight away. Without the key, the site's security headers are exactly as they were before Razorpay.
+
+`scripts/razorpay-smoke.mjs` tests all of this without a Razorpay account. It runs a local stand-in for the Razorpay API, which the server uses only when `SNUGKNOT_RAZORPAY_API_BASE` points at `127.0.0.1` or `localhost` and the site is not on Vercel. The script's header has the exact commands.
 
 ## Search and AI crawlers
 
@@ -100,3 +127,4 @@ Every indexable page has a canonical URL (filters and sorting point at the bare 
 - The CSP allows inline scripts (`'unsafe-inline'`) because Next.js needs them for statically
   rendered pages. Nonces would make every page render per request.
 - Email addresses are not verified, and the site does not send email (no password-reset mail).
+- With Razorpay keys set, the CSP allows scripts, frames and connections to `*.razorpay.com` on every page (the shop navigates client-side, so checkout cannot have headers of its own), and the opener policy is `same-origin-allow-popups` so bank verification pop-ups can report back.

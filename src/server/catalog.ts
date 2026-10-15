@@ -4,6 +4,7 @@ import * as products from './repo/products'
 import * as collections from './repo/collections'
 import * as reviews from './repo/reviews'
 import { getSettings } from './repo/settings'
+import { onlinePaymentsAvailable } from './razorpay'
 import type { Gender, SortOption } from '@/types/commerce'
 
 /**
@@ -20,10 +21,19 @@ export const TAGS = {
 
 const REVALIDATE = 300
 
-export const getStoreSettings = unstable_cache(() => getSettings(), ['settings'], {
+const cachedSettings = unstable_cache(() => getSettings(), ['settings'], {
   tags: [TAGS.settings],
   revalidate: REVALIDATE,
 })
+
+/**
+ * Settings as the storefront sees them. Online payment counts as on only while the owner's switch is
+ * on and the Razorpay keys are set; that check reads the environment on every call, outside the cache.
+ */
+export async function getStoreSettings() {
+  const settings = await cachedSettings()
+  return { ...settings, commerce: { ...settings.commerce, onlinePaymentsEnabled: onlinePaymentsAvailable(settings.commerce) } }
+}
 
 export const getProducts = unstable_cache(
   (opts: {

@@ -18,6 +18,7 @@ export const LIMITS = {
   passwordChange: { limit: 8, windowMs: 15 * 60_000, message: 'Too many attempts. Please wait a few minutes.' },
   order: { limit: 10, windowMs: 60 * 60_000, message: 'Too many orders from this connection. Please try again later.' },
   orderEmail: { limit: 5, windowMs: 60 * 60_000, message: 'Too many orders for this email. Please contact us.' },
+  payment: { limit: 30, windowMs: 10 * 60_000, message: 'Too many payment attempts. Please wait a few minutes.' },
   orderLookupIp: { limit: 15, windowMs: 15 * 60_000, message: 'Too many lookups. Please wait a few minutes.' },
   orderLookupEmail: { limit: 10, windowMs: 60 * 60_000, message: 'Too many lookups for this email. Please try again later.' },
   helpful: { limit: 1, windowMs: 24 * 3600_000, message: 'You have already marked this review as helpful.' },

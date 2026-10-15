@@ -129,7 +129,9 @@ export interface Coupon {
   usedCount: number
 }
 
-export type OrderStatus = 'placed' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+/** 'pending_payment': paid online, stock held, waiting for the payment to be confirmed. Customers never see it. */
+export type OrderStatus = 'pending_payment' | 'placed' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+export type PaymentMethod = 'cod' | 'razorpay'
 export type PaymentStatus = 'pending' | 'paid' | 'refunded'
 export type ShippingMethod = 'standard' | 'express'
 
@@ -186,6 +188,10 @@ export interface Order {
   shippedAt: string | null
   deliveredAt: string | null
   cancelledAt: string | null
+  /** When an online payment was confirmed. Null for cash on delivery and for unpaid online orders. */
+  paidAt: string | null
+  /** Razorpay's payment id (pay_…), once paid online. */
+  paymentReference: string | null
   items: OrderItem[]
 }
 
@@ -271,6 +277,11 @@ export interface CommerceSettings {
   returnWindowDays: number
   pointsPerDollar: number
   codEnabled: boolean
+  /**
+   * Offer Razorpay at checkout. In the admin this is the owner's switch; on the storefront it is true
+   * only while the switch is on AND the Razorpay keys are set on the server.
+   */
+  onlinePaymentsEnabled: boolean
 }
 
 export interface AnnouncementSettings {
