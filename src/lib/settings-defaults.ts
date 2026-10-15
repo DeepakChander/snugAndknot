@@ -45,12 +45,11 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     moderation: 'manual',
   },
   homepage: {
-    heroEyebrow: 'Autumn–Winter 2026',
-    heroTitle: 'Knitwear made slowly, *to wear for years*.',
-    heroSubtitle:
-      'Merino, cashmere blends and long-staple cotton — knitted in small runs and finished by hand.',
-    primaryCtaLabel: 'Shop new in',
-    primaryCtaHref: '/shop?sort=newest',
+    heroEyebrow: 'Everyday clothing for',
+    heroTitle: 'Men, Women & Kids',
+    heroSubtitle: 'Trendy · Comfortable · Premium',
+    primaryCtaLabel: 'Shop now',
+    primaryCtaHref: '/shop',
     secondaryCtaLabel: 'See the collections',
     secondaryCtaHref: '/collections',
     manifesto:

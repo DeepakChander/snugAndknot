@@ -43,14 +43,43 @@ export default function ShopIndex({ rows }: { rows: IndexRow[] }) {
         gsap.set(el, { x: e.clientX + 28, y: e.clientY - el.offsetHeight * 0.55 })
         gsap.to(el, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'expo.out' })
       }
-      const onLeave = () => gsap.to(el, { autoAlpha: 0, scale: 0.85, duration: 0.4, ease: 'power2.in' })
+      let shown = false
+      const show = (e: PointerEvent) => {
+        shown = true
+        onEnter(e)
+      }
+      const onLeave = () => {
+        shown = false
+        setHovered(null)
+        gsap.to(el, { autoAlpha: 0, scale: 0.85, duration: 0.4, ease: 'power2.in' })
+      }
+      // Scrolling with the wheel moves the list out from under a still pointer without any pointer
+      // event, so the preview would stay on screen over the rest of the page. On every scroll, check
+      // whether the last pointer position is still over the list.
+      let px = -1
+      let py = -1
+      const track = (e: PointerEvent) => {
+        px = e.clientX
+        py = e.clientY
+      }
+      const onScroll = () => {
+        if (!shown) return
+        const r = list.getBoundingClientRect()
+        if (px < r.left || px > r.right || py < r.top || py > r.bottom) onLeave()
+      }
       list.addEventListener('pointermove', onMove)
-      list.addEventListener('pointerenter', onEnter)
+      list.addEventListener('pointerenter', show)
       list.addEventListener('pointerleave', onLeave)
+      window.addEventListener('pointermove', track, { passive: true })
+      window.addEventListener('scroll', onScroll, { passive: true })
+      window.addEventListener('blur', onLeave)
       return () => {
         list.removeEventListener('pointermove', onMove)
-        list.removeEventListener('pointerenter', onEnter)
+        list.removeEventListener('pointerenter', show)
         list.removeEventListener('pointerleave', onLeave)
+        window.removeEventListener('pointermove', track)
+        window.removeEventListener('scroll', onScroll)
+        window.removeEventListener('blur', onLeave)
       }
     },
     { scope: root }

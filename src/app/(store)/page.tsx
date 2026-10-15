@@ -1,4 +1,5 @@
-import WordmarkHero from '@/components/home/WordmarkHero'
+import HomeHero from '@/components/home/HomeHero'
+import type { CarouselItem } from '@/components/home/GarmentCarousel'
 import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
 import MaterialRows from '@/components/home/MaterialRows'
 import NewInRing from '@/components/home/NewInRing'
@@ -65,13 +66,27 @@ export default async function HomePage() {
       image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
     }))
 
+  // Hero carousel: the active pieces, two photographs each, so even a short catalogue makes a full ring.
+  const withPhotos = products.filter((p) => p.images[0])
+  const carousel: CarouselItem[] = [0, 1].flatMap((round) =>
+    withPhotos.map((p) => {
+      const img = p.images[round] ?? p.images[0]
+      return {
+        key: `${p.id}-${round}`,
+        src: img.src,
+        alt: img.alt || p.title,
+        product: { id: p.id, handle: p.handle, title: p.title, productType: p.productType, price: p.price, compareAtPrice: p.compareAtPrice, prices: p.prices },
+      }
+    })
+  ).slice(0, 10)
+
   // Video wall: nothing renders until the admin switches it on with at least one playable clip.
   const wall = settings.videos.enabled ? buildWall(settings.videos.items, products) : []
 
   return (
     <>
       <JsonLd data={[organizationLd(settings), websiteLd(settings)]} />
-      <WordmarkHero />
+      <HomeHero home={settings.homepage} commerce={settings.commerce} storeName={settings.store.name} items={carousel} />
       <CategoryGrid tiles={tiles} />
       <MaterialRows />
       <NewInRing products={products.slice(0, 8)} />

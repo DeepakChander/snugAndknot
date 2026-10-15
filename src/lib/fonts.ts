@@ -14,12 +14,12 @@ export const inter = Inter({
   display: 'swap',
 })
 
-/** Italic serif accent — one word or phrase inside a headline, never a whole heading. */
+/** Serif: upright for the home hero headline (font-serif), italic for accents (font-accent). */
 export const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
-  // Only the italic is ever set; the upright face would be a wasted preload.
-  style: 'italic',
+  // Upright for the home hero's serif headline, italic for accents.
+  style: ['normal', 'italic'],
   variable: '--font-instrument',
   display: 'swap',
 })

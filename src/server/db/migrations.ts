@@ -410,6 +410,23 @@ ALTER TABLE orders ALTER COLUMN currency SET DEFAULT 'USD';
 ALTER TABLE orders ALTER COLUMN currency SET NOT NULL;
 `,
   },
+  {
+    version: 10,
+    name: 'premium-home-copy',
+    // The home page hero became a photograph hero ("Everyday clothing for / Men, Women &
+    // Kids"). Each hero field moves to the new wording only while it still holds the previous default,
+    // so anything edited in the admin stays. New home fields need nothing here: defaults fill them in.
+    sql: `
+UPDATE settings SET value = jsonb_set(value, '{heroEyebrow}', to_jsonb('Everyday clothing for'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'heroEyebrow' = 'Autumn–Winter 2026';
+UPDATE settings SET value = jsonb_set(value, '{heroTitle}', to_jsonb('Men, Women & Kids'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'heroTitle' = 'Knitwear made slowly, *to wear for years*.';
+UPDATE settings SET value = jsonb_set(value, '{heroSubtitle}', to_jsonb('Trendy · Comfortable · Premium'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'heroSubtitle' = 'Merino, cashmere blends and long-staple cotton — knitted in small runs and finished by hand.';
+UPDATE settings SET value = value || '{"primaryCtaLabel": "Shop now", "primaryCtaHref": "/shop"}'::jsonb, updated_at = now()
+ WHERE key = 'homepage' AND value->>'primaryCtaLabel' = 'Shop new in' AND value->>'primaryCtaHref' = '/shop?sort=newest';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

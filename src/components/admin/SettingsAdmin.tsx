@@ -377,14 +377,14 @@ function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
           title="Hero"
           description={
             <>
-              The first screen of the home page. Products in the 3D ring come from your active products and collections.{' '}
+              The first screen: this copy beside a 3D carousel of your active pieces (their first two photographs).{' '}
               <Link href="/" target="_blank" className="underline">
                 Open the home page ↗
               </Link>
             </>
           }
         >
-          <Input label="Eyebrow" value={d.heroEyebrow} error={s.err.heroEyebrow} onChange={(e) => set({ heroEyebrow: e.target.value })} hint="The small line above the title." />
+          <Input label="Eyebrow" value={d.heroEyebrow} error={s.err.heroEyebrow} onChange={(e) => set({ heroEyebrow: e.target.value })} hint="The small spaced line above the title." />
           <Input label="Title" value={d.heroTitle} error={s.err.heroTitle} onChange={(e) => set({ heroTitle: e.target.value })} />
           <Textarea label="Subtitle" rows={2} value={d.heroSubtitle} error={s.err.heroSubtitle} onChange={(e) => set({ heroSubtitle: e.target.value })} />
           <div className="grid gap-4 sm:grid-cols-2">

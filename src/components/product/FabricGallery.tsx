@@ -1,41 +1,25 @@
 'use client'
 
 import Image from 'next/image'
-import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { hasWebGL, useInView } from '@/hooks/use-in-view'
-import { prefersReducedMotion } from '@/lib/motion/gsap'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { ArrowLeft, ArrowRight } from '@/components/kit/icons'
 import { cn } from '@/lib/format'
 import type { ProductImage } from '@/types/commerce'
 
-const FabricPlane = dynamic(() => import('@/components/three/FabricPlane'), { ssr: false })
-
 /**
- * Product photographs rendered as a hanging knit panel (WebGL): it sways, ripples under
- * the pointer and changes image with a ribbed pleat transition. Falls back to a plain
- * crossfade without WebGL or with reduced motion.
+ * Product photographs: crossfade between them with arrows, swipe or the thumbnails, and open any
+ * one enlarged to zoom in. Plain photographs on purpose: the fabric should read as it is.
  */
 export default function FabricGallery({ images, title }: { images: ProductImage[]; title: string }) {
   const [index, setIndex] = useState(0)
-  const [gl, setGl] = useState<boolean | null>(null)
-  const [glReady, setGlReady] = useState(false)
   const [zoom, setZoom] = useState(false)
   const stage = useRef<HTMLDivElement>(null)
-  const inView = useInView(stage, '100px 0px')
   const touch = useRef<{ x: number; t: number } | null>(null)
   const count = images.length
 
-  // The 3D fabric is for desktop-class screens; phones get the photographs, without three.js on load.
-  useEffect(
-    () => setGl(hasWebGL() && !prefersReducedMotion() && count > 0 && window.matchMedia('(pointer: fine) and (min-width: 1024px)').matches),
-    [count]
-  )
-
   const go = useCallback((d: number) => setIndex((i) => (i + d + count) % count), [count])
-  const onReady = useCallback(() => setGlReady(true), [])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -68,19 +52,11 @@ export default function FabricGallery({ images, title }: { images: ProductImage[
           }
         }}
       >
-        {/* Static image: first paint, SEO, and the no-WebGL fallback */}
         <AnimatePresence initial={false}>
-          {!gl || !glReady ? (
-            <motion.div key={index} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
-              <Image src={images[index].src} alt={images[index].alt || title} fill loading={index === 0 ? 'eager' : undefined} fetchPriority={index === 0 ? 'high' : undefined} sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
-            </motion.div>
-          ) : null}
+          <motion.div key={index} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
+            <Image src={images[index].src} alt={images[index].alt || title} fill loading={index === 0 ? 'eager' : undefined} fetchPriority={index === 0 ? 'high' : undefined} sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
+          </motion.div>
         </AnimatePresence>
-        {gl ? (
-          <div className={cn('absolute inset-0 transition-opacity duration-700', glReady ? 'opacity-100' : 'opacity-0')}>
-            <FabricPlane images={images.map((i) => i.src)} index={index} active={inView} onReady={onReady} />
-          </div>
-        ) : null}
 
         {count > 1 ? (
           <>
