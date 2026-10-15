@@ -6,7 +6,7 @@ import { useRef } from 'react'
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import SplitReveal from '@/components/motion/SplitReveal'
 import { ButtonLink } from '@/components/kit/Button'
-import { useMoney } from '@/components/providers/SettingsProvider'
+import { ProductPrice } from '@/components/kit/Price'
 import { accent } from '@/lib/accent'
 import { cn } from '@/lib/format'
 import type { Collection, Product } from '@/types/commerce'
@@ -33,7 +33,6 @@ function sheetTitle(title: string) {
 }
 
 function Sheet({ collection, index, total, pieces }: { collection: Collection; index: number; total: number; pieces: Product[] }) {
-  const money = useMoney()
   const ref = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
   const tone = TONES[index % TONES.length]
@@ -84,7 +83,7 @@ function Sheet({ collection, index, total, pieces }: { collection: Collection; i
                         ) : null}
                       </span>
                       <span className="mt-2 block truncate text-sm font-medium tracking-[-0.01em]">{p.title}</span>
-                      <span className={cn('font-mono text-xs', tone.soft)}>{money(p.price)}</span>
+                      <ProductPrice product={p} showCompareAt={false} className={cn('text-xs', tone.soft)} />
                     </Link>
                   </li>
                 ))}

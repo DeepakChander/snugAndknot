@@ -18,7 +18,7 @@ export default async function LookbookPage() {
     ...chapter,
     pieces: handles.flatMap((h) => {
       const p = byHandle.get(h)
-      return p ? [{ handle: p.handle, title: p.title, price: p.price, image: p.images[0]?.src ?? '' }] : []
+      return p ? [{ handle: p.handle, title: p.title, price: p.price, compareAtPrice: p.compareAtPrice, prices: p.prices, image: p.images[0]?.src ?? '' }] : []
     }),
   }))
   return <LookbookView spreads={spreads} />

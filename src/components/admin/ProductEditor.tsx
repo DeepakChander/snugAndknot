@@ -5,14 +5,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMemo, useRef, useState } from 'react'
 import { useUIStore } from '@/stores/ui-store'
-import { useMoney } from '@/components/providers/SettingsProvider'
+import { useCurrency, useMoney } from '@/components/providers/SettingsProvider'
+import { currencySymbol } from '@/lib/currency'
 import { Badge, Btn, Card, Input, PageHeader, Select, STATUS_TONE, Textarea, Toggle, confirmAction, useMutate } from './ui'
 import { MediaLibrary, uploadImage } from './ImagePicker'
 import { ApiError } from '@/lib/api'
 import { cn } from '@/lib/format'
-import type { Category, ColorSwatch, Gender, Product, ProductImage, ProductStatus } from '@/types/commerce'
+import type { Category, ColorSwatch, Gender, PriceBook, Product, ProductImage, ProductStatus } from '@/types/commerce'
 
-type VariantRow = { id?: string; title?: string; sku: string; size: string; color: string; price: string; compareAtPrice: string; inventory: string }
+/** `prices`: this variant's own price per additional currency; empty inherits the product's. */
+type VariantRow = { id?: string; title?: string; sku: string; size: string; color: string; price: string; compareAtPrice: string; inventory: string; prices: Record<string, string> }
 
 interface Draft {
   title: string
@@ -25,6 +27,8 @@ interface Draft {
   tags: string
   price: string
   compareAtPrice: string
+  /** Per additional currency (e.g. INR): price and compare-at. An empty price: not sold in it yet. */
+  prices: Record<string, { price: string; compareAtPrice: string }>
   images: ProductImage[]
   colors: ColorSwatch[]
   fabric: string
@@ -63,6 +67,7 @@ function toDraft(p: Product | null): Draft {
     tags: (p?.tags ?? []).join(', '),
     price: p ? String(p.price) : '',
     compareAtPrice: p?.compareAtPrice ? String(p.compareAtPrice) : '',
+    prices: Object.fromEntries(Object.entries(p?.prices ?? {}).map(([c, x]) => [c, { price: String(x.price), compareAtPrice: x.compareAtPrice ? String(x.compareAtPrice) : '' }])),
     images: p?.images ?? [],
     colors: p?.colors ?? [],
     fabric: p?.details.fabric ?? '',
@@ -85,6 +90,7 @@ function toDraft(p: Product | null): Draft {
       price: String(v.price),
       compareAtPrice: v.compareAtPrice ? String(v.compareAtPrice) : '',
       inventory: String(v.inventory),
+      prices: Object.fromEntries(Object.entries(v.prices ?? {}).map(([c, x]) => [c, String(x.price)])),
     })),
   }
 }
@@ -92,6 +98,9 @@ function toDraft(p: Product | null): Draft {
 export default function ProductEditor({ product, categories }: { product: Product | null; categories: Category[] }) {
   const router = useRouter()
   const money = useMoney()
+  const { all } = useCurrency()
+  const baseCur = all[0]
+  const extra = all.slice(1)
   const addToast = useUIStore((s) => s.addToast)
   const { run, busy, fieldErrors } = useMutate()
   const [d, setD] = useState<Draft>(() => toDraft(product))
@@ -109,6 +118,12 @@ export default function ProductEditor({ product, categories }: { product: Produc
 
   function payload() {
     const num = (v: string) => (v.trim() === '' ? null : Number(v))
+    // Only the shop's current currencies, and only those with a price, are sent.
+    const productPrices: PriceBook = {}
+    for (const c of extra) {
+      const x = d.prices[c.code]
+      if (x && x.price.trim() !== '') productPrices[c.code] = { price: Number(x.price), compareAtPrice: num(x.compareAtPrice) }
+    }
     return {
       handle: d.handle,
       title: d.title,
@@ -133,6 +148,7 @@ export default function ProductEditor({ product, categories }: { product: Produc
         .filter(Boolean),
       price: Number(d.price),
       compareAtPrice: num(d.compareAtPrice),
+      prices: productPrices,
       images: d.images.filter((i) => i.src.trim()),
       colors: d.colors.filter((c) => c.name.trim()),
       featured: d.featured,
@@ -150,6 +166,11 @@ export default function ProductEditor({ product, categories }: { product: Produc
         price: v.price.trim() === '' ? Number(d.price) : Number(v.price),
         compareAtPrice: num(v.compareAtPrice) ?? num(d.compareAtPrice),
         inventory: parseInt(v.inventory, 10) || 0,
+        prices: Object.fromEntries(
+          extra
+            .filter((c) => (v.prices?.[c.code] ?? '').trim() !== '')
+            .map((c) => [c.code, { price: Number(v.prices[c.code]), compareAtPrice: productPrices[c.code]?.compareAtPrice ?? null }])
+        ) as PriceBook,
       })),
     }
   }
@@ -189,6 +210,7 @@ export default function ProductEditor({ product, categories }: { product: Produc
             price: '',
             compareAtPrice: '',
             inventory: '0',
+            prices: {},
           }
         )
       }
@@ -330,8 +352,27 @@ export default function ProductEditor({ product, categories }: { product: Produc
 
           <Card title="Pricing">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Input label="Price" type="number" min={0} step="0.01" prefix="$" value={d.price} error={err('price')} onChange={(e) => set('price', e.target.value)} hint="Default price for variants without their own." />
-              <Input label="Compare-at price (optional)" type="number" min={0} step="0.01" prefix="$" value={d.compareAtPrice} error={err('compareAtPrice')} onChange={(e) => set('compareAtPrice', e.target.value)} hint="Shown struck through when higher than the price." />
+              <Input label={extra.length ? `Price (${baseCur.code})` : 'Price'} type="number" min={0} step="0.01" prefix={currencySymbol(baseCur.code, baseCur.locale)} value={d.price} error={err('price')} onChange={(e) => set('price', e.target.value)} hint="Default price for variants without their own." />
+              <Input label={`Compare-at price${extra.length ? ` (${baseCur.code})` : ''} (optional)`} type="number" min={0} step="0.01" prefix={currencySymbol(baseCur.code, baseCur.locale)} value={d.compareAtPrice} error={err('compareAtPrice')} onChange={(e) => set('compareAtPrice', e.target.value)} hint="Shown struck through when higher than the price." />
+              {extra.map((c) => {
+                const x = d.prices[c.code] ?? { price: '', compareAtPrice: '' }
+                const setX = (patch: Partial<typeof x>) => set('prices', { ...d.prices, [c.code]: { ...x, ...patch } })
+                return [
+                  <Input
+                    key={`${c.code}-price`}
+                    label={`Price (${c.code})`}
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    prefix={currencySymbol(c.code, c.locale)}
+                    value={x.price}
+                    error={err(`prices.${c.code}.price`)}
+                    onChange={(e) => setX({ price: e.target.value })}
+                    hint={x.price.trim() ? 'Shoppers paying in this currency see this price.' : `Empty: not sold in ${c.code} yet.`}
+                  />,
+                  <Input key={`${c.code}-compare`} label={`Compare-at price (${c.code}) (optional)`} type="number" min={0} step="0.01" prefix={currencySymbol(c.code, c.locale)} value={x.compareAtPrice} error={err(`prices.${c.code}.compareAtPrice`)} onChange={(e) => setX({ compareAtPrice: e.target.value })} />,
+                ]
+              })}
             </div>
           </Card>
 
@@ -375,6 +416,11 @@ export default function ProductEditor({ product, categories }: { product: Produc
                     <th className="px-2 py-2 font-medium">Colour</th>
                     <th className="px-2 py-2 font-medium">Price</th>
                     <th className="px-2 py-2 font-medium">Compare-at</th>
+                    {extra.map((c) => (
+                      <th key={c.code} className="px-2 py-2 font-medium">
+                        {c.code} price
+                      </th>
+                    ))}
                     <th className="px-2 py-2 font-medium">Stock</th>
                     <th className="px-4 py-2" />
                   </tr>
@@ -400,6 +446,20 @@ export default function ProductEditor({ product, categories }: { product: Produc
                         <td className="px-2 py-2">
                           <input type="number" min={0} step="0.01" value={v.compareAtPrice} placeholder={d.compareAtPrice} onChange={(e) => upd({ compareAtPrice: e.target.value })} className={cn(cell, 'w-24')} aria-label="Compare-at price" />
                         </td>
+                        {extra.map((c) => (
+                          <td key={c.code} className="px-2 py-2">
+                            <input
+                              type="number"
+                              min={0}
+                              step="0.01"
+                              value={v.prices?.[c.code] ?? ''}
+                              placeholder={d.prices[c.code]?.price ?? ''}
+                              onChange={(e) => upd({ prices: { ...v.prices, [c.code]: e.target.value } })}
+                              className={cn(cell, 'w-24')}
+                              aria-label={`${c.code} price`}
+                            />
+                          </td>
+                        ))}
                         <td className="px-2 py-2">
                           <input type="number" min={0} step={1} value={v.inventory} onChange={(e) => upd({ inventory: e.target.value })} className={cn(cell, 'w-20', (parseInt(v.inventory, 10) || 0) === 0 && 'border-error/40')} aria-label="Stock" />
                         </td>
@@ -420,7 +480,7 @@ export default function ProductEditor({ product, categories }: { product: Produc
               </datalist>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 px-4 py-3">
-              <Btn size="sm" variant="outline" onClick={() => set('variants', [...d.variants, { sku: '', size: '', color: d.colors[0]?.name ?? '', price: '', compareAtPrice: '', inventory: '0' }])}>
+              <Btn size="sm" variant="outline" onClick={() => set('variants', [...d.variants, { sku: '', size: '', color: d.colors[0]?.name ?? '', price: '', compareAtPrice: '', inventory: '0', prices: {} }])}>
                 Add variant
               </Btn>
               <span className="text-xs text-stone">

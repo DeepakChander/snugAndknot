@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { Button } from '@/components/kit/Button'
-import { useMoney } from '@/components/providers/SettingsProvider'
+import { useMoney, useCurrency } from '@/components/providers/SettingsProvider'
 import { cn } from '@/lib/format'
 import type { ShopFilters } from '@/lib/shop-filters'
 import type { ColorSwatch } from '@/types/commerce'
@@ -30,6 +30,7 @@ export default function FilterDrawer({
   resultCount: number
 }) {
   const money = useMoney()
+  const { currency: cur } = useCurrency()
   const [sizes, setSizes] = useState<string[]>(filters.sizes)
   const [colors, setColors] = useState<string[]>(filters.colors)
   const [min, setMin] = useState<string>(filters.min?.toString() ?? '')
@@ -92,22 +93,25 @@ export default function FilterDrawer({
             })}
           </div>
         </fieldset>
-        <fieldset>
-          <legend className="text-eyebrow text-stone">Price</legend>
-          <p className="mt-2 text-xs text-stone">
-            Pieces range from {money(lo)} to {money(hi)}.
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className="text-xs text-stone">From</span>
-              <input type="number" inputMode="numeric" min={0} value={min} onChange={(e) => setMin(e.target.value)} placeholder={String(Math.floor(lo))} className="mt-1 w-full rounded-xl border border-ink/15 bg-transparent px-3 py-2.5 font-mono text-sm outline-none focus:border-ink/60" />
-            </label>
-            <label className="block">
-              <span className="text-xs text-stone">To</span>
-              <input type="number" inputMode="numeric" min={0} value={max} onChange={(e) => setMax(e.target.value)} placeholder={String(Math.ceil(hi))} className="mt-1 w-full rounded-xl border border-ink/15 bg-transparent px-3 py-2.5 font-mono text-sm outline-none focus:border-ink/60" />
-            </label>
-          </div>
-        </fieldset>
+        {/* Prices are filtered on the base-currency price, so the filter is offered only in it. */}
+        {cur.base ? (
+          <fieldset>
+            <legend className="text-eyebrow text-stone">Price</legend>
+            <p className="mt-2 text-xs text-stone">
+              Pieces range from {money(lo)} to {money(hi)}.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className="text-xs text-stone">From</span>
+                <input type="number" inputMode="numeric" min={0} value={min} onChange={(e) => setMin(e.target.value)} placeholder={String(Math.floor(lo))} className="mt-1 w-full rounded-xl border border-ink/15 bg-transparent px-3 py-2.5 font-mono text-sm outline-none focus:border-ink/60" />
+              </label>
+              <label className="block">
+                <span className="text-xs text-stone">To</span>
+                <input type="number" inputMode="numeric" min={0} value={max} onChange={(e) => setMax(e.target.value)} placeholder={String(Math.ceil(hi))} className="mt-1 w-full rounded-xl border border-ink/15 bg-transparent px-3 py-2.5 font-mono text-sm outline-none focus:border-ink/60" />
+              </label>
+            </div>
+          </fieldset>
+        ) : null}
       </div>
       <div className="grid grid-cols-2 gap-2 border-t border-ink/10 p-6">
         <Button

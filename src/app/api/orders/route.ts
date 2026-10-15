@@ -8,6 +8,7 @@ import { orderSchema } from '@/server/validation'
 import { inventoryAfterOrder, orderPlaced } from '@/server/notify-events'
 import { onlinePaymentsAvailable, startOnlinePayment, sweepUnpaidOrders } from '@/server/payments'
 import { after } from 'next/server'
+import { findCurrency } from '@/lib/currency'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +26,10 @@ export const POST = route(async (req) => {
   const online = input.paymentMethod === 'razorpay'
   if (!online && !settings.commerce.codEnabled) throw new HttpError(400, 'Checkout is temporarily unavailable.')
   if (online && !onlinePaymentsAvailable(settings.commerce)) throw new HttpError(400, 'Online payment is not available right now. Please choose another way to pay.')
+  // Never charge in a currency other than the one the shopper saw.
+  if (input.currency && !findCurrency(settings.commerce, input.currency)) {
+    throw new HttpError(400, `Prices in ${input.currency} are no longer available. Please refresh the page and check your bag.`)
+  }
   // Expired holds from abandoned online checkouts go back on sale.
   after(sweepUnpaidOrders)
   const user = await currentUser()
@@ -40,6 +45,7 @@ export const POST = route(async (req) => {
       userId: user?.id ?? null,
       paymentMethod: input.paymentMethod,
       commerce: settings.commerce,
+      currency: input.currency ?? null,
     })
   } catch (err) {
     if (err instanceof CheckoutError) throw new HttpError(err.status, err.message)
@@ -49,7 +55,7 @@ export const POST = route(async (req) => {
   invalidate('products')
   if (online) {
     // Held, not placed: the store hears about it once the payment is confirmed.
-    const payment = await startOnlinePayment(order, settings.commerce, settings.store)
+    const payment = await startOnlinePayment(order, settings.store)
     return ok({ order, payment }, { status: 201 })
   }
   await orderPlaced(order)

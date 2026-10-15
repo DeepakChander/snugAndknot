@@ -512,3 +512,18 @@ html.has-cursor select {
   transform: rotate(-45deg);
 }
 }
+
+/* ─────────────────────────── Currency ─────────────────────────── */
+
+/* Set before first paint for shoppers whose currency is not the base one (see the store layout);
+   prices stay hidden until the page has switched them to that currency. If scripts never run, they
+   show again after 3 seconds rather than staying hidden. */
+.sk-currency-pending [data-money] {
+  visibility: hidden;
+  animation: sk-money-reveal 0s linear 3s forwards;
+}
+@keyframes sk-money-reveal {
+  to {
+    visibility: visible;
+  }
+}

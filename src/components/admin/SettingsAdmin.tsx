@@ -6,7 +6,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Btn, Card, Input, PageHeader, Textarea, Toggle, useMutate } from './ui'
 import { ImageField } from './ImagePicker'
 import { cn } from '@/lib/format'
-import type { SettingsKey, SiteSettings } from '@/types/commerce'
+import { currencySymbol } from '@/lib/currency'
+import type { CurrencySettings, SettingsKey, SiteSettings } from '@/types/commerce'
 
 const TABS: { key: SettingsKey; label: string; blurb: string }[] = [
   { key: 'store', label: 'Store details', blurb: 'Name, contact details, address and social links. Shown in the header, footer, contact page, policies and order pages.' },
@@ -114,6 +115,50 @@ export interface RazorpayConnection {
   mode: 'test' | 'live' | null
   webhook: boolean
   webhookUrl: string
+  /** Active products with no price yet, per additional currency. */
+  missingPrices: Record<string, number>
+}
+
+/** One additional currency. Countries are typed as text and parsed, so commas can be typed freely. */
+function CurrencyRow({ value, index, err, onChange, onRemove, missing }: { value: CurrencySettings; index: number; err: Record<string, string>; onChange: (v: CurrencySettings) => void; onRemove: () => void; missing: number | undefined }) {
+  const [countries, setCountries] = useState(value.countries.join(', '))
+  const num = (v: string) => (v === '' ? 0 : Number(v))
+  const e = (k: string) => err[`extraCurrencies.${index}.${k}`]
+  const sym = currencySymbol(value.code || 'XXX', value.locale || 'en')
+  return (
+    <div className="rounded-2xl border border-ink/10 p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="font-mono text-sm">{value.code || 'New currency'}</p>
+        <Btn size="sm" variant="ghost" className="text-error" onClick={onRemove}>
+          Remove
+        </Btn>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Input label="Currency code" value={value.code} maxLength={3} error={e('code')} onChange={(ev) => onChange({ ...value, code: ev.target.value.toUpperCase() })} className="font-mono uppercase" hint="e.g. INR" />
+        <Input label="Locale" value={value.locale} error={e('locale')} onChange={(ev) => onChange({ ...value, locale: ev.target.value })} className="font-mono" hint="e.g. en-IN" />
+        <Input
+          label="Shown first in"
+          value={countries}
+          error={e('countries') ?? Object.entries(err).find(([k]) => k.startsWith(`extraCurrencies.${index}.countries.`))?.[1]}
+          onChange={(ev) => {
+            setCountries(ev.target.value)
+            onChange({ ...value, countries: ev.target.value.split(/[\s,]+/).map((c) => c.trim().toUpperCase()).filter(Boolean) })
+          }}
+          className="font-mono uppercase"
+          hint="Country codes, e.g. IN"
+        />
+        <Input label="Standard shipping" type="number" min={0} step="0.01" prefix={sym} value={value.standardShippingRate} error={e('standardShippingRate')} onChange={(ev) => onChange({ ...value, standardShippingRate: num(ev.target.value) })} />
+        <Input label="Express shipping" type="number" min={0} step="0.01" prefix={sym} value={value.expressShippingRate} error={e('expressShippingRate')} onChange={(ev) => onChange({ ...value, expressShippingRate: num(ev.target.value) })} />
+        <Input label="Free shipping from" type="number" min={0} step="0.01" prefix={sym} value={value.freeShippingThreshold} error={e('freeShippingThreshold')} onChange={(ev) => onChange({ ...value, freeShippingThreshold: num(ev.target.value) })} />
+        <Input label="Points per 1 spent" type="number" min={0} max={100} step="0.01" value={value.pointsPerUnit} error={e('pointsPerUnit')} onChange={(ev) => onChange({ ...value, pointsPerUnit: num(ev.target.value) })} hint="e.g. 0.01 per rupee ≈ 1 per dollar" />
+      </div>
+      {missing ? (
+        <p className="mt-3 rounded-xl bg-gold/15 p-3 text-xs text-gold-deep">
+          {missing} active product{missing === 1 ? ' has' : 's have'} no {value.code} price yet. Shoppers paying in {value.code} cannot buy {missing === 1 ? 'it' : 'them'} until you add one (Products → edit → Pricing).
+        </p>
+      ) : null}
+    </div>
+  )
 }
 
 function CommerceForm({ initial, payments }: { initial: SiteSettings['commerce']; payments: RazorpayConnection }) {
@@ -131,10 +176,46 @@ function CommerceForm({ initial, payments }: { initial: SiteSettings['commerce']
   return (
     <>
       <Card>
-        <Section title="Currency" description={<>How prices are shown. Preview: <strong className="font-medium text-ink">{preview}</strong></>}>
+        <Section title="Currency" description={<>The base currency: every price, rate and threshold on this page is in it. Preview: <strong className="font-medium text-ink">{preview}</strong></>}>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label="Currency code" value={d.currency} maxLength={3} error={s.err.currency} onChange={(e) => set({ currency: e.target.value.toUpperCase() })} hint="ISO code, e.g. USD, EUR, GBP, INR." className="font-mono uppercase" />
             <Input label="Locale" value={d.locale} error={s.err.locale} onChange={(e) => set({ locale: e.target.value })} hint="Number format, e.g. en-US, en-GB, fr-FR." className="font-mono" />
+          </div>
+        </Section>
+        <Section
+          title="More currencies"
+          description="Sell in another currency too, such as INR next to USD. You set every price in it yourself (Products → Pricing), plus its shipping. Shoppers in the countries you list see it first, and anyone can switch in the footer. Orders are charged in the currency the shopper sees."
+        >
+          <div className="space-y-3">
+            {(d.extraCurrencies ?? []).map((c, i) => (
+              <CurrencyRow
+                key={i}
+                index={i}
+                value={c}
+                err={s.err}
+                missing={payments.missingPrices[c.code]}
+                onChange={(v) => set({ extraCurrencies: d.extraCurrencies.map((x, j) => (j === i ? v : x)) })}
+                onRemove={() => set({ extraCurrencies: d.extraCurrencies.filter((_, j) => j !== i) })}
+              />
+            ))}
+            {(d.extraCurrencies ?? []).length < 3 ? (
+              <Btn
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  set({
+                    extraCurrencies: [
+                      ...(d.extraCurrencies ?? []),
+                      d.currency !== 'INR' && !(d.extraCurrencies ?? []).some((x) => x.code === 'INR')
+                        ? { code: 'INR', locale: 'en-IN', countries: ['IN'], standardShippingRate: 0, expressShippingRate: 0, freeShippingThreshold: 0, pointsPerUnit: 0.01 }
+                        : { code: '', locale: 'en-US', countries: [], standardShippingRate: 0, expressShippingRate: 0, freeShippingThreshold: 0, pointsPerUnit: 1 },
+                    ],
+                  })
+                }
+              >
+                Add a currency
+              </Btn>
+            ) : null}
           </div>
         </Section>
         <Section title="Shipping" description="Standard shipping becomes free once the bag reaches the threshold. Set the threshold to 0 to always charge.">

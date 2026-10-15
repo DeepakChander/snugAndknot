@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: Props) {
       <Reviews handle={product.handle} productTitle={product.title} initialReviews={reviews} initialSummary={summary} />
       <Related products={related} />
       <RecentlyViewed current={product.handle} />
-      <StickyBuyBar title={product.title} price={product.price} image={product.images[0]?.src ?? ''} targetId="buy-panel" />
+      <StickyBuyBar title={product.title} product={{ price: product.price, compareAtPrice: product.compareAtPrice, prices: product.prices }} image={product.images[0]?.src ?? ''} targetId="buy-panel" />
     </>
   )
 }

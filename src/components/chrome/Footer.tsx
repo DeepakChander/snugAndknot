@@ -7,6 +7,7 @@ import { scrollToTop } from '@/lib/motion/lenis'
 import { useSettings } from '@/components/providers/SettingsProvider'
 import Magnetic from '@/components/motion/Magnetic'
 import NewsletterForm from './NewsletterForm'
+import CurrencySwitcher from './CurrencySwitcher'
 import { ArrowUp, InstagramIcon, PinterestIcon, TiktokIcon, XIcon } from '@/components/kit/icons'
 
 const COLUMNS = [
@@ -170,6 +171,7 @@ function FooterContent() {
           © {new Date().getFullYear()} {store.name}.{store.tagline ? ` ${store.tagline}` : ''}
         </p>
         <div className="flex items-center gap-6">
+          <CurrencySwitcher />
           <Link href="/privacy-policy" className="link-wipe">
             Privacy
           </Link>

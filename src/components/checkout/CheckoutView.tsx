@@ -8,7 +8,7 @@ import { useCartStore } from '@/stores/cart-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useCartQuote } from '@/hooks/use-cart-quote'
 import { useHydrated } from '@/hooks/use-hydrated'
-import { useMoney, useSettings } from '@/components/providers/SettingsProvider'
+import { useMoney, useSettings, useCurrency } from '@/components/providers/SettingsProvider'
 import { Button, ButtonLink } from '@/components/kit/Button'
 import { Field, Select, TextArea } from '@/components/kit/Field'
 import { ShieldIcon, TruckIcon } from '@/components/kit/icons'
@@ -49,6 +49,7 @@ export default function CheckoutView() {
   const openAuthModal = useAuthStore((s) => s.openAuthModal)
   const { commerce, store } = useSettings()
   const money = useMoney()
+  const { currency: cur } = useCurrency()
   const [form, setForm] = useState<Form>({
     email: '',
     firstName: '',
@@ -151,6 +152,7 @@ export default function CheckoutView() {
           },
           notes: form.notes || null,
           paymentMethod: method,
+          currency: cur.code,
         },
       })
       let order = placed.order
@@ -237,7 +239,7 @@ export default function CheckoutView() {
     )
   }
 
-  const standardFree = (quote ? quote.subtotal - quote.discount : 0) >= commerce.freeShippingThreshold && commerce.freeShippingThreshold > 0
+  const standardFree = (quote ? quote.subtotal - quote.discount : 0) >= cur.freeShippingThreshold && cur.freeShippingThreshold > 0
 
   return (
     <div className="bg-ivory pb-28 pt-nav text-ink">
@@ -289,8 +291,8 @@ export default function CheckoutView() {
               <div className="grid gap-3" role="radiogroup" aria-label="Shipping method">
                 {(
                   [
-                    { id: 'standard', title: 'Standard delivery', price: standardFree ? 0 : commerce.standardShippingRate, note: commerce.freeShippingThreshold > 0 ? `Free over ${money(commerce.freeShippingThreshold)}` : undefined },
-                    { id: 'express', title: 'Express delivery', price: commerce.expressShippingRate, note: 'Priority dispatch' },
+                    { id: 'standard', title: 'Standard delivery', price: standardFree ? 0 : cur.standardShippingRate, note: cur.freeShippingThreshold > 0 ? `Free over ${money(cur.freeShippingThreshold)}` : undefined },
+                    { id: 'express', title: 'Express delivery', price: cur.expressShippingRate, note: 'Priority dispatch' },
                   ] as const
                 ).map((m) => (
                   <label key={m.id} className={cn('flex cursor-pointer items-center gap-4 rounded-2xl border p-5 transition-colors', form.shippingMethod === m.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15 hover:border-ink/40')}>
@@ -373,10 +375,10 @@ export default function CheckoutView() {
               {method === 'razorpay'
                 ? placing
                   ? 'Waiting for payment…'
-                  : `Pay${quote ? ` ${money(quote.total)}` : ''} securely`
+                  : `Pay${quote ? ` ${money(quote.total, { currency: quote.currency })}` : ''} securely`
                 : placing
                   ? 'Placing order…'
-                  : `Place order${quote ? ` — ${money(quote.total)}` : ''}`}
+                  : `Place order${quote ? ` — ${money(quote.total, { currency: quote.currency })}` : ''}`}
             </Button>
             <p className="mt-3 text-center text-xs text-stone">
               By placing your order you agree to our{' '}

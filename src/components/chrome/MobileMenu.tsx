@@ -7,6 +7,7 @@ import { useUIStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useSettings } from '@/components/providers/SettingsProvider'
 import { useDialogBehaviour } from '@/components/kit/Overlay'
+import CurrencySwitcher from './CurrencySwitcher'
 import { InstagramIcon, PinterestIcon, TiktokIcon } from '@/components/kit/icons'
 
 const EASE = [0.16, 1, 0.3, 1] as const
@@ -108,6 +109,7 @@ export default function MobileMenu() {
               <button type="button" onClick={openSearch} className="block text-bone/70">
                 Search
               </button>
+              <CurrencySwitcher className="pt-2 text-bone/70" />
             </div>
             <div className="space-y-2">
               <p className="text-eyebrow slash text-bone/60">Say hello</p>

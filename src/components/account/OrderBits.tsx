@@ -82,7 +82,7 @@ export function OrderTimeline({ order, tone = 'light' }: { order: Order; tone?: 
 }
 
 export function OrderLines({ order }: { order: Order }) {
-  const money = useMoney()
+  const money = useMoney(order.currency)
   return (
     <ul className="divide-y divide-current/10">
       {order.items.map((it) => (
@@ -104,7 +104,7 @@ export function OrderLines({ order }: { order: Order }) {
 }
 
 export function OrderTotals({ order }: { order: Order }) {
-  const money = useMoney()
+  const money = useMoney(order.currency)
   return (
     <dl className="space-y-2 text-sm">
       <div className="flex justify-between">

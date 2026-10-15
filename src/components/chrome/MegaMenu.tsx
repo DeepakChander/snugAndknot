@@ -4,7 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useMoney, useNavData } from '@/components/providers/SettingsProvider'
+import { useNavData } from '@/components/providers/SettingsProvider'
+import { ProductPrice } from '@/components/kit/Price'
 import { Arrow } from '@/components/kit/Button'
 import { cn } from '@/lib/format'
 
@@ -94,7 +95,6 @@ export default function MegaMenu({
   onNavigate: () => void
 }) {
   const nav = useNavData()
-  const money = useMoney()
   const [hovered, setHovered] = useState<string>('women')
   const [from, setFrom] = useState<'top' | 'bottom'>('bottom')
   const lastY = useRef(0)
@@ -179,7 +179,7 @@ export default function MegaMenu({
                       <span className="min-w-0">
                         <span className="text-eyebrow slash text-burgundy">Spotlight</span>
                         <span className="mt-1 block truncate font-display text-lg font-semibold leading-tight tracking-[-0.03em]">{nav.spotlight[0].title}</span>
-                        <span className="font-mono text-xs text-stone">{money(nav.spotlight[0].price)}</span>
+                        <ProductPrice product={nav.spotlight[0]} showCompareAt={false} className="text-xs text-stone" />
                       </span>
                     </Link>
                   ) : null}

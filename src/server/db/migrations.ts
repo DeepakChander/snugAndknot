@@ -390,6 +390,26 @@ ALTER TABLE categories ADD COLUMN IF NOT EXISTS badge TEXT NOT NULL DEFAULT '';
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS show_on_home BOOLEAN NOT NULL DEFAULT true;
 `,
   },
+  {
+    version: 9,
+    name: 'multi-currency',
+    // Version 8 is the category grid (badge, show_on_home). Additional currencies: products and
+    // variants get prices per extra currency, coupons their amounts per extra currency, and every
+    // order the currency it was placed in. Existing orders were all in the base currency of the day.
+    // Only adds: older code keeps working, and an order it writes gets the default (USD, the base).
+    sql: `
+ALTER TABLE products ADD COLUMN IF NOT EXISTS prices JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE variants ADD COLUMN IF NOT EXISTS prices JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE coupons ADD COLUMN IF NOT EXISTS amounts JSONB NOT NULL DEFAULT '{}'::jsonb;
+-- Backfill only rows with no currency yet, so running this again can never relabel an INR order.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS currency TEXT;
+UPDATE orders SET currency = coalesce(
+    (SELECT upper(value->>'currency') FROM settings WHERE key = 'commerce' AND value->>'currency' ~ '^[A-Za-z]{3}$'), 'USD')
+ WHERE currency IS NULL;
+ALTER TABLE orders ALTER COLUMN currency SET DEFAULT 'USD';
+ALTER TABLE orders ALTER COLUMN currency SET NOT NULL;
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

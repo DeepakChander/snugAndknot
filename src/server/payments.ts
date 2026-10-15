@@ -1,7 +1,6 @@
 import 'server-only'
 import { invalidate } from '@/server/catalog'
 import { HttpError } from '@/server/http'
-import { getSettings } from '@/server/repo/settings'
 import {
   getOrderById,
   getPaymentState,
@@ -24,7 +23,7 @@ import {
   type RazorpayPayment,
 } from '@/server/razorpay'
 import { checkoutAbandoned, inventoryAfterOrder, latePayment, orderPlaced, paymentMismatch } from '@/server/notify-events'
-import type { CommerceSettings, Order, StoreSettings } from '@/types/commerce'
+import type { Order, StoreSettings } from '@/types/commerce'
 
 /**
  * Online payments, end to end. An order paid online is saved first ('pending_payment', stock held),
@@ -52,14 +51,15 @@ export interface CheckoutPayment {
 }
 
 /** Creates the Razorpay order for a just-saved online order. If Razorpay fails, the order is released. */
-export async function startOnlinePayment(order: Order, commerce: CommerceSettings, store: StoreSettings): Promise<CheckoutPayment> {
+export async function startOnlinePayment(order: Order, store: StoreSettings): Promise<CheckoutPayment> {
   const c = razorpayConfig()
-  const amount = toSubunits(order.total, commerce.currency)
+  // Charged in the order's own currency (INR orders in rupees, USD orders in dollars).
+  const amount = toSubunits(order.total, order.currency)
   try {
     if (!c) throw new RazorpayError('Razorpay keys are not set', null)
     const rzp = await createRazorpayOrder(c, {
       amount,
-      currency: commerce.currency,
+      currency: order.currency,
       receipt: order.orderNumber,
       notes: { order_id: order.id, order_number: order.orderNumber },
     })
@@ -69,7 +69,7 @@ export async function startOnlinePayment(order: Order, commerce: CommerceSetting
       keyId: c.keyId,
       razorpayOrderId: rzp.id,
       amount,
-      currency: commerce.currency,
+      currency: order.currency,
       name: store.name,
       description: `Order ${order.orderNumber}`,
       prefill: { name: order.customerName, email: order.email, contact: order.shippingAddress.phone || undefined },
@@ -98,13 +98,12 @@ export type Settlement =
 async function settlePayment(c: RazorpayConfig, orderId: string, payment: RazorpayPayment): Promise<Settlement> {
   const state = await getPaymentState({ id: orderId })
   if (!state || state.paymentMethod !== 'razorpay' || !state.razorpayOrderId || payment.order_id !== state.razorpayOrderId) return { kind: 'failed' }
-  const { commerce } = await getSettings()
-  const expected = toSubunits(state.total, commerce.currency)
-  if (payment.amount !== expected || payment.currency?.toUpperCase() !== commerce.currency.toUpperCase()) {
+  const expected = toSubunits(state.total, state.currency)
+  if (payment.amount !== expected || payment.currency?.toUpperCase() !== state.currency.toUpperCase()) {
     const order = await getOrderById(orderId)
     await paymentMismatch(orderId, order?.orderNumber ?? orderId, [
       ['Order', order?.orderNumber],
-      ['Expected', `${expected} ${commerce.currency} (smallest unit)`],
+      ['Expected', `${expected} ${state.currency} (smallest unit)`],
       ['Paid', `${payment.amount} ${payment.currency}`],
       ['Razorpay payment', payment.id],
       ['Payment status', payment.status],

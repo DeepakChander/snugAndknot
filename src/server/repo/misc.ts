@@ -1,5 +1,6 @@
 import 'server-only'
 import { query } from '@/server/db/client'
+import { getSettings } from './settings'
 import { iso, newId, num } from './util'
 
 /* ─────────────────────────── Newsletter ─────────────────────────── */
@@ -145,7 +146,10 @@ export async function listCustomers() {
   const rows = await query(
     `SELECT u.id, u.email, u.name, u.role, u.points, u.created_at, u.last_login_at,
             count(o.id) FILTER (WHERE NOT (o.payment_method = 'razorpay' AND o.paid_at IS NULL))::int AS orders,
-            coalesce(sum(o.total) FILTER (WHERE o.status NOT IN ('cancelled', 'pending_payment')), 0) AS spent
+            -- Amounts in different currencies are never added together: one total per currency.
+            (SELECT coalesce(json_agg(json_build_object('currency', t.currency, 'amount', t.amount) ORDER BY t.amount DESC), '[]'::json)
+               FROM (SELECT o2.currency, sum(o2.total) AS amount FROM orders o2
+                      WHERE o2.user_id = u.id AND o2.status NOT IN ('cancelled', 'pending_payment') GROUP BY o2.currency) t) AS spent
        FROM users u LEFT JOIN orders o ON o.user_id = u.id
       GROUP BY u.id ORDER BY u.created_at DESC`
   )
@@ -156,7 +160,7 @@ export async function listCustomers() {
     role: r.role as 'customer' | 'admin',
     points: Math.trunc(num(r.points)),
     orders: Math.trunc(num(r.orders)),
-    spent: num(r.spent),
+    spent: (typeof r.spent === 'string' ? JSON.parse(r.spent) : (r.spent ?? [])).map((x: { currency: string; amount: unknown }) => ({ currency: x.currency, amount: num(x.amount) })) as { currency: string; amount: number }[],
     createdAt: iso(r.created_at),
     lastLoginAt: r.last_login_at ? iso(r.last_login_at) : null,
   }))
@@ -183,13 +187,21 @@ export async function updateCustomer(
 
 /* ─────────────────────────── Dashboard ─────────────────────────── */
 
+/** Money figures are in the base currency; orders in other currencies are reported per currency. */
 export async function dashboardStats() {
+  const base = (await getSettings()).commerce.currency.toUpperCase()
   const [totals] = await query(
-    `SELECT coalesce(sum(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment')), 0) AS revenue,
+    `SELECT coalesce(sum(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment') AND currency = $1), 0) AS revenue,
             count(*) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment'))::int AS orders,
             count(*) FILTER (WHERE status = 'placed')::int AS awaiting,
-            coalesce(avg(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment')), 0) AS aov
-       FROM orders`
+            coalesce(avg(total) FILTER (WHERE status NOT IN ('cancelled', 'pending_payment') AND currency = $1), 0) AS aov
+       FROM orders`,
+    [base]
+  )
+  const other = await query(
+    `SELECT currency, sum(total) AS revenue, count(*)::int AS orders FROM orders
+      WHERE status NOT IN ('cancelled', 'pending_payment') AND currency <> $1 GROUP BY currency ORDER BY currency`,
+    [base]
   )
   const [counts] = await query(
     `SELECT (SELECT count(*)::int FROM users WHERE role = 'customer') AS customers,
@@ -205,8 +217,9 @@ export async function dashboardStats() {
             coalesce(sum(o.total) FILTER (WHERE o.status NOT IN ('cancelled', 'pending_payment')), 0) AS revenue,
             count(o.id) FILTER (WHERE o.status NOT IN ('cancelled', 'pending_payment'))::int AS orders
        FROM generate_series(current_date - 29, current_date, interval '1 day') d
-       LEFT JOIN orders o ON o.placed_at::date = d::date
-      GROUP BY d ORDER BY d`
+       LEFT JOIN orders o ON o.placed_at::date = d::date AND o.currency = $1
+      GROUP BY d ORDER BY d`,
+    [base]
   )
   const lowStock = await query(
     `SELECT v.id, v.title, v.sku, v.inventory, p.title AS product_title, p.id AS product_id
@@ -216,13 +229,15 @@ export async function dashboardStats() {
   const top = await query(
     `SELECT i.title, i.handle, sum(i.quantity)::int AS units, sum(i.price * i.quantity) AS revenue
        FROM order_items i JOIN orders o ON o.id = i.order_id
-      WHERE o.status NOT IN ('cancelled', 'pending_payment') GROUP BY i.title, i.handle ORDER BY units DESC LIMIT 5`
+      WHERE o.status NOT IN ('cancelled', 'pending_payment') AND o.currency = $1 GROUP BY i.title, i.handle ORDER BY units DESC LIMIT 5`,
+    [base]
   )
   return {
     revenue: num(totals.revenue),
     orders: Math.trunc(num(totals.orders)),
     awaitingFulfilment: Math.trunc(num(totals.awaiting)),
     averageOrderValue: Math.round(num(totals.aov) * 100) / 100,
+    otherCurrencies: other.map((o) => ({ currency: o.currency as string, revenue: num(o.revenue), orders: Math.trunc(num(o.orders)) })),
     customers: Math.trunc(num(counts.customers)),
     pendingReviews: Math.trunc(num(counts.pending_reviews)),
     newMessages: Math.trunc(num(counts.new_messages)),

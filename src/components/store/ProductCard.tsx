@@ -8,7 +8,7 @@ import { useCartStore } from '@/stores/cart-store'
 import { useWishlistStore } from '@/stores/wishlist-store'
 import { useUIStore } from '@/stores/ui-store'
 import { useHydrated } from '@/hooks/use-hydrated'
-import Price from '@/components/kit/Price'
+import { ProductPrice } from '@/components/kit/Price'
 import { Stars } from '@/components/kit/Stars'
 import { HeartIcon, PlusIcon, XIcon } from '@/components/kit/icons'
 import { cn, discountPercent } from '@/lib/format'
@@ -16,7 +16,7 @@ import type { Product } from '@/types/commerce'
 
 export type CardProduct = Pick<
   Product,
-  'id' | 'handle' | 'title' | 'price' | 'compareAtPrice' | 'images' | 'colors' | 'variants' | 'isNew' | 'bestseller' | 'rating' | 'reviewCount' | 'productType'
+  'id' | 'handle' | 'title' | 'price' | 'compareAtPrice' | 'prices' | 'images' | 'colors' | 'variants' | 'isNew' | 'bestseller' | 'rating' | 'reviewCount' | 'productType'
 >
 
 /** Backgrounds a card shows while its photograph loads, so a grid reads as colour, not grey boxes. */
@@ -205,7 +205,7 @@ export default function ProductCard({
           >
             {product.title}
           </Link>
-          <Price price={product.price} compareAt={product.compareAtPrice} className="shrink-0 pt-1 text-[0.8rem]" />
+          <ProductPrice product={product} className="shrink-0 pt-1 text-[0.8rem]" />
         </div>
         {product.reviewCount > 0 ? (
           <div className="mt-1.5 flex items-center gap-1.5 text-xs text-stone">

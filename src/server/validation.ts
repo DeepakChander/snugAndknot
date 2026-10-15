@@ -14,6 +14,14 @@ const trimmed = (max: number) => text().trim().max(max)
 const required = (max: number, label = 'This field') => text().trim().min(1, `${label} is required`).max(max)
 export const emailSchema = z.string().trim().toLowerCase().email('Enter a valid email address').max(254)
 const money = z.coerce.number().finite().min(0).max(1_000_000).transform((n) => Math.round(n * 100) / 100)
+const currencyCode = z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO currency code')
+
+/** Prices in the additional currencies: { INR: { price, compareAtPrice } }. */
+const priceBookSchema = z
+  .record(currencyCode, z.object({ price: money, compareAtPrice: money.nullable().default(null) }))
+  .refine((b) => Object.keys(b).length <= 10, 'At most 10 currencies')
+  .default({})
+
 const handle = z
   .string()
   .trim()
@@ -120,6 +128,8 @@ export const quoteSchema = z.object({
   lines: z.array(lineSchema).max(20),
   couponCode: trimmed(40).nullable().optional(),
   shippingMethod: z.enum(['standard', 'express']).optional(),
+  /** The currency the shopper sees. Unknown or unset: the base currency. */
+  currency: currencyCode.optional(),
 })
 
 export const addressSchema = z.object({
@@ -146,6 +156,8 @@ export const orderSchema = z.object({
   address: addressSchema,
   notes: trimmed(500).nullable().optional(),
   paymentMethod: z.enum(['cod', 'razorpay']),
+  /** The currency the shopper saw. It must be one the shop sells in, or the order is refused. */
+  currency: currencyCode.optional(),
 })
 
 /** What Razorpay Checkout hands the browser after a successful payment. */
@@ -212,6 +224,7 @@ export const productSchema = z
     tags: z.array(trimmed(40)).max(40).default([]),
     price: money,
     compareAtPrice: money.nullable().default(null),
+    prices: priceBookSchema,
     images: z
       .array(z.object({ src: imageUrl.refine((v) => v.length > 0, 'Image URL is required'), alt: trimmed(300).default(''), width: z.number().int().positive().optional(), height: z.number().int().positive().optional() }))
       .max(20)
@@ -237,6 +250,7 @@ export const productSchema = z
           price: money,
           compareAtPrice: money.nullable().default(null),
           inventory: z.coerce.number().int().min(0).max(1_000_000),
+          prices: priceBookSchema,
         })
       )
       .min(1, 'Add at least one variant')
@@ -300,6 +314,10 @@ export const couponSchema = z
       .default(null),
     active: z.boolean().default(true),
     usageLimit: z.coerce.number().int().positive().nullable().default(null),
+    /** Per additional currency: the fixed amount off (fixed codes only) and the minimum spend. */
+    amounts: z
+      .record(currencyCode, z.object({ value: money.nullable().default(null), minPurchase: money.default(0) }))
+      .default({}),
   })
   .refine((c) => c.type !== 'percentage' || c.value <= 100, { path: ['value'], message: 'A percentage cannot exceed 100' })
 
@@ -362,6 +380,41 @@ export const settingsSchemas = {
     pointsPerDollar: z.coerce.number().finite().min(0).max(100),
     codEnabled: z.boolean(),
     onlinePaymentsEnabled: z.boolean().default(false),
+    extraCurrencies: z
+      .array(
+        z.object({
+          code: currencyCode,
+          locale: trimmed(20).refine((l) => {
+            try {
+              return Intl.NumberFormat.supportedLocalesOf([l]).length > 0
+            } catch {
+              return false
+            }
+          }, 'Unknown locale'),
+          freeShippingThreshold: nonNegative,
+          standardShippingRate: nonNegative,
+          expressShippingRate: nonNegative,
+          pointsPerUnit: z.coerce.number().finite().min(0).max(100),
+          countries: z
+            .array(z.string().trim().toUpperCase().regex(/^[A-Z]{2}$/, 'Use 2-letter country codes, e.g. IN'))
+            .max(50)
+            .default([]),
+        })
+      )
+      .max(3, 'At most 3 additional currencies')
+      .default([]),
+  })
+  .superRefine((c, ctx) => {
+    const seen = new Set([c.currency])
+    c.extraCurrencies.forEach((x, i) => {
+      if (seen.has(x.code)) ctx.addIssue({ code: 'custom', path: ['extraCurrencies', i, 'code'], message: `${x.code} is already one of the store's currencies` })
+      seen.add(x.code)
+      try {
+        new Intl.NumberFormat('en', { style: 'currency', currency: x.code })
+      } catch {
+        ctx.addIssue({ code: 'custom', path: ['extraCurrencies', i, 'code'], message: 'Unknown currency code' })
+      }
+    })
   }),
   announcement: z.object({
     enabled: z.boolean(),

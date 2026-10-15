@@ -7,6 +7,7 @@ import type {
   ProductDetails,
   ProductImage,
   ProductStatus,
+  PriceBook,
   SortOption,
   Variant,
 } from '@/types/commerce'
@@ -27,7 +28,7 @@ SELECT p.*,
                json_agg(json_build_object(
                  'id', id, 'title', title, 'sku', sku, 'size', size, 'color', color,
                  'price', price, 'compareAtPrice', compare_at_price,
-                 'inventory', inventory, 'position', position
+                 'inventory', inventory, 'position', position, 'prices', prices
                ) ORDER BY position, id) AS variants
           FROM variants GROUP BY product_id
        ) v ON v.product_id = p.id
@@ -46,7 +47,18 @@ function mapVariant(v: Row): Variant {
     inventory,
     available: inventory > 0,
     position: Math.trunc(num(v.position)),
+    prices: priceBook(v.prices),
   }
+}
+
+/** Prices per additional currency, defensively normalised (numbers, no empty entries). */
+export function priceBook(v: unknown): PriceBook {
+  const out: PriceBook = {}
+  for (const [code, p] of Object.entries(json<Record<string, { price?: unknown; compareAtPrice?: unknown }>>(v, {}) ?? {})) {
+    if (!/^[A-Z]{3}$/.test(code) || !p || p.price === null || p.price === undefined) continue
+    out[code] = { price: num(p.price), compareAtPrice: numOrNull(p.compareAtPrice) }
+  }
+  return out
 }
 
 export function mapProduct(r: Row): Product {
@@ -63,6 +75,7 @@ export function mapProduct(r: Row): Product {
     tags: r.tags ?? [],
     price: num(r.price),
     compareAtPrice: numOrNull(r.compare_at_price),
+    prices: priceBook(r.prices),
     images: json<ProductImage[]>(r.images, []),
     colors: json<ColorSwatch[]>(r.colors, []),
     sizes: r.sizes ?? [],
@@ -216,6 +229,7 @@ export interface ProductInput {
   tags: string[]
   price: number
   compareAtPrice: number | null
+  prices: PriceBook
   images: ProductImage[]
   colors: ColorSwatch[]
   featured: boolean
@@ -233,6 +247,7 @@ export interface ProductInput {
     price: number
     compareAtPrice: number | null
     inventory: number
+    prices: PriceBook
   }[]
 }
 
@@ -249,13 +264,13 @@ async function writeVariants(q: Queryable, productId: string, input: ProductInpu
     keepIds.push(id)
     const title = v.title || [v.size, v.color].filter(Boolean).join(' / ') || 'Default'
     await q.query(
-      `INSERT INTO variants (id, product_id, title, sku, size, color, price, compare_at_price, inventory, position)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO variants (id, product_id, title, sku, size, color, price, compare_at_price, inventory, position, prices)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb)
        ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, sku = EXCLUDED.sku, size = EXCLUDED.size,
          color = EXCLUDED.color, price = EXCLUDED.price, compare_at_price = EXCLUDED.compare_at_price,
-         inventory = EXCLUDED.inventory, position = EXCLUDED.position
+         inventory = EXCLUDED.inventory, position = EXCLUDED.position, prices = EXCLUDED.prices
        WHERE variants.product_id = EXCLUDED.product_id`,
-      [id, productId, title, v.sku, v.size, v.color, v.price, v.compareAtPrice, Math.max(0, Math.trunc(v.inventory)), i]
+      [id, productId, title, v.sku, v.size, v.color, v.price, v.compareAtPrice, Math.max(0, Math.trunc(v.inventory)), i, JSON.stringify(v.prices ?? {})]
     )
   }
   await q.query('DELETE FROM variants WHERE product_id = $1 AND NOT (id = ANY($2::text[]))', [productId, keepIds])
@@ -276,14 +291,14 @@ export async function createProduct(id: string, input: ProductInput): Promise<Pr
     await tx(async (q) => {
       await q.query(
         `INSERT INTO products (id, handle, title, description, details, vendor, product_type, gender, category, tags,
-           price, compare_at_price, images, colors, sizes, featured, is_new, bestseller, status, seo_title, seo_description)
+           price, compare_at_price, images, colors, sizes, featured, is_new, bestseller, status, seo_title, seo_description, prices)
          VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, $9, $10::text[], $11, $12, $13::jsonb, $14::jsonb, $15::text[],
-           $16, $17, $18, $19, $20, $21)`,
+           $16, $17, $18, $19, $20, $21, $22::jsonb)`,
         [
           id, input.handle, input.title, input.description, JSON.stringify(input.details), input.vendor,
           input.productType, input.gender, input.category, input.tags, input.price, input.compareAtPrice,
           JSON.stringify(input.images), JSON.stringify(input.colors), sizesFrom(input), input.featured,
-          input.isNew, input.bestseller, input.status, input.seoTitle, input.seoDescription,
+          input.isNew, input.bestseller, input.status, input.seoTitle, input.seoDescription, JSON.stringify(input.prices ?? {}),
         ]
       )
       await writeVariants(q, id, input)
@@ -301,13 +316,13 @@ export async function updateProduct(id: string, input: ProductInput): Promise<Pr
         `UPDATE products SET handle = $2, title = $3, description = $4, details = $5::jsonb, vendor = $6,
            product_type = $7, gender = $8, category = $9, tags = $10::text[], price = $11, compare_at_price = $12,
            images = $13::jsonb, colors = $14::jsonb, sizes = $15::text[], featured = $16, is_new = $17,
-           bestseller = $18, status = $19, seo_title = $20, seo_description = $21, updated_at = now()
+           bestseller = $18, status = $19, seo_title = $20, seo_description = $21, prices = $22::jsonb, updated_at = now()
          WHERE id = $1 RETURNING id`,
         [
           id, input.handle, input.title, input.description, JSON.stringify(input.details), input.vendor,
           input.productType, input.gender, input.category, input.tags, input.price, input.compareAtPrice,
           JSON.stringify(input.images), JSON.stringify(input.colors), sizesFrom(input), input.featured,
-          input.isNew, input.bestseller, input.status, input.seoTitle, input.seoDescription,
+          input.isNew, input.bestseller, input.status, input.seoTitle, input.seoDescription, JSON.stringify(input.prices ?? {}),
         ]
       )
       if (!rows.length) return false
