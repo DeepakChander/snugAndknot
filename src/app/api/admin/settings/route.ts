@@ -14,7 +14,7 @@ export const GET = route(async () => {
 })
 
 const envelope = z.object({
-  section: z.enum(['store', 'commerce', 'announcement', 'reviews', 'homepage', 'seo']),
+  section: z.enum(['store', 'commerce', 'announcement', 'reviews', 'homepage', 'seo', 'videos']),
   value: z.unknown(),
 })
 

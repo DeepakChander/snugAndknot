@@ -61,7 +61,7 @@ function usePortalTarget() {
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
-type Side = 'right' | 'left' | 'bottom' | 'center' | 'top'
+type Side = 'right' | 'left' | 'bottom' | 'center' | 'top' | 'full'
 
 const panelMotion: Record<Side, { initial: TargetAndTransition; animate: TargetAndTransition; exit: TargetAndTransition }> = {
   right: { initial: { x: '100%' }, animate: { x: 0 }, exit: { x: '100%' } },
@@ -69,6 +69,7 @@ const panelMotion: Record<Side, { initial: TargetAndTransition; animate: TargetA
   bottom: { initial: { y: '100%' }, animate: { y: 0 }, exit: { y: '100%' } },
   top: { initial: { y: '-100%' }, animate: { y: 0 }, exit: { y: '-100%' } },
   center: { initial: { opacity: 0, y: 30, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0, y: 20, scale: 0.98 } },
+  full: { initial: { opacity: 0, scale: 1.03 }, animate: { opacity: 1, scale: 1 }, exit: { opacity: 0, scale: 1.02 } },
 }
 
 const panelPos: Record<Side, string> = {
@@ -77,6 +78,7 @@ const panelPos: Record<Side, string> = {
   bottom: 'bottom-0 left-0 right-0 max-h-[92dvh] rounded-t-[2rem]',
   top: 'left-0 right-0 top-0',
   center: 'left-1/2 top-1/2 w-[min(92vw,960px)] max-h-[90dvh] -translate-x-1/2 -translate-y-1/2 rounded-[2rem]',
+  full: 'inset-0',
 }
 
 export default function Overlay({

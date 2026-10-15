@@ -45,6 +45,7 @@ const GROUPS = [
       { href: '/admin/inbox', label: 'Inbox', count: 'newMessages' as const },
     ],
   },
+  { label: 'Content', items: [{ href: '/admin/videos', label: 'Videos' }] },
   { label: 'Store', items: [{ href: '/admin/settings', label: 'Settings' }, { href: '/admin/emails', label: 'Emails' }] },
 ]
 

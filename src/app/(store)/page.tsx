@@ -7,6 +7,7 @@ import ShopIndex, { type IndexRow } from '@/components/home/ShopIndex'
 import Statement from '@/components/home/Statement'
 import CraftCards from '@/components/home/CraftCards'
 import ClientReviews from '@/components/home/ClientReviews'
+import VideoWall from '@/components/home/VideoWall'
 import JournalCards from '@/components/home/JournalCards'
 import Promises from '@/components/home/Promises'
 import type { Metadata } from 'next'
@@ -14,6 +15,7 @@ import { getCategories, getCollections, getLatestReviews, getProducts, getStoreS
 import JsonLd from '@/components/seo/JsonLd'
 import { organizationLd, websiteLd } from '@/lib/seo'
 import { JOURNAL } from '@/lib/journal'
+import { buildWall } from '@/lib/video'
 import type { Product } from '@/types/commerce'
 
 /** Knitwear-only editorial frames, the fallback images for the "Shop by" index. */
@@ -63,6 +65,9 @@ export default async function HomePage() {
       image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
     }))
 
+  // Video wall: nothing renders until the admin switches it on with at least one playable clip.
+  const wall = settings.videos.enabled ? buildWall(settings.videos.items, products) : []
+
   return (
     <>
       <JsonLd data={[organizationLd(settings), websiteLd(settings)]} />
@@ -75,6 +80,7 @@ export default async function HomePage() {
       <Statement />
       <CraftCards />
       <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} />
+      {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} /> : null}
       <JournalCards posts={JOURNAL} />
       <Promises />
     </>
