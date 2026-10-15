@@ -351,6 +351,84 @@ body {
   margin-bottom: -0.1em;
 }
 
+/* ─────────────────────────── Home hero: the knitted wordmark ─────────────────────────── */
+
+/* How far the stitch fill has drifted. Registered so it can be animated; it inherits from each word
+   to its letters, so every letter of a word moves as one piece of fabric. */
+@property --kd {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+@keyframes knit-drift {
+  to {
+    --kd: 0.64em;
+  }
+}
+@keyframes course-run {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+/* The stitch tile (2 stitches × 16 rows) comes from the component as --knit; 0.1em × 0.64em keeps
+   the stitches in proportion to the letters at every size. */
+.knit-word,
+.knit-word.is-split .knit-char {
+  background-image: var(--knit);
+  background-size: 0.1em 0.64em;
+  background-position: var(--kx, 0px) calc(var(--ky, 0px) + var(--kd));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.knit-word {
+  animation: knit-drift 18s linear infinite;
+}
+.knit-word[data-word='b'] {
+  animation-direction: reverse;
+}
+/* Once split, each letter carries the fill (a background clipped to text cannot follow letters that
+   move on their own layers). Padding paired with an equal negative margin widens the painted and
+   masked box past the glyph's overhang without changing the layout. */
+.knit-word.is-split {
+  background: none;
+}
+.knit-word .knit-char,
+.knit-word .knit-char-mask {
+  padding: 0.08em 0.06em;
+  margin: -0.08em -0.06em;
+}
+.course-track {
+  animation: course-run var(--dur, 80s) linear infinite;
+}
+.course-track[data-dir='rev'] {
+  animation-direction: reverse;
+}
+/* Nothing drifts while the hero is off screen or has parted. */
+.hero-idle .knit-word,
+.hero-idle .course-track {
+  animation-play-state: paused;
+}
+.hero-word {
+  position: relative;
+}
+.hero-stitch {
+  position: absolute;
+  left: -0.04em;
+  bottom: -0.22em;
+  overflow: visible;
+  pointer-events: none;
+}
+/* Static fallback for the stitched underline when the title is not split (reduced motion). */
+.hero-title:not(.is-split) em {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--color-gold);
+  text-decoration-thickness: 0.045em;
+  text-underline-offset: 0.2em;
+}
+
 /* Rolling text: label duplicated in ::after and rolled up on hover. */
 .roll {
   position: relative;

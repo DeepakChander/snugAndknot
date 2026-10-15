@@ -16,15 +16,12 @@ import { organizationLd, websiteLd } from '@/lib/seo'
 import { JOURNAL } from '@/lib/journal'
 import type { Product } from '@/types/commerce'
 
-/** Knitwear-only editorial frames that join the garments in the hero's flip-book. */
+/** Knitwear-only editorial frames, the fallback images for the "Shop by" index. */
 const LOOKS = [
   '/images/lookbook/soft-focus-2.png',
   '/images/lookbook/quiet-luxury-1.png',
   '/images/Collections-Hero/Winter.png',
-  '/images/Collections-Hero/Essentials.png',
-  '/images/Collections-Hero/Coastal.png',
 ]
-const COVER = '/images/collection-home/Material-Intimacy.png'
 
 export const metadata: Metadata = { alternates: { canonical: '/', types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: 'Snug&Knot Journal' }] } } }
 
@@ -38,14 +35,6 @@ export default async function HomePage() {
     getLatestReviews(6),
     getStoreSettings(),
   ])
-
-  // Flip-book: alternate real garments with editorial frames.
-  const garments = products.flatMap((p) => p.images.slice(0, 2).map((i) => i.src))
-  const frames: string[] = []
-  for (let i = 0; i < Math.max(garments.length, LOOKS.length); i++) {
-    if (garments[i]) frames.push(garments[i])
-    if (LOOKS[i]) frames.push(LOOKS[i])
-  }
 
   // "Shop by": departments that have pieces, then the active categories, then everything.
   const forDept = (d: 'women' | 'men' | 'kids') =>
@@ -77,7 +66,7 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={[organizationLd(settings), websiteLd(settings)]} />
-      <WordmarkHero frames={frames.slice(0, 14)} cover={COVER} />
+      <WordmarkHero />
       <CategoryGrid tiles={tiles} />
       <MaterialRows />
       <NewInRing products={products.slice(0, 8)} />
