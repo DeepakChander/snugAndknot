@@ -213,7 +213,11 @@ export function OrderDetailAdmin({ order }: { order: Order }) {
               {order.email}
             </a>
             <p className="mt-1 text-xs text-stone">{order.userId ? 'Registered customer' : 'Guest checkout'}</p>
-            {order.pointsEarned ? <p className="mt-1 text-xs text-stone">{order.pointsEarned} loyalty points earned</p> : null}
+            {order.pointsEarned ? (
+              <p className="mt-1 text-xs text-stone">
+                {order.pointsEarned} loyalty points {order.pointsGranted ? 'given' : order.status === 'cancelled' ? '(not given)' : '(given on delivery)'}
+              </p>
+            ) : null}
           </Card>
           <Card title="Delivery address">
             <address className="text-sm not-italic leading-relaxed">

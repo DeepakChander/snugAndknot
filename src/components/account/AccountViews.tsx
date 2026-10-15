@@ -333,7 +333,14 @@ export function NewReturn({ orders, initialOrderId }: { orders: Order[]; initial
 export function Rewards({ user, orders }: { user: PublicUser; orders: Order[] }) {
   const { all } = useCurrency()
   const activity = [
-    ...orders.filter((o) => o.pointsEarned > 0).map((o) => ({ id: o.id, label: `Order ${o.orderNumber}${o.status === 'cancelled' ? ' (cancelled — points removed)' : ''}`, points: o.status === 'cancelled' ? 0 : o.pointsEarned, date: o.placedAt })),
+    ...orders
+      .filter((o) => o.pointsEarned > 0)
+      .map((o) => ({
+        id: o.id,
+        label: `Order ${o.orderNumber}${o.status === 'cancelled' ? ' (cancelled — no points)' : o.pointsGranted ? '' : ' (points on delivery)'}`,
+        points: o.pointsGranted ? o.pointsEarned : 0,
+        date: o.placedAt,
+      })),
     { id: 'welcome', label: 'Welcome bonus', points: 100, date: user.createdAt },
   ].sort((a, b) => +new Date(b.date) - +new Date(a.date))
   return (

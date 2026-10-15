@@ -177,7 +177,7 @@ async function main() {
   check('review requires sign-in → 401', anonReview.status === 401, anonReview.status)
   const review = await shopper.post(`/api/products/${cardigan.handle}/reviews`, { rating: 4, title: 'Heirloom quality', body: 'The cable pattern is gorgeous and it washes well.', fit: 'true' })
   check('signed-in review → 201', review.status === 201, review.data)
-  check('purchase makes the review "verified"', review.data.review?.verified === true, review.data.review)
+  check('an order not yet delivered does not make the review "verified"', review.data.review?.verified === false, review.data.review)
   const reviewDup = await shopper.post(`/api/products/${cardigan.handle}/reviews`, { rating: 5, title: 'Again', body: 'Trying to review twice here.' })
   check('one review per customer per product → 409', reviewDup.status === 409, reviewDup.status)
   const badReview = await shopper.post(`/api/products/${other.handle}/reviews`, { rating: 9, title: '', body: 'short' })
@@ -267,6 +267,12 @@ async function main() {
   check('return refused before delivery', earlyReturn.status === 400, earlyReturn.data)
   const delivered = await admin.patch(`/api/admin/orders/${placed.id}`, { status: 'delivered' })
   check('mark delivered → COD marked paid', delivered.data.order?.paymentStatus === 'paid', delivered.data.order)
+  const pointsDelivered = (await shopper.get('/api/auth/me')).data.user.points
+  check('loyalty points are given on delivery, not before', !placed.pointsGranted && delivered.data.order?.pointsGranted === true && pointsDelivered === signup.data.user.points + placed.pointsEarned, { pointsDelivered, earned: placed.pointsEarned })
+  const redeliver = await admin.patch(`/api/admin/orders/${placed.id}`, { status: 'delivered', trackingNumber: '1Z999AA10123456784' })
+  check('…and only once', redeliver.status === 200 && (await shopper.get('/api/auth/me')).data.user.points === pointsDelivered)
+  const verifiedReview = await shopper.post(`/api/products/${other.handle}/reviews`, { rating: 5, title: 'Worth the wait', body: 'Arrived well packed and fits perfectly.', fit: 'true' })
+  check('a delivered order makes the review "verified"', verifiedReview.status === 201 && verifiedReview.data.review?.verified === true, verifiedReview.data)
   const ret = await shopper.post('/api/returns', { orderId: placed.id, items: [{ orderItemId: placed.items[0].id, quantity: 1 }], reason: 'wrong-size', comments: 'Need a size up' })
   check('customer return request → 201', ret.status === 201, ret.data)
   const overReturn = await shopper.post('/api/returns', { orderId: placed.id, items: [{ orderItemId: placed.items[0].id, quantity: 1 }], reason: 'wrong-size' })
@@ -281,7 +287,7 @@ async function main() {
   const invAfter = (await anon.get('/api/products')).data.products.find((p) => p.id === cardigan.id).variants.find((v) => v.id === v1.id).inventory
   check('cancellation restocks inventory', invAfter === invBefore + 1, { invBefore, invAfter })
   const pointsAfter = (await shopper.get('/api/auth/me')).data.user.points
-  check('cancellation removes points earned', pointsAfter === pointsBefore - tamperOrder.pointsEarned, { pointsBefore, pointsAfter })
+  check('cancelling an undelivered order changes no points (none were given)', pointsAfter === pointsBefore && tamperOrder.pointsGranted === false, { pointsBefore, pointsAfter })
   const reopen = await admin.patch(`/api/admin/orders/${tamperOrder.id}`, { status: 'placed' })
   check('cancelled order cannot be reopened → 409', reopen.status === 409, reopen.status)
 
@@ -488,6 +494,7 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   const masked = await anon.post('/api/orders/lookup', { orderNumber: guest.orderNumber, email: guest.email })
   const a = masked.data.order?.shippingAddress ?? {}
   check('guest tracking hides street and phone', masked.status === 200 && a.line1 !== '1 Weaver Lane' && !String(a.phone ?? '').includes('0100'), a)
+  check('…and the postal code', masked.status === 200 && a.postalCode !== address.postalCode && String(a.postalCode).startsWith(address.postalCode.slice(0, 2)), a.postalCode)
   const claimer = new Client('claimer')
   await claimer.post('/api/auth/signup', { name: 'Claimer', email: guest.email, password: 'claim-guest-77' })
   const claimed = await claimer.get('/api/orders')
@@ -545,6 +552,47 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   if (stored) await admin.del(`/api/admin/messages/${stored.id}`)
   const badDate = await admin.post('/api/admin/coupons', { code: `BAD${stamp}`.toUpperCase().slice(0, 20), type: 'fixed', value: 5, expiresAt: '2026-02-31' })
   check('impossible date refused → 422', badDate.status === 422, badDate.status)
+
+  console.log('\nSecurity: hardening')
+  // Cash on delivery: one email cannot hold more than 12 pieces in unconfirmed orders.
+  const holder = new Client('holder', `10.252.${Math.floor(Math.random() * 250)}.3`)
+  const holdEmail = `hold-${stamp}@example.com`
+  const stockVariant = (await anon.get('/api/products')).data.products.flatMap((p) => p.variants).find((v) => v.inventory >= 9)
+  const hold1 = await holder.post('/api/orders', { lines: [{ variantId: stockVariant.id, quantity: 8 }], shippingMethod: 'standard', email: holdEmail, address, paymentMethod: 'cod' })
+  const hold2 = await holder.post('/api/orders', { lines: [{ variantId: stockVariant.id, quantity: 5 }], shippingMethod: 'standard', email: holdEmail.toUpperCase(), address, paymentMethod: 'cod' })
+  check('a 2nd COD order past 12 held pieces for one email → 429', hold1.status === 201 && hold2.status === 429 && /waiting to be confirmed/.test(hold2.data.error), { first: hold1.status, second: hold2.status, msg: hold2.data.error })
+  if (hold1.data.order) await admin.patch(`/api/admin/orders/${hold1.data.order.id}`, { status: 'confirmed' })
+  const hold3 = await holder.post('/api/orders', { lines: [{ variantId: stockVariant.id, quantity: 1 }], shippingMethod: 'standard', email: holdEmail, address, paymentMethod: 'cod' })
+  check('…confirmed orders no longer count towards it', hold3.status === 201, hold3.status)
+  for (const o of [hold1.data.order, hold3.data.order]) if (o) await admin.patch(`/api/admin/orders/${o.id}`, { status: 'cancelled' })
+
+  // Sign-in: only failures count, and a correct password clears that connection's failures.
+  const loginEmail = `login-${stamp}@example.com`
+  const loginUser = new Client('login-user', `10.253.${Math.floor(Math.random() * 250)}.4`)
+  await loginUser.post('/api/auth/signup', { name: 'Login Test', email: loginEmail, password: 'login-knit-77' })
+  for (let i = 0; i < 9; i++) await loginUser.post('/api/auth/login', { email: loginEmail, password: `nope-${i}-xyz` })
+  const okAfterNine = await loginUser.post('/api/auth/login', { email: loginEmail, password: 'login-knit-77' })
+  let allOk = okAfterNine.status === 200
+  for (let i = 0; i < 12; i++) allOk = (await loginUser.post('/api/auth/login', { email: loginEmail, password: 'login-knit-77' })).status === 200 && allOk
+  check('correct sign-ins never use up the limit (9 failures, then 13 successes)', allOk, okAfterNine.status)
+  for (let i = 0; i < 9; i++) await loginUser.post('/api/auth/login', { email: loginEmail, password: `again-${i}-xyz` })
+  check('…because a success cleared the earlier failures', (await loginUser.post('/api/auth/login', { email: loginEmail, password: 'login-knit-77' })).status === 200)
+
+  // IPv6: addresses in one /64 share a limit (contact: 5 per 10 minutes).
+  const net = `2001:db8:${Math.floor(Math.random() * 65535).toString(16)}:${Math.floor(Math.random() * 65535).toString(16)}`
+  let last6
+  for (let i = 1; i <= 6; i++) last6 = await new Client(`v6-${i}`, `${net}::${i.toString(16)}`).post('/api/contact', { name: 'Six', email: `six-${stamp}-${i}@example.com`, message: 'Rotating through one IPv6 network.' })
+  check('6th contact message from one IPv6 /64 (different addresses) → 429', last6.status === 429, last6.status)
+  const otherNet = await new Client('v6-other', `2001:db8:ffff:${Math.floor(Math.random() * 65535).toString(16)}::1`).post('/api/contact', { name: 'Other', email: `other-${stamp}@example.com`, message: 'A different IPv6 network entirely.' })
+  check('…another /64 is not affected', otherNet.status === 201 || otherNet.status === 200, otherNet.status)
+
+  // Subscriber export: cells that a spreadsheet would run as a formula are neutralised.
+  const formula = `+cmd-${stamp}@example.com`
+  await anon.post('/api/newsletter', { email: formula, source: 'footer' })
+  const csv = await admin.req('GET', '/api/admin/subscribers?format=csv')
+  const csvText = Buffer.from(csv.data).toString()
+  check("CSV export quotes cells and prefixes formula characters with '", csvText.includes(`"'${formula}"`) && !csvText.split('\n').some((l) => l.startsWith('+')), csvText.split('\n').find((l) => l.includes(stamp)))
+  await admin.del(`/api/admin/subscribers?email=${encodeURIComponent(formula)}`)
 
   console.log('\nSecurity: admin sign-out')
   const second = new Client('admin-laptop')

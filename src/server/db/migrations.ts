@@ -427,6 +427,20 @@ UPDATE settings SET value = value || '{"primaryCtaLabel": "Shop now", "primaryCt
  WHERE key = 'homepage' AND value->>'primaryCtaLabel' = 'Shop new in' AND value->>'primaryCtaHref' = '/shop?sort=newest';
 `,
   },
+  {
+    version: 11,
+    name: 'points-on-delivery',
+    // Loyalty points used to be granted the moment a cash-on-delivery order was placed, before anyone
+    // paid. They are now granted once: on delivery (cash on delivery) or on payment (online), and this
+    // column records it, so a cancellation takes back only points that were actually given.
+    // Backfill: points already given (COD orders not cancelled; online orders that were paid).
+    sql: `
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS points_granted_at TIMESTAMPTZ;
+UPDATE orders SET points_granted_at = coalesce(paid_at, placed_at)
+ WHERE points_granted_at IS NULL AND user_id IS NOT NULL AND points_earned > 0 AND status <> 'cancelled'
+   AND (payment_method <> 'razorpay' OR paid_at IS NOT NULL);
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

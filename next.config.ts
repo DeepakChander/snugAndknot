@@ -81,7 +81,10 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: '/:path*', headers: securityHeaders },
+      // Every page and API route except uploaded images, whose route sets a stricter, sandboxed policy
+      // of its own (a later or duplicate CSP here would replace or weaken it).
+      { source: '/:path((?!api/media/).*)', headers: securityHeaders },
+      { source: '/api/media/:path*', headers: securityHeaders.filter((h) => h.key !== 'Content-Security-Policy') },
       // Photographs change rarely; cache them for a month (file names are not hashed, so not immutable).
       { source: '/images/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' }] },
       { source: '/admin', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },

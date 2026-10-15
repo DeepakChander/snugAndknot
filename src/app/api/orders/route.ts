@@ -1,4 +1,4 @@
-import { CheckoutError, listOrdersForUser, placeOrder } from '@/server/repo/orders'
+import { CheckoutError, listOrdersForUser, openCodPieces, placeOrder } from '@/server/repo/orders'
 import { getSettings } from '@/server/repo/settings'
 import { invalidate } from '@/server/catalog'
 import { currentUser } from '@/server/auth'
@@ -12,6 +12,9 @@ import { findCurrency } from '@/lib/currency'
 
 export const dynamic = 'force-dynamic'
 
+/** Pieces one email may hold in unconfirmed cash-on-delivery orders. */
+const MAX_OPEN_COD_PIECES = 12
+
 export const GET = route(async () => {
   const user = await requireUser()
   const orders = await listOrdersForUser(user.id)
@@ -21,10 +24,20 @@ export const GET = route(async () => {
 export const POST = route(async (req) => {
   const input = await parseBody(req, orderSchema)
   await rateLimit('order', clientIp(req))
+  await rateLimit('orderDay', clientIp(req))
   await rateLimit('orderEmail', input.email)
   const settings = await getSettings()
   const online = input.paymentMethod === 'razorpay'
   if (!online && !settings.commerce.codEnabled) throw new HttpError(400, 'Checkout is temporarily unavailable.')
+  // Cash on delivery takes stock before anyone pays, so one email cannot hold more than a few
+  // pieces in orders the store has not confirmed yet (stops fake orders emptying the shelves).
+  if (!online) {
+    const held = await openCodPieces(input.email)
+    const asked = input.lines.reduce((n, l) => n + l.quantity, 0)
+    if (held + asked > MAX_OPEN_COD_PIECES) {
+      throw new HttpError(429, `You already have ${held} piece${held === 1 ? '' : 's'} in orders waiting to be confirmed. Please wait for them, or contact us to order more.`)
+    }
+  }
   if (online && !onlinePaymentsAvailable(settings.commerce)) throw new HttpError(400, 'Online payment is not available right now. Please choose another way to pay.')
   // Never charge in a currency other than the one the shopper saw.
   if (input.currency && !findCurrency(settings.commerce, input.currency)) {

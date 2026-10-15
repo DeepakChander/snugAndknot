@@ -76,7 +76,9 @@ export default function Confirmation({ orderNumber }: { orderNumber: string }) {
             )}
           </motion.p>
           {order.pointsEarned > 0 ? (
-            <p className="mt-4 inline-flex rounded-full bg-gold/15 px-4 py-2 text-sm text-gold-light">+{order.pointsEarned} loyalty points added to your account</p>
+            <p className="mt-4 inline-flex rounded-full bg-gold/15 px-4 py-2 text-sm text-gold-light">
+              {order.pointsGranted ? `+${order.pointsEarned} loyalty points added to your account` : `You will earn ${order.pointsEarned} loyalty points when it is delivered`}
+            </p>
           ) : null}
         </div>
       </section>

@@ -17,6 +17,7 @@ export const LIMITS = {
   signup: { limit: 10, windowMs: 60 * 60_000, message: 'Too many sign-ups from this connection. Please try again later.' },
   passwordChange: { limit: 8, windowMs: 15 * 60_000, message: 'Too many attempts. Please wait a few minutes.' },
   order: { limit: 10, windowMs: 60 * 60_000, message: 'Too many orders from this connection. Please try again later.' },
+  orderDay: { limit: 20, windowMs: 24 * 3600_000, message: 'Too many orders from this connection today. Please contact us.' },
   orderEmail: { limit: 5, windowMs: 60 * 60_000, message: 'Too many orders for this email. Please contact us.' },
   payment: { limit: 30, windowMs: 10 * 60_000, message: 'Too many payment attempts. Please wait a few minutes.' },
   orderLookupIp: { limit: 15, windowMs: 15 * 60_000, message: 'Too many lookups. Please wait a few minutes.' },
@@ -37,6 +38,24 @@ export type LimitName = keyof typeof LIMITS
 
 function hashKey(name: string, id: string) {
   return createHash('sha256').update(`${name}\u0000${id.toLowerCase()}`).digest('base64url')
+}
+
+/**
+ * Refuses (429) when `name` is already full for `id`, without counting anything. Used where only
+ * failures count, such as sign-in: a correct password never uses up the allowance.
+ */
+export async function rateLimitCheck(name: LimitName, id: string): Promise<void> {
+  const { limit, message } = LIMITS[name]
+  const rows = await query<{ count: number; retry: number }>(
+    `SELECT count, CEIL(EXTRACT(EPOCH FROM (reset_at - now())))::int AS retry FROM rate_limits WHERE key = $1 AND reset_at > now()`,
+    [hashKey(name, id)]
+  )
+  if (rows[0] && rows[0].count >= limit) throw new HttpError(429, message, undefined, { 'Retry-After': String(Math.max(1, rows[0].retry)) })
+}
+
+/** Clears `name` for `id` (e.g. a successful sign-in clears that connection's failures). */
+export async function rateLimitReset(name: LimitName, id: string): Promise<void> {
+  await query('DELETE FROM rate_limits WHERE key = $1', [hashKey(name, id)])
 }
 
 /** Counts one hit against `name` for `id`; throws 429 (with Retry-After) once the window is full. */

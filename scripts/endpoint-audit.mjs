@@ -544,8 +544,10 @@ async function reviewsAndReturns() {
   expect(R, 'customer', 'text/plain body', await shopper.post(`/api/products/${handle}/reviews`, JSON.stringify(body)), 415)
   expect(R, 'customer', 'cross-site Origin', await shopper.post(`/api/products/${handle}/reviews`, body, EVIL), 403)
   expect(R, 'customer', 'unknown product', await shopper.post(`/api/products/${MISSING}/reviews`, body), 404)
+  // "Verified" needs a delivered order from this account; this order is still on its way (the
+  // verified-after-delivery case is covered in api-smoke.mjs).
   const created = await shopper.post(`/api/products/${handle}/reviews`, body)
-  expect(R, 'customer', 'customer reviews a piece they bought (verified)', created, 201, created.data?.review?.verified === true)
+  expect(R, 'customer', 'customer reviews a piece ordered but not yet delivered (not verified)', created, 201, created.data?.review?.verified === false)
   ctx.review = created.data?.review
   expect(R, 'customer', 'second review of the same piece', await shopper.post(`/api/products/${handle}/reviews`, body), 409)
   const unverified = await other.post(`/api/products/${handle}/reviews`, { ...body, title: 'Not bought' })

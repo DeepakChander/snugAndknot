@@ -128,7 +128,7 @@ async function main() {
   const order = await shopper.post('/api/orders', { lines: [{ variantId: vA.id, quantity: 1 }], shippingMethod: 'express', email, address, paymentMethod: 'cod', currency: 'INR' })
   const o = order.data.order
   check('COD order placed in INR', order.status === 201 && o.currency === 'INR' && o.subtotal === 11999 && o.shipping === 299, order.data)
-  check('points use the INR rate (0.01 per rupee)', o.pointsEarned === Math.floor(o.total * 0.01) && (await shopper.get('/api/auth/me')).data.user.points === pointsBefore + o.pointsEarned, { earned: o.pointsEarned })
+  check('points use the INR rate (0.01 per rupee), given on delivery', o.pointsEarned === Math.floor(o.total * 0.01) && !o.pointsGranted && (await shopper.get('/api/auth/me')).data.user.points === pointsBefore, { earned: o.pointsEarned })
   const eur = await anon.post('/api/orders', { lines: [{ variantId: vA.id, quantity: 1 }], shippingMethod: 'standard', email: `eur-${stamp}@example.com`, address, paymentMethod: 'cod', currency: 'EUR' })
   check('an order in a currency the shop does not sell in → 400', eur.status === 400, eur.data)
   const noInr = await anon.post('/api/orders', { lines: [{ variantId: vB.id, quantity: 1 }], shippingMethod: 'standard', email: `noinr-${stamp}@example.com`, address, paymentMethod: 'cod', currency: 'INR' })
@@ -140,6 +140,7 @@ async function main() {
 
   console.log('\nReturns and reports')
   await admin.patch(`/api/admin/orders/${o.id}`, { status: 'delivered' })
+  check('INR points arrive when the order is delivered', (await shopper.get('/api/auth/me')).data.user.points === pointsBefore + o.pointsEarned)
   const full = (await shopper.get(`/api/orders/${o.id}`)).data.order
   const ret = await shopper.post('/api/returns', { orderId: o.id, items: [{ orderItemId: full.items[0].id, quantity: 1 }], reason: 'wrong-size', comments: null })
   check('return refund is in INR', ret.status === 201 && ret.data.return?.currency === 'INR' && ret.data.return.refundAmount === 11999, ret.data)
