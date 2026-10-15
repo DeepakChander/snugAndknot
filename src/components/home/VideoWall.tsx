@@ -8,7 +8,7 @@ import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/motion
 import SplitReveal from '@/components/motion/SplitReveal'
 import { ButtonLink } from '@/components/kit/Button'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
-import Price from '@/components/kit/Price'
+import { ProductPrice } from '@/components/kit/Price'
 import { ArrowLeft, ArrowRight, BagIcon, InstagramIcon } from '@/components/kit/icons'
 import { cn } from '@/lib/format'
 import { youtubeCommand, youtubeEmbed, type WallItem } from '@/lib/video'
@@ -483,7 +483,7 @@ function Viewer({ items, index, onIndex, onClose }: { items: WallItem[]; index: 
                         <span className="min-w-0 flex-1">
                           {p.productType ? <span className="slash block truncate text-label text-bone/50">{p.productType}</span> : null}
                           <span className="mt-0.5 block truncate font-display text-[1.02rem] font-semibold leading-tight tracking-[-0.03em] md:text-[1.15rem]">{p.title}</span>
-                          <Price price={p.price} compareAt={p.compareAtPrice} className="mt-1 text-[0.78rem] text-bone/80" />
+                          <ProductPrice product={p} className="mt-1 text-[0.78rem] text-bone/80" />
                         </span>
                         <ArrowRight size={16} className="shrink-0 text-bone/60 transition-transform duration-500 group-hover:translate-x-1 group-hover:text-bone" />
                       </Link>

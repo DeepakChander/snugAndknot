@@ -9,6 +9,8 @@
  * Anything else (http:, javascript:, data:, credentials in the URL, other pages) is `null`.
  */
 
+import type { PriceBook } from '@/types/commerce'
+
 export type VideoSource =
   | { kind: 'file'; src: string }
   | { kind: 'youtube'; id: string; shorts: boolean }
@@ -119,6 +121,8 @@ export interface WallProduct {
   title: string
   price: number
   compareAtPrice: number | null
+  /** Prices in the shop's additional currencies, so the viewer can show the shopper's. */
+  prices: PriceBook
   image: string
   productType: string
 }
@@ -133,7 +137,7 @@ export interface WallItem {
 }
 
 type StoredItem = { id?: string; url?: string; poster?: string; caption?: string; credit?: string; productIds?: string[] }
-type ProductLike = { id: string; handle: string; title: string; price: number; compareAtPrice: number | null; images: { src: string }[]; productType: string }
+type ProductLike = { id: string; handle: string; title: string; price: number; compareAtPrice: number | null; prices: PriceBook; images: { src: string }[]; productType: string }
 
 /**
  * Turns the saved section into what the home page renders: unplayable links are dropped,
@@ -151,7 +155,7 @@ export function buildWall(items: StoredItem[] | undefined, catalogue: ProductLik
     const products: WallProduct[] = []
     for (const pid of it.productIds ?? []) {
       const p = byId.get(pid)
-      if (p) products.push({ id: p.id, handle: p.handle, title: p.title, price: p.price, compareAtPrice: p.compareAtPrice, image: p.images[0]?.src ?? '', productType: p.productType })
+      if (p) products.push({ id: p.id, handle: p.handle, title: p.title, price: p.price, compareAtPrice: p.compareAtPrice, prices: p.prices, image: p.images[0]?.src ?? '', productType: p.productType })
     }
     out.push({ id: it.id || `v${out.length}`, source, poster, caption: it.caption ?? '', credit: it.credit ?? '', products })
   }
