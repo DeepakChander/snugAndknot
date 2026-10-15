@@ -145,7 +145,18 @@ export const orderSchema = z.object({
   email: emailSchema,
   address: addressSchema,
   notes: trimmed(500).nullable().optional(),
-  paymentMethod: z.literal('cod'),
+  paymentMethod: z.enum(['cod', 'razorpay']),
+})
+
+/** What Razorpay Checkout hands the browser after a successful payment. */
+export const paymentConfirmSchema = z.object({
+  razorpayOrderId: z.string().trim().regex(/^order_[A-Za-z0-9]{6,40}$/, 'Invalid payment reference'),
+  razorpayPaymentId: z.string().trim().regex(/^pay_[A-Za-z0-9]{6,40}$/, 'Invalid payment reference'),
+  razorpaySignature: z.string().trim().regex(/^[a-f0-9]{64}$/, 'Invalid payment signature'),
+})
+
+export const paymentCancelSchema = z.object({
+  razorpayOrderId: z.string().trim().regex(/^order_[A-Za-z0-9]{6,40}$/, 'Invalid payment reference'),
 })
 
 export const orderLookupSchema = z.object({
@@ -348,6 +359,7 @@ export const settingsSchemas = {
     returnWindowDays: z.coerce.number().int().min(0).max(365),
     pointsPerDollar: z.coerce.number().finite().min(0).max(100),
     codEnabled: z.boolean(),
+    onlinePaymentsEnabled: z.boolean().default(false),
   }),
   announcement: z.object({
     enabled: z.boolean(),

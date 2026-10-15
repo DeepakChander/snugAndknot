@@ -15,7 +15,8 @@ import { ShieldIcon, TruckIcon } from '@/components/kit/icons'
 import OrderSummary from './OrderSummary'
 import { api, ApiError } from '@/lib/api'
 import { cn } from '@/lib/format'
-import type { Address, Order, ShippingMethod } from '@/types/commerce'
+import { payWithRazorpay, type CheckoutPayment } from '@/lib/razorpay-checkout'
+import type { Address, Order, PaymentMethod, ShippingMethod } from '@/types/commerce'
 
 const COUNTRIES = ['United States', 'Canada', 'United Kingdom', 'Ireland', 'India', 'Australia', 'New Zealand', 'Germany', 'France', 'Italy', 'Spain', 'Netherlands', 'Sweden', 'Denmark', 'Norway', 'Switzerland', 'Japan', 'Singapore', 'United Arab Emirates']
 const DRAFT_KEY = 'sk-checkout-draft'
@@ -66,6 +67,10 @@ export default function CheckoutView() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [placing, setPlacing] = useState(false)
+  const online = commerce.onlinePaymentsEnabled
+  const canCheckout = commerce.codEnabled || online
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(online ? 'razorpay' : 'cod')
+  const method: PaymentMethod = paymentMethod === 'razorpay' && online ? 'razorpay' : commerce.codEnabled ? 'cod' : 'razorpay'
   const restored = useRef(false)
 
   // Restore a draft after a refresh; prefill from the signed-in account.
@@ -127,7 +132,7 @@ export default function CheckoutView() {
     }
     setPlacing(true)
     try {
-      const { order } = await api<{ order: Order }>('/api/orders', {
+      const placed = await api<{ order: Order; payment?: CheckoutPayment }>('/api/orders', {
         body: {
           lines: items.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
           couponCode: couponCode && quote?.coupon ? couponCode : null,
@@ -145,9 +150,15 @@ export default function CheckoutView() {
             phone: form.phone || undefined,
           },
           notes: form.notes || null,
-          paymentMethod: 'cod',
+          paymentMethod: method,
         },
       })
+      let order = placed.order
+      if (placed.payment) {
+        const paid = await payOnline(placed.order, placed.payment)
+        if (!paid) return
+        order = paid
+      }
       try {
         sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order))
         sessionStorage.removeItem(DRAFT_KEY)
@@ -165,6 +176,49 @@ export default function CheckoutView() {
           setErrors(mapped)
         }
       } else setFormError('Something went wrong. Your bag is safe — please try again.')
+    }
+  }
+
+  /**
+   * Razorpay's window for an order the server is holding. Returns the order to confirm, or null when
+   * the customer stopped (the hold is released at once and the bag is left as it was).
+   */
+  async function payOnline(order: Order, payment: CheckoutPayment): Promise<Order | null> {
+    const release = () => api(`/api/orders/${order.id}/payment/cancel`, { body: { razorpayOrderId: payment.razorpayOrderId } }).catch(() => {})
+    let proof
+    try {
+      proof = await payWithRazorpay(payment, '#5b0e14')
+    } catch {
+      await release()
+      setPlacing(false)
+      setFormError('The payment window could not open, so nothing was charged. Check your connection (or any ad blocker) and try again.')
+      return null
+    }
+    if (!proof) {
+      await release()
+      setPlacing(false)
+      setFormError('Payment was not completed, so nothing was charged and the order was not placed. You can try again whenever you are ready.')
+      return null
+    }
+    try {
+      const res = await api<{ order: Order; confirmed: boolean; refundDue: boolean }>(`/api/orders/${order.id}/payment`, {
+        body: { razorpayOrderId: proof.razorpay_order_id, razorpayPaymentId: proof.razorpay_payment_id, razorpaySignature: proof.razorpay_signature },
+      })
+      if (res.refundDue) {
+        setPlacing(false)
+        setFormError(`Your payment for order ${order.orderNumber} arrived after the pieces were released, and some have sold out. We will refund it in full; write to ${store.email} if you have any questions.`)
+        return null
+      }
+      return res.order
+    } catch (err) {
+      // The money may have been taken: never tell the customer it was not. The server finishes the
+      // order from Razorpay's side, and the confirmation page says it is still being confirmed.
+      if (err instanceof ApiError && err.status === 400) {
+        setPlacing(false)
+        setFormError(`${err.message} Order reference: ${order.orderNumber}.`)
+        return null
+      }
+      return order
     }
   }
 
@@ -253,7 +307,27 @@ export default function CheckoutView() {
             </Step>
 
             <Step n={4} title="Payment">
-              {commerce.codEnabled ? (
+              {online ? (
+                <div className="grid gap-3" role="radiogroup" aria-label="Payment method">
+                  {(
+                    [
+                      { id: 'razorpay', title: 'Pay online', note: 'Card and other methods through Razorpay. Your card details go straight to Razorpay; we never see them.', show: true },
+                      { id: 'cod', title: 'Pay on delivery', note: 'Pay the courier when your parcel arrives.', show: commerce.codEnabled },
+                    ] as const
+                  )
+                    .filter((m) => m.show)
+                    .map((m) => (
+                      <label key={m.id} className={cn('flex cursor-pointer items-center gap-4 rounded-2xl border p-5 transition-colors', method === m.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15 hover:border-ink/40')}>
+                        <input type="radio" name="payment" value={m.id} checked={method === m.id} onChange={() => setPaymentMethod(m.id)} className="h-4 w-4 accent-[#5b0e14]" />
+                        <span className="flex-1">
+                          <span className="block">{m.title}</span>
+                          <span className="text-xs text-stone">{m.note}</span>
+                        </span>
+                        {m.id === 'razorpay' ? <ShieldIcon size={20} className="text-burgundy" /> : null}
+                      </label>
+                    ))}
+                </div>
+              ) : commerce.codEnabled ? (
                 <div className="grid gap-3">
                   <label className="flex items-center gap-4 rounded-2xl border border-ink bg-ink/[0.03] p-5">
                     <input type="radio" name="payment" checked readOnly className="h-4 w-4 accent-[#5b0e14]" />
@@ -295,8 +369,14 @@ export default function CheckoutView() {
                 {formError}
               </p>
             ) : null}
-            <Button type="submit" size="lg" block loading={placing} disabled={!commerce.codEnabled || !quote || loading} arrow>
-              {placing ? 'Placing order…' : `Place order${quote ? ` — ${money(quote.total)}` : ''}`}
+            <Button type="submit" size="lg" block loading={placing} disabled={!canCheckout || !quote || loading} arrow>
+              {method === 'razorpay'
+                ? placing
+                  ? 'Waiting for payment…'
+                  : `Pay${quote ? ` ${money(quote.total)}` : ''} securely`
+                : placing
+                  ? 'Placing order…'
+                  : `Place order${quote ? ` — ${money(quote.total)}` : ''}`}
             </Button>
             <p className="mt-3 text-center text-xs text-stone">
               By placing your order you agree to our{' '}

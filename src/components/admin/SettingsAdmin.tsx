@@ -108,7 +108,15 @@ function StoreForm({ initial }: { initial: SiteSettings['store'] }) {
   )
 }
 
-function CommerceForm({ initial }: { initial: SiteSettings['commerce'] }) {
+/** The Razorpay connection as the server sees it. Never carries a key or secret. */
+export interface RazorpayConnection {
+  configured: boolean
+  mode: 'test' | 'live' | null
+  webhook: boolean
+  webhookUrl: string
+}
+
+function CommerceForm({ initial, payments }: { initial: SiteSettings['commerce']; payments: RazorpayConnection }) {
   const s = useSection('commerce', initial)
   const d = s.draft
   const set = (patch: Partial<typeof d>) => s.setDraft({ ...d, ...patch })
@@ -145,8 +153,52 @@ function CommerceForm({ initial }: { initial: SiteSettings['commerce'] }) {
             <Input label="Points earned per 1 spent" type="number" min={0} max={100} step="0.1" value={d.pointsPerDollar} error={s.err.pointsPerDollar} onChange={(e) => set({ pointsPerDollar: num(e.target.value) })} />
           </div>
         </Section>
-        <Section title="Payment" description="Card payments are not connected yet, so cash on delivery is the only way to pay.">
-          <Toggle checked={d.codEnabled} onChange={(v) => set({ codEnabled: v })} label="Accept cash on delivery" description={d.codEnabled ? 'Customers can place orders and pay when they arrive.' : 'Checkout is paused: customers are asked to contact you instead.'} />
+        <Section
+          title="Payment"
+          description={
+            payments.configured
+              ? `Razorpay is connected in ${payments.mode} mode${payments.mode === 'test' ? ': payments use test cards and no real money moves' : ''}. Turn online payments on to offer them at checkout.`
+              : 'Online payments need the Razorpay keys on the server first (SNUGKNOT_RAZORPAY_KEY_ID and SNUGKNOT_RAZORPAY_KEY_SECRET; see the README). Until then cash on delivery is the only way to pay.'
+          }
+        >
+          <div className="space-y-5">
+            <Toggle
+              checked={d.onlinePaymentsEnabled}
+              disabled={!payments.configured && !d.onlinePaymentsEnabled}
+              onChange={(v) => set({ onlinePaymentsEnabled: v })}
+              label="Accept online payments (Razorpay)"
+              description={
+                !payments.configured
+                  ? 'Not connected yet.'
+                  : d.onlinePaymentsEnabled
+                    ? 'Customers can pay by card and the other methods your Razorpay account allows. Orders are placed once the payment is confirmed.'
+                    : 'Off: checkout does not offer online payment.'
+              }
+            />
+            <Toggle
+              checked={d.codEnabled}
+              onChange={(v) => set({ codEnabled: v })}
+              label="Accept cash on delivery"
+              description={
+                d.codEnabled
+                  ? 'Customers can place orders and pay when they arrive.'
+                  : d.onlinePaymentsEnabled && payments.configured
+                    ? 'Off: customers pay online only.'
+                    : 'Checkout is paused: customers are asked to contact you instead.'
+              }
+            />
+            {payments.configured ? (
+              <p className={cn('rounded-xl p-3 text-xs', payments.webhook ? 'bg-success/10 text-success' : 'bg-gold/15 text-gold-deep')}>
+                {payments.webhook ? (
+                  <>Webhook secret set. Razorpay should send events to <span className="font-mono">{payments.webhookUrl}</span>.</>
+                ) : (
+                  <>
+                    Recommended: in Razorpay → Webhooks, add <span className="font-mono">{payments.webhookUrl}</span> with the events payment.captured, payment.authorized, order.paid and refund.processed, and set the same secret as SNUGKNOT_RAZORPAY_WEBHOOK_SECRET. Without it, a customer who closes the page right after paying is still placed, but only when the 30-minute check runs.
+                  </>
+                )}
+              </p>
+            ) : null}
+          </div>
         </Section>
       </Card>
       <SaveBar dirty={s.dirty} busy={s.busy} onSave={s.save} onReset={s.reset} />
@@ -298,7 +350,7 @@ function SeoForm({ initial }: { initial: SiteSettings['seo'] }) {
 
 /* ─────────────────────────── Page ─────────────────────────── */
 
-export function SettingsAdmin({ settings, tab }: { settings: SiteSettings; tab: SettingsKey }) {
+export function SettingsAdmin({ settings, tab, payments }: { settings: SiteSettings; tab: SettingsKey; payments: RazorpayConnection }) {
   const router = useRouter()
   const pathname = usePathname()
   const current = TABS.find((t) => t.key === tab) ?? TABS[0]
@@ -321,7 +373,7 @@ export function SettingsAdmin({ settings, tab }: { settings: SiteSettings; tab: 
       </div>
       <div role="tabpanel" aria-label={current.label}>
         {current.key === 'store' ? <StoreForm initial={settings.store} /> : null}
-        {current.key === 'commerce' ? <CommerceForm initial={settings.commerce} /> : null}
+        {current.key === 'commerce' ? <CommerceForm initial={settings.commerce} payments={payments} /> : null}
         {current.key === 'announcement' ? <AnnouncementForm initial={settings.announcement} /> : null}
         {current.key === 'reviews' ? <ReviewsForm initial={settings.reviews} /> : null}
         {current.key === 'homepage' ? <HomepageForm initial={settings.homepage} /> : null}

@@ -7,32 +7,44 @@ const isDev = process.env.NODE_ENV === 'development'
  * request). Allows this site plus the analytics it actually loads: Google Analytics and the
  * Meta Pixel. Images come from this site or the two photo hosts the image optimiser allows.
  */
-const csp = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://*.googletagmanager.com https://connect.facebook.net`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net",
-  "font-src 'self' data:",
-  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net",
-  "media-src 'self' blob:",
-  "worker-src 'self' blob:",
-  // The Meta Pixel sends some events through a hidden facebook.com iframe and form.
-  "frame-src https://www.facebook.com",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self' https://www.facebook.com",
-  "frame-ancestors 'none'",
-  // Only on Vercel: a local `next start` over plain http must keep working.
-  ...(process.env.VERCEL ? ['upgrade-insecure-requests'] : []),
-].join('; ')
+const buildCsp = (extra: { script?: string; img?: string; connect?: string; frame?: string; form?: string } = {}) =>
+  [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://*.googletagmanager.com https://connect.facebook.net${extra.script ?? ''}`,
+    "style-src 'self' 'unsafe-inline'",
+    `img-src 'self' data: blob: https://images.unsplash.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net${extra.img ?? ''}`,
+    "font-src 'self' data:",
+    `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://www.facebook.com https://connect.facebook.net${extra.connect ?? ''}`,
+    "media-src 'self' blob:",
+    "worker-src 'self' blob:",
+    // The Meta Pixel sends some events through a hidden facebook.com iframe and form.
+    `frame-src https://www.facebook.com${extra.frame ?? ''}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    `form-action 'self' https://www.facebook.com${extra.form ?? ''}`,
+    "frame-ancestors 'none'",
+    // Only on Vercel: a local `next start` over plain http must keep working.
+    ...(process.env.VERCEL ? ['upgrade-insecure-requests'] : []),
+  ].join('; ')
+
+/**
+ * Razorpay Checkout, only when its key is set: the script comes from checkout.razorpay.com, the
+ * payment runs in an api.razorpay.com frame, and a bank's 3-D Secure page may open in a pop-up that
+ * must be able to report back (hence `same-origin-allow-popups`). It applies to every page, not just
+ * /checkout, because the shop navigates client-side: a visitor who reaches checkout from the bag keeps
+ * the headers of the page they arrived on. Without the key the headers are exactly as before.
+ */
+const razorpay = /^rzp_(test|live)_/.test(process.env.SNUGKNOT_RAZORPAY_KEY_ID?.trim() ?? '')
+const RZP = ' https://*.razorpay.com'
+const csp = razorpay ? buildCsp({ script: RZP, img: RZP, connect: RZP, frame: RZP, form: RZP }) : buildCsp()
 
 const securityHeaders = [
   { key: 'Content-Security-Policy', value: csp },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'X-Frame-Options', value: 'DENY' },
-  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()' },
+  { key: 'Cross-Origin-Opener-Policy', value: razorpay ? 'same-origin-allow-popups' : 'same-origin' },
+  { key: 'Permissions-Policy', value: `camera=(), microphone=(), geolocation=(), payment=(${razorpay ? 'self "https://api.razorpay.com"' : ''}), usb=(), browsing-topics=()` },
   // Browsers ignore this over plain http, so it is safe to send everywhere.
   { key: 'Strict-Transport-Security', value: 'max-age=63072000' },
 ]

@@ -51,6 +51,7 @@ export const STATUS_TONE: Record<string, 'neutral' | 'good' | 'warn' | 'bad' | '
   active: 'good',
   draft: 'warn',
   archived: 'neutral',
+  pending_payment: 'warn',
   placed: 'warn',
   confirmed: 'info',
   shipped: 'info',

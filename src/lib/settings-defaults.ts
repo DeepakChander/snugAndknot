@@ -29,6 +29,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     returnWindowDays: 30,
     pointsPerDollar: 1,
     codEnabled: true,
+    onlinePaymentsEnabled: false,
   },
   announcement: {
     enabled: true,

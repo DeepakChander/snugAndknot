@@ -12,7 +12,7 @@ export interface LegalSection {
  * actually does (pay on delivery, Google Analytics and the Meta Pixel). The store owner
  * should have it reviewed for their jurisdiction.
  */
-export function privacySections({ store }: Pick<SiteSettings, 'store'>): LegalSection[] {
+export function privacySections({ store, commerce }: Pick<SiteSettings, 'store' | 'commerce'>): LegalSection[] {
   return [
     {
       id: 'information-collected',
@@ -48,7 +48,12 @@ export function privacySections({ store }: Pick<SiteSettings, 'store'>): LegalSe
     {
       id: 'payments',
       title: 'Payments',
-      body: ['Orders are currently paid on delivery. We do not collect or store card details on this website.'],
+      body: commerce.onlinePaymentsEnabled
+        ? [
+            'Online payments are processed by Razorpay. You enter your card or bank details in Razorpay\'s secure payment window; they are never sent to or stored on this website. We receive only the payment reference, amount and status, and share your name, email and phone with Razorpay to process the payment.',
+            ...(commerce.codEnabled ? ['You can also choose to pay on delivery.'] : []),
+          ]
+        : ['Orders are currently paid on delivery. We do not collect or store card details on this website.'],
     },
     {
       id: 'security',
@@ -102,7 +107,11 @@ export function termsSections({ store, commerce }: Pick<SiteSettings, 'store' | 
       title: 'Orders, prices and payment',
       body: [
         `Prices are shown in ${commerce.currency} and may change. We may refuse or cancel an order — for example because of a pricing error, suspected fraud or limited stock — and will let you know if we do.`,
-        commerce.codEnabled ? 'Orders are currently paid on delivery: you pay the courier when your parcel arrives.' : 'Payment options are shown at checkout.',
+        commerce.onlinePaymentsEnabled
+          ? `Online payments are taken through Razorpay when you place the order; your order is confirmed once the payment is.${commerce.codEnabled ? ' You can also choose to pay the courier on delivery.' : ''}`
+          : commerce.codEnabled
+            ? 'Orders are currently paid on delivery: you pay the courier when your parcel arrives.'
+            : 'Payment options are shown at checkout.',
         commerce.taxRate > 0 ? `Tax is charged at ${commerce.taxRate}% where applicable.` : 'Any applicable taxes are shown at checkout.',
       ],
     },

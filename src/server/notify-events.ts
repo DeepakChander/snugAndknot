@@ -2,6 +2,7 @@ import 'server-only'
 import { isDeepStrictEqual } from 'node:util'
 import { query } from '@/server/db/client'
 import { getSettings } from '@/server/repo/settings'
+import { UNPAID_ONLINE } from '@/server/repo/orders'
 import { notify, type Field, type Section } from '@/server/notify'
 import { mailConfig } from '@/server/mail'
 import { formatMoney } from '@/lib/format'
@@ -41,11 +42,13 @@ const itemLines = (o: Order, m: (n: number) => string) =>
 
 /* ───────────────────────── Orders & payments ───────────────────────── */
 
+const paymentLabel = (method: string) => (method === 'cod' ? 'Cash on delivery' : method === 'razorpay' ? 'Paid online (Razorpay)' : method)
+
 /** A new order. Flags: first order, guest, coupon, express, high value, customer note, large order. */
 export const orderPlaced = safely('orderPlaced', async (order: Order) => {
   const m = await money()
   const { commerce } = await getSettings()
-  const [{ n }] = await query<{ n: number }>('SELECT count(*)::int AS n FROM orders WHERE lower(email) = lower($1)', [order.email])
+  const [{ n }] = await query<{ n: number }>(`SELECT count(*)::int AS n FROM orders WHERE lower(email) = lower($1) AND NOT ${UNPAID_ONLINE}`, [order.email])
   const pieces = order.items.reduce((s, i) => s + i.quantity, 0)
   const highValue = order.total >= Math.max(300, commerce.freeShippingThreshold * 2)
   const tags = [
@@ -57,6 +60,7 @@ export const orderPlaced = safely('orderPlaced', async (order: Order) => {
     order.notes ? 'Customer note' : null,
     pieces >= 10 ? 'Large order' : null,
     order.paymentMethod === 'cod' ? 'Cash on delivery' : null,
+    order.paymentMethod === 'razorpay' ? 'Paid online' : null,
   ].filter((t): t is string => !!t)
   await notify({
     type: 'order.placed',
@@ -74,7 +78,8 @@ export const orderPlaced = safely('orderPlaced', async (order: Order) => {
           ['Shipping', `${m(order.shipping)} (${order.shippingMethod})`],
           ['Tax', order.tax ? m(order.tax) : null],
           ['Total', m(order.total)],
-          ['Payment', `${order.paymentMethod === 'cod' ? 'Cash on delivery' : order.paymentMethod} — ${order.paymentStatus}`],
+          ['Payment', `${paymentLabel(order.paymentMethod)} — ${order.paymentStatus}`],
+          ['Razorpay payment', order.paymentReference],
         ],
       },
       {
@@ -143,7 +148,7 @@ export const orderUpdated = safely('orderUpdated', async (before: Order, after: 
       subject: refunded ? `Order ${after.orderNumber} refunded — ${m(after.total)}` : `Payment ${after.paymentStatus} for order ${after.orderNumber}`,
       intro: refunded ? 'The order payment was marked refunded.' : `Payment status changed from ${before.paymentStatus} to ${after.paymentStatus}.`,
       tags: [`Payment ${before.paymentStatus} → ${after.paymentStatus}`],
-      sections: [{ fields: [...summary, ['Payment method', after.paymentMethod], who] }],
+      sections: [{ fields: [...summary, ['Payment method', paymentLabel(after.paymentMethod)], who] }],
     })
   }
   if ((before.trackingNumber ?? '') !== (after.trackingNumber ?? '') && before.status === after.status) {
@@ -165,6 +170,75 @@ export const orderUpdated = safely('orderUpdated', async (before: Order, after: 
       sections: [{ fields: [...summary, who] }, { title: 'Note', text: after.adminNotes || '(cleared)' }],
     })
   }
+})
+
+const razorpayLink = (o: Order): Field => ['Razorpay payment', o.paymentReference ? `${o.paymentReference} (dashboard.razorpay.com/app/payments/${o.paymentReference})` : null]
+
+/**
+ * An online payment arrived after the order's hold had run out. 'reinstated': every piece was still
+ * in stock, so the order went ahead (orderPlaced is sent too). 'refund-needed': pieces sold out
+ * meanwhile, so the order stays cancelled and the customer must be refunded in Razorpay.
+ */
+export const latePayment = safely('latePayment', async (order: Order, kind: 'reinstated' | 'refund-needed') => {
+  const m = await money()
+  const refund = kind === 'refund-needed'
+  await notify({
+    type: refund ? 'payment.refund_needed' : 'payment.late_reinstated',
+    subject: refund ? `Refund needed: ${order.orderNumber} was paid after it was cancelled — ${m(order.total)}` : `Late payment: ${order.orderNumber} went ahead after all`,
+    intro: refund
+      ? `${order.customerName} paid ${m(order.total)} online after the order's stock hold had run out, and some pieces have sold out since. The order stays cancelled. Refund the payment in the Razorpay dashboard and let the customer know.`
+      : `${order.customerName}'s payment arrived after the order's stock hold had run out. Every piece was still in stock, so the order is placed and paid. Check it before shipping if it had been cancelled on purpose.`,
+    tags: refund ? ['Payment', 'Action needed'] : ['Payment'],
+    replyTo: order.email,
+    sections: [{ fields: [['Order', order.orderNumber], ['Customer', `${order.customerName} <${order.email}>`], ['Total', m(order.total)], ['Status', order.status], razorpayLink(order)] }, { title: 'Items', list: itemLines(order, m) }],
+    action: { label: 'Open the order', path: `/admin/orders/${order.id}` },
+  })
+})
+
+/** An online checkout that was not paid: the customer closed it, it could not start, or it ran past the hold. Its stock is back. */
+export const checkoutAbandoned = safely('checkoutAbandoned', async (order: Order, reason: 'closed' | 'expired' | 'start-failed') => {
+  const m = await money()
+  const why = {
+    closed: 'The customer closed the payment window without paying.',
+    expired: 'The payment was not completed within 30 minutes.',
+    'start-failed': 'Razorpay could not be reached to start the payment, so the customer saw an error.',
+  }[reason]
+  await notify({
+    type: 'payment.checkout_abandoned',
+    subject: `Unpaid checkout: ${order.orderNumber} — ${m(order.total)}`,
+    intro: `${why} The order was cancelled and its pieces went back into stock. Nothing was charged. The customer never sees this order.`,
+    tags: ['Payment', reason === 'start-failed' ? 'Razorpay error' : 'Not paid'],
+    replyTo: order.email,
+    sections: [{ fields: [['Order', order.orderNumber], ['Customer', `${order.customerName} <${order.email}>`], ['Total', m(order.total)]] }, { title: 'Items', list: itemLines(order, m) }],
+    action: { label: 'Open the order', path: `/admin/orders/${order.id}` },
+  })
+})
+
+/** Razorpay reported a payment for an order that does not match it. Nothing was marked paid. */
+export const paymentMismatch = safely('paymentMismatch', async (orderId: string, orderNumber: string, fields: Field[]) => {
+  await notify({
+    type: 'payment.mismatch',
+    subject: `Payment does not match order ${orderNumber}`,
+    intro: 'A Razorpay payment for this order has a different amount or currency, or was not captured. The order was not marked paid. Check the payment in the Razorpay dashboard.',
+    tags: ['Payment', 'Action needed'],
+    dedupe: { key: orderId, minutes: 60 },
+    sections: [{ fields }],
+    action: { label: 'Open the order', path: `/admin/orders/${orderId}` },
+  })
+})
+
+/** A full refund made in the Razorpay dashboard, reported by the webhook. */
+export const paymentRefunded = safely('paymentRefunded', async (order: Order) => {
+  const m = await money()
+  await notify({
+    type: 'order.refunded',
+    subject: `Order ${order.orderNumber} refunded — ${m(order.total)}`,
+    intro: 'Razorpay reported a full refund for this order, so its payment is now marked refunded.',
+    tags: ['Payment paid → refunded'],
+    replyTo: order.email,
+    sections: [{ fields: [['Order', order.orderNumber], ['Customer', `${order.customerName} <${order.email}>`], ['Total', m(order.total)], razorpayLink(order), ['Changed by', 'Razorpay webhook']] }],
+    action: { label: 'Open the order', path: `/admin/orders/${order.id}` },
+  })
 })
 
 /* ───────────────────────── Inventory ───────────────────────── */
@@ -554,6 +628,7 @@ const LIMIT_COPY: Record<string, string> = {
   signup: 'Many accounts being created from one connection.',
   order: 'Many orders from one connection — possible fake orders.',
   orderEmail: 'Many orders for one email address.',
+  payment: 'Many payment confirmations or cancellations from one connection.',
   orderLookupIp: 'Someone is guessing order numbers on the tracking page.',
   orderLookupEmail: 'Repeated tracking lookups for one email.',
   contact: 'Contact form flooding from one connection.',

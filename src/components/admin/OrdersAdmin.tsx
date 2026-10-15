@@ -9,7 +9,10 @@ import { Badge, Btn, Card, Empty, Input, PageHeader, STATUS_TONE, Select, Textar
 import { cn, formatDate } from '@/lib/format'
 import type { Order, OrderStatus, PaymentStatus, ReturnRequest, ReturnStatus } from '@/types/commerce'
 
-const TABS: (OrderStatus | 'all')[] = ['all', 'placed', 'confirmed', 'shipped', 'delivered', 'cancelled']
+const TABS: (OrderStatus | 'all')[] = ['all', 'pending_payment', 'placed', 'confirmed', 'shipped', 'delivered', 'cancelled']
+const statusLabel = (s: OrderStatus | 'all') => (s === 'pending_payment' ? 'awaiting payment' : s)
+/** An online checkout that was never paid (abandoned, failed, or still open). */
+const unpaidOnline = (o: Order) => o.paymentMethod === 'razorpay' && !o.paidAt
 
 export function OrdersList({ orders, initialStatus }: { orders: Order[]; initialStatus: string }) {
   const money = useMoney()
@@ -28,7 +31,7 @@ export function OrdersList({ orders, initialStatus }: { orders: Order[]; initial
         <div className="no-scrollbar flex overflow-x-auto rounded-full border border-ink/10 bg-white/70 p-1">
           {TABS.map((s) => (
             <button key={s} type="button" onClick={() => setStatus(s)} className={cn('shrink-0 rounded-full px-3.5 py-1.5 text-sm capitalize', status === s ? 'bg-ink text-ivory' : 'text-ink/70 hover:text-ink')}>
-              {s} <span className="ml-1 text-xs opacity-60">{count(s)}</span>
+              {statusLabel(s)} <span className="ml-1 text-xs opacity-60">{count(s)}</span>
             </button>
           ))}
         </div>
@@ -65,10 +68,15 @@ export function OrdersList({ orders, initialStatus }: { orders: Order[]; initial
                   </td>
                   <td className="px-3 py-3 text-stone">{formatDate(o.placedAt, 'en-US', { dateStyle: 'medium', timeStyle: 'short' })}</td>
                   <td className="px-3 py-3">
-                    <Badge tone={STATUS_TONE[o.status]}>{o.status}</Badge>
+                    <Badge tone={STATUS_TONE[o.status]}>{statusLabel(o.status)}</Badge>
                   </td>
                   <td className="px-3 py-3">
-                    <Badge tone={o.paymentStatus === 'paid' ? 'good' : o.paymentStatus === 'refunded' ? 'neutral' : 'warn'}>{o.paymentStatus}</Badge>
+                    {o.status === 'cancelled' && unpaidOnline(o) ? (
+                      <Badge tone="neutral">not paid</Badge>
+                    ) : (
+                      <Badge tone={o.paymentStatus === 'paid' ? 'good' : o.paymentStatus === 'refunded' ? 'neutral' : 'warn'}>{o.paymentStatus}</Badge>
+                    )}
+                    <span className="ml-1.5 text-xs text-stone">{o.paymentMethod === 'cod' ? 'COD' : o.paymentMethod === 'razorpay' ? 'online' : o.paymentMethod}</span>
                   </td>
                   <td className="px-3 py-3 tabular-nums">{o.items.reduce((s, i) => s + i.quantity, 0)}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{money(o.total)}</td>
@@ -111,7 +119,7 @@ export function OrderDetailAdmin({ order }: { order: Order }) {
         title={order.orderNumber}
         description={
           <>
-            Placed {formatDate(order.placedAt, 'en-US', { dateStyle: 'long', timeStyle: 'short' })} · <Badge tone={STATUS_TONE[order.status]}>{order.status}</Badge> <Badge tone={order.paymentStatus === 'paid' ? 'good' : 'warn'}>{order.paymentStatus}</Badge>
+            Placed {formatDate(order.placedAt, 'en-US', { dateStyle: 'long', timeStyle: 'short' })} · <Badge tone={STATUS_TONE[order.status]}>{statusLabel(order.status)}</Badge> <Badge tone={order.paymentStatus === 'paid' ? 'good' : 'warn'}>{order.status === 'cancelled' && unpaidOnline(order) ? 'not paid' : order.paymentStatus}</Badge>
           </>
         }
         actions={
@@ -125,7 +133,13 @@ export function OrderDetailAdmin({ order }: { order: Order }) {
               <Btn
                 variant="danger"
                 loading={busy}
-                onClick={() => confirmAction('Cancel this order? Stock is returned to inventory and points earned are removed.') && patch({ status: 'cancelled' }, 'Order cancelled and stock restored.')}
+                onClick={() =>
+                  confirmAction(
+                    order.paymentMethod === 'razorpay' && order.paymentStatus === 'paid'
+                      ? 'Cancel this order? Stock is returned to inventory and points earned are removed. The online payment is NOT refunded automatically: refund it in the Razorpay dashboard.'
+                      : 'Cancel this order? Stock is returned to inventory and points earned are removed.'
+                  ) && patch({ status: 'cancelled' }, 'Order cancelled and stock restored.')
+                }
               >
                 Cancel order
               </Btn>
@@ -226,12 +240,32 @@ export function OrderDetailAdmin({ order }: { order: Order }) {
             </Btn>
           </Card>
           <Card title="Payment">
-            <Select label="Payment status" value={order.paymentStatus} onChange={(e) => patch({ paymentStatus: e.target.value as PaymentStatus }, 'Payment status updated.')}>
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
-              <option value="refunded">Refunded</option>
-            </Select>
-            <p className="mt-2 text-xs text-stone">Pay-on-delivery orders are marked paid automatically when delivered.</p>
+            <p className="mb-3 text-sm">{order.paymentMethod === 'razorpay' ? 'Paid online through Razorpay' : order.paymentMethod === 'cod' ? 'Cash on delivery' : order.paymentMethod}</p>
+            {order.paymentReference ? (
+              <p className="mb-3 text-xs text-stone">
+                Payment{' '}
+                <a href={`https://dashboard.razorpay.com/app/payments/${encodeURIComponent(order.paymentReference)}`} target="_blank" rel="noreferrer" className="font-mono text-burgundy underline">
+                  {order.paymentReference}
+                </a>
+                {order.paidAt ? ` · paid ${formatDate(order.paidAt, 'en-US', { dateStyle: 'medium', timeStyle: 'short' })}` : ''}
+              </p>
+            ) : null}
+            {order.status === 'pending_payment' ? (
+              <p className="text-xs text-stone">The customer is paying online. The order is placed automatically once Razorpay confirms the payment, or cancelled after 30 minutes without one.</p>
+            ) : (
+              <>
+                <Select label="Payment status" value={order.paymentStatus} onChange={(e) => patch({ paymentStatus: e.target.value as PaymentStatus }, 'Payment status updated.')}>
+                  <option value="pending">Pending</option>
+                  <option value="paid">Paid</option>
+                  <option value="refunded">Refunded</option>
+                </Select>
+                <p className="mt-2 text-xs text-stone">
+                  {order.paymentMethod === 'razorpay'
+                    ? 'Refunds are made in the Razorpay dashboard. With the webhook set up, a full refund there marks this order refunded on its own.'
+                    : 'Pay-on-delivery orders are marked paid automatically when delivered.'}
+                </p>
+              </>
+            )}
           </Card>
         </div>
       </div>

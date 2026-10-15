@@ -51,6 +51,9 @@ export default function Confirmation({ orderNumber }: { orderNumber: string }) {
   }
 
   const a = order.shippingAddress
+  const paidOnline = order.paymentMethod === 'razorpay' && order.paymentStatus === 'paid'
+  // Razorpay took the payment but the server has not confirmed it yet (the webhook will).
+  const confirming = order.paymentMethod === 'razorpay' && !paidOnline
   return (
     <>
       <section data-nav-theme="dark" className="relative overflow-hidden bg-noir pb-20 pt-nav text-bone">
@@ -64,7 +67,13 @@ export default function Confirmation({ orderNumber }: { orderNumber: string }) {
             {`Thank you, ${a.firstName}.`}
           </SplitReveal>
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: EASE, delay: 0.6 }} className="mt-6 max-w-xl text-lead text-bone/70">
-            Your order is with the atelier. We will prepare it carefully and it will be sent to {a.city}. You will pay {money(order.total)} on delivery.
+            {confirming ? (
+              <>We are confirming your payment of {money(order.total)} with the bank. Please do not pay again: your order will show as placed on Track an order within a few minutes. If it does not, write to us with order number {order.orderNumber}.</>
+            ) : paidOnline ? (
+              <>Your order is with the atelier and your payment of {money(order.total)} is received. We will prepare it carefully and it will be sent to {a.city}.</>
+            ) : (
+              <>Your order is with the atelier. We will prepare it carefully and it will be sent to {a.city}. You will pay {money(order.total)} on delivery.</>
+            )}
           </motion.p>
           {order.pointsEarned > 0 ? (
             <p className="mt-4 inline-flex rounded-full bg-gold/15 px-4 py-2 text-sm text-gold-light">+{order.pointsEarned} loyalty points added to your account</p>
@@ -80,7 +89,7 @@ export default function Confirmation({ orderNumber }: { orderNumber: string }) {
               {[
                 ['Confirmed', 'We review your order and confirm it with you.'],
                 ['Shipped', 'Your parcel leaves the atelier with a tracking number.'],
-                ['Delivered', 'Pay the courier on arrival. Returns open for the next weeks.'],
+                ['Delivered', order.paymentMethod === 'cod' ? 'Pay the courier on arrival. Returns open for the next weeks.' : 'Returns open for the next weeks.'],
               ].map(([t, d], i) => (
                 <li key={t} className="rounded-[1.5rem] bg-bone/70 p-6">
                   <span className="font-mono text-sm text-gold">{String(i + 1).padStart(2, '0')}</span>
@@ -145,7 +154,7 @@ export default function Confirmation({ orderNumber }: { orderNumber: string }) {
                 </div>
               ) : null}
               <div className="flex justify-between border-t border-ink/10 pt-3 text-base">
-                <dt>Total due on delivery</dt>
+                <dt>{order.paymentMethod === 'cod' ? 'Total due on delivery' : paidOnline ? 'Total paid' : 'Total'}</dt>
                 <dd className="font-mono text-xl">{money(order.total)}</dd>
               </div>
             </dl>

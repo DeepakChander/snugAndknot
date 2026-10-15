@@ -349,6 +349,36 @@ UPDATE settings SET value = jsonb_set(value, '{email}', to_jsonb('support@snugan
  WHERE key = 'store' AND value->>'email' = 'hello@snugandknot.com';
 `,
   },
+  {
+    version: 7,
+    name: 'razorpay-payments',
+    // Online payments. An order paid online is saved as 'pending_payment' (its stock held) until the
+    // payment is verified, then becomes 'placed'. Only adds: older code keeps working on this schema.
+    // The status check is found by its definition rather than by name, so a differently named
+    // constraint cannot survive and keep refusing the new status.
+    sql: `
+DO $$
+DECLARE c record;
+BEGIN
+  FOR c IN
+    SELECT conname FROM pg_constraint
+     WHERE conrelid = 'orders'::regclass AND contype = 'c'
+       AND pg_get_constraintdef(oid) LIKE '%status%' AND pg_get_constraintdef(oid) NOT LIKE '%payment_status%'
+  LOOP
+    EXECUTE format('ALTER TABLE orders DROP CONSTRAINT %I', c.conname);
+  END LOOP;
+END $$;
+ALTER TABLE orders ADD CONSTRAINT orders_status_check
+  CHECK (status IN ('pending_payment', 'placed', 'confirmed', 'shipped', 'delivered', 'cancelled'));
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS razorpay_order_id TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS razorpay_payment_id TEXT;
+-- Set once, when an online payment is confirmed. NULL on cash-on-delivery orders.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
+CREATE UNIQUE INDEX IF NOT EXISTS orders_razorpay_order_key ON orders (razorpay_order_id) WHERE razorpay_order_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS orders_pending_payment_idx ON orders (placed_at) WHERE status = 'pending_payment';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

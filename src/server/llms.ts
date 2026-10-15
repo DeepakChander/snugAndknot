@@ -42,7 +42,11 @@ export async function buildLlmsTxt({ full }: { full: boolean }): Promise<string>
     `Prices are in ${commerce.currency}.`,
     commerce.freeShippingThreshold > 0 ? `Standard shipping is ${money(commerce.standardShippingRate)}, free on orders over ${money(commerce.freeShippingThreshold)}; express is ${money(commerce.expressShippingRate)}.` : `Standard shipping is ${money(commerce.standardShippingRate)}; express is ${money(commerce.expressShippingRate)}.`,
     `Unworn pieces in their original condition can be returned within ${commerce.returnWindowDays} days of delivery.`,
-    commerce.codEnabled ? 'Orders are paid on delivery (cash on delivery).' : '',
+    commerce.onlinePaymentsEnabled
+      ? `Orders are paid online at checkout through Razorpay${commerce.codEnabled ? ', or on delivery (cash on delivery)' : ''}.`
+      : commerce.codEnabled
+        ? 'Orders are paid on delivery (cash on delivery).'
+        : '',
   ].filter(Boolean)
 
   const out: string[] = [

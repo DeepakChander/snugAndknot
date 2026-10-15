@@ -16,9 +16,11 @@ export default function Promises() {
     },
     { Icon: ReturnIcon, title: `${commerce.returnWindowDays}-day returns`, body: 'Start a return from your account once your order arrives.' },
     { Icon: NeedleIcon, title: 'Hand-finished', body: 'Buttons, seams and labels finished by hand in small batches.' },
-    commerce.codEnabled
-      ? { Icon: ShieldIcon, title: 'Pay on delivery', body: 'Pay when your parcel arrives — no card details needed online.' }
-      : { Icon: ShieldIcon, title: 'Track every order', body: 'Follow each order from your account, or with your order number and email.' },
+    commerce.onlinePaymentsEnabled
+      ? { Icon: ShieldIcon, title: 'Secure checkout', body: commerce.codEnabled ? 'Pay online through Razorpay, or pay when your parcel arrives.' : 'Pay online through Razorpay. Card details never reach this site.' }
+      : commerce.codEnabled
+        ? { Icon: ShieldIcon, title: 'Pay on delivery', body: 'Pay when your parcel arrives — no card details needed online.' }
+        : { Icon: ShieldIcon, title: 'Track every order', body: 'Follow each order from your account, or with your order number and email.' },
   ]
   return (
     <section className="border-t border-ink/10 bg-ivory text-ink" aria-label="Our promises">

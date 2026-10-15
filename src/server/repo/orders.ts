@@ -7,6 +7,7 @@ import type {
   Order,
   OrderItem,
   OrderStatus,
+  PaymentMethod,
   PaymentStatus,
   Quote,
   ReturnReason,
@@ -207,6 +208,8 @@ function mapOrder(r: Row, items: OrderItem[]): Order {
     shippedAt: isoOrNull(r.shipped_at),
     deliveredAt: isoOrNull(r.delivered_at),
     cancelledAt: isoOrNull(r.cancelled_at),
+    paidAt: isoOrNull(r.paid_at),
+    paymentReference: r.razorpay_payment_id ?? null,
     items,
   }
 }
@@ -232,10 +235,21 @@ export interface PlaceOrderInput {
   address: Address
   notes: string | null
   userId: string | null
-  paymentMethod: 'cod'
+  paymentMethod: PaymentMethod
   commerce: CommerceSettings
 }
 
+/**
+ * An online order that was never paid: its checkout was abandoned or the payment failed. Customers
+ * never see these, and they are left out of sales figures.
+ */
+export const UNPAID_ONLINE = "(payment_method = 'razorpay' AND paid_at IS NULL)"
+
+/**
+ * Cash-on-delivery orders are placed straight away. Online orders start as 'pending_payment' with
+ * their stock and coupon held; markOrderPaid() places them, releaseUnpaidOrder() gives the stock back.
+ * Loyalty points are granted only once the order is placed.
+ */
 export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
   return tx(async (q) => {
     const quote = await quoteCart(input.lines, input, q)
@@ -271,15 +285,16 @@ export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
     const id = newId('ord')
     const points = input.userId ? Math.floor(quote.total * Math.max(0, input.commerce.pointsPerDollar)) : 0
     const name = `${input.address.firstName} ${input.address.lastName}`.trim()
+    const status: OrderStatus = input.paymentMethod === 'razorpay' ? 'pending_payment' : 'placed'
 
     await q.query(
       `INSERT INTO orders (id, order_number, user_id, email, customer_name, status, payment_method, payment_status,
          shipping_method, subtotal, shipping, discount, tax, total, coupon_code, shipping_address, notes, points_earned)
-       VALUES ($1, $2, $3, lower($4), $5, 'placed', $6, 'pending', $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15, $16)`,
+       VALUES ($1, $2, $3, lower($4), $5, $17, $6, 'pending', $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15, $16)`,
       [
         id, orderNumber, input.userId, input.email.trim(), name, input.paymentMethod, input.shippingMethod,
         quote.subtotal, quote.shipping, quote.discount, quote.tax, quote.total, quote.coupon?.code ?? null,
-        JSON.stringify(input.address), input.notes, points,
+        JSON.stringify(input.address), input.notes, points, status,
       ]
     )
     for (const [i, l] of quote.lines.entries()) {
@@ -289,12 +304,128 @@ export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
         [`${id}_${i}`, id, l.productId, l.variantId, l.handle, l.title, l.image, l.size, l.color, l.price, l.quantity]
       )
     }
-    if (input.userId && points > 0) {
+    if (status === 'placed' && input.userId && points > 0) {
       await q.query('UPDATE users SET points = points + $2 WHERE id = $1', [input.userId, points])
     }
     const rows = await q.query('SELECT * FROM orders WHERE id = $1', [id])
     return (await attachItems(q, rows))[0]
   })
+}
+
+/* ─────────────────────────── Online payments ─────────────────────────── */
+
+export async function setRazorpayOrderId(id: string, razorpayOrderId: string): Promise<void> {
+  await query('UPDATE orders SET razorpay_order_id = $2, updated_at = now() WHERE id = $1', [id, razorpayOrderId])
+}
+
+/** The payment fields of one order, for the payment routes. Never sent to the browser as is. */
+export async function getPaymentState(where: { id: string } | { razorpayOrderId: string }) {
+  const [r] = 'id' in where
+    ? await query('SELECT id, status, payment_method, payment_status, total, razorpay_order_id, paid_at FROM orders WHERE id = $1', [where.id])
+    : await query('SELECT id, status, payment_method, payment_status, total, razorpay_order_id, paid_at FROM orders WHERE razorpay_order_id = $1', [where.razorpayOrderId])
+  if (!r) return null
+  return {
+    id: r.id as string,
+    status: r.status as OrderStatus,
+    paymentMethod: r.payment_method as string,
+    paymentStatus: r.payment_status as PaymentStatus,
+    total: num(r.total),
+    razorpayOrderId: (r.razorpay_order_id as string | null) ?? null,
+    paid: r.paid_at !== null && r.paid_at !== undefined,
+  }
+}
+
+async function grantPoints(q: Queryable, row: Row) {
+  const points = Math.trunc(num(row.points_earned))
+  if (row.user_id && points > 0) await q.query('UPDATE users SET points = points + $2 WHERE id = $1', [row.user_id, points])
+}
+
+/**
+ * What confirming a payment did. 'confirmed': the held order is now placed. 'already-paid': nothing
+ * changed (the browser and the webhook both report the same payment). 'reinstated': the hold had
+ * expired but every piece was still in stock, so the order went ahead. 'paid-after-cancel': the order
+ * stays cancelled with the payment recorded, and the money has to be refunded.
+ */
+export type PaidOutcome = 'confirmed' | 'already-paid' | 'reinstated' | 'paid-after-cancel'
+
+class OutOfStock extends Error {}
+
+/** Records a verified, captured online payment. Safe to call any number of times for the same order. */
+export async function markOrderPaid(id: string, paymentId: string): Promise<{ order: Order; outcome: PaidOutcome } | null> {
+  const attempt = (reinstate: boolean) =>
+    tx(async (q) => {
+      const [row] = await q.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [id])
+      if (!row) return null
+      let outcome: PaidOutcome
+      if (row.paid_at) outcome = 'already-paid'
+      else if (row.status === 'pending_payment') {
+        await q.query(
+          `UPDATE orders SET status = 'placed', payment_status = 'paid', paid_at = now(), razorpay_payment_id = $2, updated_at = now() WHERE id = $1`,
+          [id, paymentId]
+        )
+        await grantPoints(q, row)
+        outcome = 'confirmed'
+      } else if (row.status === 'cancelled' && reinstate) {
+        const items = await q.query('SELECT variant_id, quantity FROM order_items WHERE order_id = $1', [id])
+        for (const it of items) {
+          if (!it.variant_id) continue
+          const ok = await q.query('UPDATE variants SET inventory = inventory - $2 WHERE id = $1 AND inventory >= $2 RETURNING id', [it.variant_id, it.quantity])
+          if (!ok.length) throw new OutOfStock()
+        }
+        // The customer has paid: their code counts again even if its limit was reached meanwhile.
+        if (row.coupon_code) await q.query('UPDATE coupons SET used_count = used_count + 1 WHERE code = $1', [row.coupon_code])
+        await q.query(
+          `UPDATE orders SET status = 'placed', payment_status = 'paid', paid_at = now(), razorpay_payment_id = $2,
+                  cancelled_at = NULL, updated_at = now() WHERE id = $1`,
+          [id, paymentId]
+        )
+        await grantPoints(q, row)
+        outcome = 'reinstated'
+      } else {
+        await q.query(`UPDATE orders SET payment_status = 'paid', paid_at = now(), razorpay_payment_id = $2, updated_at = now() WHERE id = $1`, [id, paymentId])
+        outcome = 'paid-after-cancel'
+      }
+      const rows = await q.query('SELECT * FROM orders WHERE id = $1', [id])
+      return { order: (await attachItems(q, rows))[0], outcome }
+    })
+  try {
+    return await attempt(true)
+  } catch (err) {
+    if (!(err instanceof OutOfStock)) throw err
+    return attempt(false)
+  }
+}
+
+/** Gives back the stock and coupon an unpaid online order was holding. Does nothing to any other order. */
+export async function releaseUnpaidOrder(id: string): Promise<Order | null> {
+  return tx(async (q) => {
+    const [row] = await q.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [id])
+    if (!row || row.status !== 'pending_payment' || row.paid_at) return null
+    const items = await q.query('SELECT variant_id, quantity FROM order_items WHERE order_id = $1', [id])
+    for (const it of items) {
+      if (it.variant_id) await q.query('UPDATE variants SET inventory = inventory + $2 WHERE id = $1', [it.variant_id, it.quantity])
+    }
+    if (row.coupon_code) await q.query('UPDATE coupons SET used_count = GREATEST(0, used_count - 1) WHERE code = $1', [row.coupon_code])
+    await q.query(`UPDATE orders SET status = 'cancelled', cancelled_at = now(), updated_at = now() WHERE id = $1`, [id])
+    const rows = await q.query('SELECT * FROM orders WHERE id = $1', [id])
+    return (await attachItems(q, rows))[0]
+  })
+}
+
+/** Online orders still waiting for payment after `minutes`, oldest first. */
+export async function listStaleUnpaidOrders(minutes: number, limit: number): Promise<{ id: string; razorpayOrderId: string | null }[]> {
+  const rows = await query(
+    `SELECT id, razorpay_order_id FROM orders WHERE status = 'pending_payment' AND placed_at < now() - make_interval(mins => $1)
+      ORDER BY placed_at LIMIT $2`,
+    [minutes, limit]
+  )
+  return rows.map((r) => ({ id: r.id, razorpayOrderId: r.razorpay_order_id ?? null }))
+}
+
+/** A full refund made in the Razorpay dashboard. Only a paid order moves to refunded. */
+export async function markOrderRefunded(id: string): Promise<Order | null> {
+  const rows = await query(`UPDATE orders SET payment_status = 'refunded', updated_at = now() WHERE id = $1 AND payment_status = 'paid' RETURNING id`, [id])
+  return rows.length ? getOrderById(id) : null
 }
 
 export async function getOrderById(id: string): Promise<Order | null> {
@@ -313,7 +444,7 @@ export async function getOrderAdmin(id: string): Promise<Order | null> {
 
 export async function findOrderForGuest(orderNumber: string, email: string): Promise<Order | null> {
   const q: Queryable = { query, exec: async () => {} }
-  const rows = await query('SELECT * FROM orders WHERE upper(order_number) = upper($1) AND lower(email) = lower($2)', [
+  const rows = await query(`SELECT * FROM orders WHERE upper(order_number) = upper($1) AND lower(email) = lower($2) AND NOT ${UNPAID_ONLINE}`, [
     orderNumber.trim(),
     email.trim(),
   ])
@@ -326,7 +457,7 @@ export async function findOrderForGuest(orderNumber: string, email: string): Pro
  */
 export async function listOrdersForUser(userId: string): Promise<Order[]> {
   const q: Queryable = { query, exec: async () => {} }
-  const rows = await query('SELECT * FROM orders WHERE user_id = $1 ORDER BY placed_at DESC', [userId])
+  const rows = await query(`SELECT * FROM orders WHERE user_id = $1 AND NOT ${UNPAID_ONLINE} ORDER BY placed_at DESC`, [userId])
   return attachItems(q, rows)
 }
 
@@ -364,6 +495,10 @@ export async function updateOrderAdmin(
     const rows = await q.query('SELECT * FROM orders WHERE id = $1 FOR UPDATE', [id])
     const current = rows[0]
     if (!current) return false
+    // Until its payment is confirmed an online order can only be cancelled (which releases its stock).
+    if (current.status === 'pending_payment' && ((patch.status && patch.status !== 'cancelled') || patch.paymentStatus)) {
+      throw new CheckoutError('This order is still waiting for its online payment. You can only cancel it for now.', 409)
+    }
     const sets: string[] = ['updated_at = now()']
     const params: unknown[] = [id]
     const set = (col: string, v: unknown) => {
@@ -383,7 +518,12 @@ export async function updateOrderAdmin(
             await q.query('UPDATE variants SET inventory = inventory + $2 WHERE id = $1', [it.variant_id, it.quantity])
           }
         }
-        if (current.user_id && num(current.points_earned) > 0) {
+        // An unpaid online order held its coupon use; points were never granted for it.
+        if (current.status === 'pending_payment' && current.coupon_code) {
+          await q.query('UPDATE coupons SET used_count = GREATEST(0, used_count - 1) WHERE code = $1', [current.coupon_code])
+        }
+        const pointsGranted = current.payment_method !== 'razorpay' || current.paid_at
+        if (pointsGranted && current.user_id && num(current.points_earned) > 0) {
           await q.query('UPDATE users SET points = GREATEST(0, points - $2) WHERE id = $1', [
             current.user_id,
             Math.trunc(num(current.points_earned)),
