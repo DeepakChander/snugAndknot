@@ -631,6 +631,7 @@ const LIMIT_COPY: Record<string, string> = {
   signup: 'Many accounts being created from one connection.',
   order: 'Many orders from one connection — possible fake orders.',
   orderEmail: 'Many orders for one email address.',
+  orderDay: 'Daily order limit reached from one connection — possible fake orders.',
   payment: 'Many payment confirmations or cancellations from one connection.',
   orderLookupIp: 'Someone is guessing order numbers on the tracking page.',
   orderLookupEmail: 'Repeated tracking lookups for one email.',

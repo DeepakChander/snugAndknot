@@ -1,6 +1,6 @@
 import { checkPassword, findUserByEmail, hashPassword, isEnvAdminEmail, isPublishedPassword, mapUser, matchEnvAdmin, needsRehash, sessionUser, startSession } from '@/server/auth'
 import { query } from '@/server/db/client'
-import { rateLimit } from '@/server/rate-limit'
+import { rateLimit, rateLimitCheck, rateLimitReset } from '@/server/rate-limit'
 import { clientIp, HttpError, ok, parseBody, route } from '@/server/http'
 import { loginSchema } from '@/server/validation'
 import { adminLoginFailed, adminSignedIn, customerLoginFailed, customerSignedIn } from '@/server/notify-events'
@@ -9,15 +9,20 @@ const FAILED = 'That email and password do not match.'
 
 export const POST = route(async (req) => {
   const { email, password } = await parseBody(req, loginSchema)
-  // Per connection, per account on that connection, and a high ceiling per account overall.
+  // Per connection, per account on that connection, and a high ceiling per account overall. Only
+  // failed attempts count, so a correct password never uses up anyone's allowance; a full window
+  // still refuses every attempt (otherwise guessing could carry on).
   const ip = clientIp(req)
   const ua = req.headers.get('user-agent')
-  await rateLimit('loginIp', ip)
-  await rateLimit('loginAccountIp', `${email}|${ip}`)
-  await rateLimit('loginEmail', email)
+  await rateLimitCheck('loginIp', ip)
+  await rateLimitCheck('loginAccountIp', `${email}|${ip}`)
+  await rateLimitCheck('loginEmail', email)
 
   // The response is the same whichever way a sign-in fails; only the store inbox hears which it was.
   const failed = async (row: Record<string, unknown> | null | undefined) => {
+    await rateLimit('loginIp', ip)
+    await rateLimit('loginAccountIp', `${email}|${ip}`)
+    await rateLimit('loginEmail', email)
     if (isEnvAdminEmail(email)) await adminLoginFailed(email, ip, ua, true)
     else if (row?.role === 'admin') await adminLoginFailed(email, ip, ua, false)
     else await customerLoginFailed(email, ip, ua, !!row)
@@ -38,6 +43,7 @@ export const POST = route(async (req) => {
       throw await failed(null)
     }
     await startSession(admin.session)
+    await rateLimitReset('loginAccountIp', `${email}|${ip}`)
     await adminSignedIn(email, ip, ua, true)
     return ok({ user: admin.user })
   }
@@ -51,6 +57,7 @@ export const POST = route(async (req) => {
     await query('UPDATE users SET password_hash = $2 WHERE id = $1', [row.id, await hashPassword(password)])
   }
   await startSession(sessionUser(row))
+  await rateLimitReset('loginAccountIp', `${email}|${ip}`)
   if (row.role === 'admin') await adminSignedIn(String(row.email), ip, ua, false)
   else await customerSignedIn({ id: String(row.id), email: String(row.email), name: String(row.name) }, ip, ua)
   return ok({ user: mapUser(row) })

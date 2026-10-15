@@ -117,7 +117,13 @@ async function settlePayment(c: RazorpayConfig, orderId: string, payment: Razorp
     } catch (err) {
       // The browser and the webhook can race to capture the same payment; read where it ended up.
       console.warn('[payments] capture failed, re-reading the payment', p.id, (err as Error).message)
-      p = await fetchPayment(c, p.id)
+      try {
+        p = await fetchPayment(c, p.id)
+      } catch (again) {
+        // Razorpay's error text stays in the log; the webhook or the sweep will settle the order.
+        console.error('[payments] payment could not be re-read', p.id, (again as Error).message)
+        return { kind: 'pending' }
+      }
     }
   }
   if (p.status === 'captured') {

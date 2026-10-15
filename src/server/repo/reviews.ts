@@ -54,11 +54,11 @@ export async function findUserReview(productId: string, userId: string): Promise
   return rows[0] ? mapReview(rows[0]) : null
 }
 
-/** A "verified" review needs an order placed from this account (not just the same email). */
+/** A "verified" review needs a delivered order from this account (not just the same email, nor an unpaid order). */
 export async function hasPurchased(productId: string, userId: string): Promise<boolean> {
   const rows = await query(
     `SELECT 1 FROM orders o JOIN order_items i ON i.order_id = o.id
-      WHERE i.product_id = $1 AND o.status NOT IN ('cancelled', 'pending_payment') AND o.user_id = $2
+      WHERE i.product_id = $1 AND o.status = 'delivered' AND o.user_id = $2
       LIMIT 1`,
     [productId, userId]
   )

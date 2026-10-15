@@ -223,6 +223,7 @@ function mapOrder(r: Row, items: OrderItem[]): Order {
     trackingNumber: r.tracking_number ?? null,
     notes: r.notes ?? null,
     pointsEarned: Math.trunc(num(r.points_earned)),
+    pointsGranted: r.points_granted_at !== null && r.points_granted_at !== undefined,
     placedAt: iso(r.placed_at),
     confirmedAt: isoOrNull(r.confirmed_at),
     shippedAt: isoOrNull(r.shipped_at),
@@ -327,9 +328,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<Order> {
         [`${id}_${i}`, id, l.productId, l.variantId, l.handle, l.title, l.image, l.size, l.color, l.price, l.quantity]
       )
     }
-    if (status === 'placed' && input.userId && points > 0) {
-      await q.query('UPDATE users SET points = points + $2 WHERE id = $1', [input.userId, points])
-    }
+    // Points are granted later: on delivery (cash on delivery) or on payment (online).
     const rows = await q.query('SELECT * FROM orders WHERE id = $1', [id])
     return (await attachItems(q, rows))[0]
   })
@@ -359,9 +358,12 @@ export async function getPaymentState(where: { id: string } | { razorpayOrderId:
   }
 }
 
+/** Gives an order's loyalty points to its customer, once (points_granted_at records it). */
 async function grantPoints(q: Queryable, row: Row) {
   const points = Math.trunc(num(row.points_earned))
-  if (row.user_id && points > 0) await q.query('UPDATE users SET points = points + $2 WHERE id = $1', [row.user_id, points])
+  if (!row.user_id || points <= 0 || row.points_granted_at) return
+  const marked = await q.query('UPDATE orders SET points_granted_at = now() WHERE id = $1 AND points_granted_at IS NULL RETURNING id', [row.id])
+  if (marked.length) await q.query('UPDATE users SET points = points + $2 WHERE id = $1', [row.user_id, points])
 }
 
 /**
@@ -434,6 +436,16 @@ export async function releaseUnpaidOrder(id: string): Promise<Order | null> {
     const rows = await q.query('SELECT * FROM orders WHERE id = $1', [id])
     return (await attachItems(q, rows))[0]
   })
+}
+
+/** Pieces held by this email's cash-on-delivery orders that the store has not confirmed yet. */
+export async function openCodPieces(email: string): Promise<number> {
+  const [r] = await query<{ n: number }>(
+    `SELECT coalesce(sum(i.quantity), 0)::int AS n FROM orders o JOIN order_items i ON i.order_id = o.id
+      WHERE lower(o.email) = lower($1) AND o.payment_method = 'cod' AND o.status = 'placed'`,
+    [email.trim()]
+  )
+  return Math.trunc(num(r?.n))
 }
 
 /** Online orders still waiting for payment after `minutes`, oldest first. */
@@ -546,8 +558,8 @@ export async function updateOrderAdmin(
         if (current.status === 'pending_payment' && current.coupon_code) {
           await q.query('UPDATE coupons SET used_count = GREATEST(0, used_count - 1) WHERE code = $1', [current.coupon_code])
         }
-        const pointsGranted = current.payment_method !== 'razorpay' || current.paid_at
-        if (pointsGranted && current.user_id && num(current.points_earned) > 0) {
+        if (current.points_granted_at && current.user_id && num(current.points_earned) > 0) {
+          set('points_granted_at', null)
           await q.query('UPDATE users SET points = GREATEST(0, points - $2) WHERE id = $1', [
             current.user_id,
             Math.trunc(num(current.points_earned)),
@@ -557,6 +569,8 @@ export async function updateOrderAdmin(
       if (patch.status === 'delivered' && current.payment_method === 'cod' && !patch.paymentStatus) {
         set('payment_status', 'paid')
       }
+      // A cash-on-delivery order earns its points once it is delivered (and paid at the door).
+      if (patch.status === 'delivered') await grantPoints(q, current)
     }
     if (patch.paymentStatus) set('payment_status', patch.paymentStatus)
     if (patch.trackingNumber !== undefined) set('tracking_number', patch.trackingNumber)

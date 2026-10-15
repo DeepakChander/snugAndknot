@@ -90,7 +90,22 @@ export async function requireAdmin(): Promise<PublicUser> {
  * (client-sent values are replaced), so they cannot be spoofed to dodge limits.
  */
 export function clientIp(req: Request): string {
-  return req.headers.get('x-real-ip')?.trim() || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local'
+  const ip = req.headers.get('x-real-ip')?.trim() || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local'
+  return ipv6Network(ip) ?? ip
+}
+
+/**
+ * An IPv6 address as its /64 network ("2001:db8:1:2::/64"): one home or phone connection gets a whole
+ * /64 and can rotate through it freely, so limits must count the network, not each address.
+ */
+function ipv6Network(ip: string): string | null {
+  if (!ip.includes(':') || ip.includes('.')) return null
+  const [head, tail = ''] = ip.toLowerCase().split('::')
+  const left = head ? head.split(':') : []
+  const right = tail ? tail.split(':') : []
+  if (left.length + right.length > 8) return null
+  const full = [...left, ...Array(8 - left.length - right.length).fill('0'), ...right]
+  return `${full.slice(0, 4).map((h) => h.replace(/^0+(?=.)/, '')).join(':')}::/64`
 }
 
 type Handler<C> = (req: Request, ctx: C) => Promise<Response>

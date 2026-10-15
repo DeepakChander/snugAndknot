@@ -210,6 +210,8 @@ export interface Order {
   /** Staff-only notes. Present only on orders loaded for the admin panel. */
   adminNotes?: string | null
   pointsEarned: number
+  /** Whether those points have been given yet: on delivery (cash on delivery) or on payment (online). */
+  pointsGranted: boolean
   placedAt: string
   confirmedAt: string | null
   shippedAt: string | null

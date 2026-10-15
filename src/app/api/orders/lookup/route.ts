@@ -19,6 +19,7 @@ function maskForGuest(order: Order): Order {
       ...a,
       lastName: a.lastName ? `${a.lastName[0]}.` : '',
       line1: mask(a.line1),
+      postalCode: mask(a.postalCode),
       line2: a.line2 ? mask(a.line2) : undefined,
       phone: a.phone ? `••• ${a.phone.replace(/\D/g, '').slice(-2)}` : undefined,
     },
