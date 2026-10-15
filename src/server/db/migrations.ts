@@ -379,6 +379,17 @@ CREATE UNIQUE INDEX IF NOT EXISTS orders_razorpay_order_key ON orders (razorpay_
 CREATE INDEX IF NOT EXISTS orders_pending_payment_idx ON orders (placed_at) WHERE status = 'pending_payment';
 `,
   },
+  {
+    version: 8,
+    name: 'category-home-grid',
+    // The home page's "Shop by category" tiles. badge is an optional short pill beside the name
+    // (e.g. "3XL TO 6XL"); show_on_home lets the admin keep a category off the grid. Only adds
+    // columns with defaults, so existing rows land on the grid with no badge and older code keeps working.
+    sql: `
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS badge TEXT NOT NULL DEFAULT '';
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS show_on_home BOOLEAN NOT NULL DEFAULT true;
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

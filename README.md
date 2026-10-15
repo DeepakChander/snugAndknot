@@ -78,6 +78,10 @@ How an online order works:
 
 `scripts/razorpay-smoke.mjs` tests all of this without a Razorpay account. It runs a local stand-in for the Razorpay API, which the server uses only when `SNUGKNOT_RAZORPAY_API_BASE` points at `127.0.0.1` or `localhost` and the site is not on Vercel. The script's header has the exact commands.
 
+## Home page category grid
+
+The "Shop by category" tiles under the hero come from Admin → Catalog → Categories: every category with "Show on home page" on and at least one active piece gets a tile, in the categories' Order, linking to `/shop/<slug>`. Each tile shows the name in capitals, the optional Badge as a small pill (up to 24 characters, e.g. `3XL TO 6XL`) and the category's Image (or, without one, a photo of one of its pieces). Images are fitted, not cropped, on a plain light ground, so a cut-out garment works best: a transparent PNG or WebP, shot from the same angle and at the same scale for every category so the row lines up.
+
 ## Search and AI crawlers
 
 | URL | What it is |

@@ -75,6 +75,10 @@ export interface Category {
   description: string
   image: string
   position: number
+  /** Optional short pill beside the name on the home grid, e.g. "3XL TO 6XL". Empty for none. */
+  badge: string
+  /** Whether the category gets a tile in the home page's "Shop by category" grid. */
+  showOnHome: boolean
 }
 
 export interface Collection {
