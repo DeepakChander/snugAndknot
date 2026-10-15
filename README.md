@@ -23,6 +23,7 @@ With no `DATABASE_URL`, the site uses a built-in PGlite database saved under `.d
 | `node scripts/api-smoke.mjs` | End-to-end API and security test. Needs `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; writes test rows, so never point it at production |
 | `node scripts/currency-smoke.mjs` | End-to-end test of a second currency (INR): settings, prices, quotes, coupons, orders, returns and reports. Needs `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; writes test rows |
 | `node scripts/razorpay-smoke.mjs` | End-to-end test of online payments against a local stand-in for the Razorpay API (see [Online payments](#online-payments-razorpay)). Local only |
+| `node scripts/endpoint-audit.mjs` | Every API route × method × role (signed out, customer, another customer, admin), the proxy and the admin/account page guards; prints a per-endpoint table and any route handler it did not exercise. Needs `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (plus the `SNUGKNOT_RAZORPAY_*` values for the payment happy paths); writes test rows, refuses production |
 
 ## Environment variables
 
