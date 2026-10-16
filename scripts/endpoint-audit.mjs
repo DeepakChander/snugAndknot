@@ -289,6 +289,7 @@ const ADMIN_ENDPOINTS = [
   ['DELETE', '/api/admin/reviews/[id]', `/api/admin/reviews/${MISSING}`],
   ['GET', '/api/admin/settings', '/api/admin/settings'],
   ['PUT', '/api/admin/settings', '/api/admin/settings'],
+  ['POST', '/api/admin/settings/currency', '/api/admin/settings/currency'],
   ['GET', '/api/admin/stats', '/api/admin/stats'],
   ['GET', '/api/admin/stock-alerts', '/api/admin/stock-alerts'],
   ['GET', '/api/admin/subscribers', '/api/admin/subscribers'],
@@ -996,6 +997,16 @@ async function adminSettingsAndMisc() {
   // A deliberately malicious value: the server must refuse it.
   // eslint-disable-next-line no-script-url
   expect(SP, 'admin', 'javascript: link', await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, primaryCtaHref: 'javascript:alert(1)' } }), 422)
+  const otherCode = settings.commerce.currency === 'INR' ? 'USD' : 'INR'
+  expect(SP, 'admin', 'relabelling the main currency (only the conversion tool may change it)', await admin.put('/api/admin/settings', { section: 'commerce', value: { ...settings.commerce, currency: otherCode } }), 400)
+  // Refusals only: a real switch would change the currency under the rest of the audit
+  // (scripts/currency-switch-smoke.mjs runs one on its own database).
+  const SC = 'POST /api/admin/settings/currency'
+  expect(SC, 'admin', 'to the current currency', await admin.post('/api/admin/settings/currency', { code: settings.commerce.currency, rate: 1 }), 400)
+  expect(SC, 'admin', 'no rate', await admin.post('/api/admin/settings/currency', { code: otherCode }), 422)
+  expect(SC, 'admin', 'negative rate', await admin.post('/api/admin/settings/currency', { code: otherCode, rate: -3 }), 422)
+  expect(SC, 'admin', 'unknown currency', await admin.post('/api/admin/settings/currency', { code: 'ZZZ', rate: 2 }), 422)
+  expect(SC, 'admin', 'text/plain body', await admin.post('/api/admin/settings/currency', JSON.stringify({ code: otherCode, rate: 2 })), 415)
   expect(SP, 'admin', 'text/plain body', await admin.put('/api/admin/settings', JSON.stringify({ section: 'announcement', value: settings.announcement })), 415)
   const after = (await admin.get('/api/admin/settings')).data?.settings
   check(SP, 'admin', 'settings unchanged after the refused writes', JSON.stringify(after) === JSON.stringify(settings), 'settings differ')

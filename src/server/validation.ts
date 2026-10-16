@@ -280,6 +280,14 @@ export const collectionSchema = z.object({
   position: z.coerce.number().int().min(0).max(10_000).default(0),
 })
 
+/** Changing the main currency (Admin → Settings → Checkout & shipping). */
+export const currencySwitchSchema = z.object({
+  // A real ISO 4217 currency (Intl formats any three letters, so it cannot tell on its own).
+  code: currencyCode.refine((c) => Intl.supportedValuesOf('currency').includes(c), 'Unknown currency code'),
+  rate: z.coerce.number().finite().positive('Enter the exchange rate').max(1_000_000),
+  rounding: z.enum(['exact', 'whole', 'ninety-nine']).default('whole'),
+})
+
 const productIds = z.array(z.string().trim().min(1).max(120)).min(1, 'Choose at least one product').max(200)
 
 /** Quick actions from the admin's product list (one product or many). */
@@ -481,9 +489,8 @@ export const settingsSchemas = {
     c.extraCurrencies.forEach((x, i) => {
       if (seen.has(x.code)) ctx.addIssue({ code: 'custom', path: ['extraCurrencies', i, 'code'], message: `${x.code} is already one of the store's currencies` })
       seen.add(x.code)
-      try {
-        new Intl.NumberFormat('en', { style: 'currency', currency: x.code })
-      } catch {
+      // A real ISO 4217 currency (Intl formats any three letters, so it cannot tell on its own).
+      if (!Intl.supportedValuesOf('currency').includes(x.code)) {
         ctx.addIssue({ code: 'custom', path: ['extraCurrencies', i, 'code'], message: 'Unknown currency code' })
       }
     })

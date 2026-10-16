@@ -7,6 +7,7 @@ import { Btn, Card, Input, PageHeader, Textarea, Toggle, useMutate } from './ui'
 import { ImageField } from './ImagePicker'
 import { cn } from '@/lib/format'
 import { currencySymbol } from '@/lib/currency'
+import { converter, type Rounding } from '@/lib/currency-convert'
 import type { CurrencySettings, SettingsKey, SiteSettings } from '@/types/commerce'
 
 const TABS: { key: SettingsKey; label: string; blurb: string }[] = [
@@ -161,6 +162,87 @@ function CurrencyRow({ value, index, err, onChange, onRemove, missing }: { value
   )
 }
 
+/**
+ * Changes the main currency (e.g. USD → INR) by converting every price, coupon amount and shipping
+ * figure at the owner's rate. Amounts already set in the new currency are kept; the old currency
+ * stays on as an extra one with its exact old amounts.
+ */
+function ChangeMainCurrency({ commerce, dirty }: { commerce: SiteSettings['commerce']; dirty: boolean }) {
+  const { run, busy, fieldErrors } = useMutate()
+  const from = commerce.currency.toUpperCase()
+  const [open, setOpen] = useState(false)
+  const [code, setCode] = useState(from === 'INR' ? '' : 'INR')
+  const [rate, setRate] = useState('')
+  const [rounding, setRounding] = useState<Rounding>('whole')
+  const to = code.trim().toUpperCase()
+  const r = Number(rate)
+  const conv = r > 0 ? converter(r, rounding) : null
+  const own = (commerce.extraCurrencies ?? []).find((c) => c.code.toUpperCase() === to)
+  const fmt = (n: number, c: string) => {
+    try {
+      return new Intl.NumberFormat(c === 'INR' ? 'en-IN' : 'en', { style: 'currency', currency: c, maximumFractionDigits: rounding === 'exact' ? 2 : 0 }).format(n)
+    } catch {
+      return `${n} ${c}`
+    }
+  }
+  const examples = [1, 25, 139, commerce.freeShippingThreshold].filter((n, i, a) => n > 0 && a.indexOf(n) === i)
+  if (!open) {
+    return (
+      <Section title="Change the main currency" description={`The shop is priced in ${from}. Switching to another currency (for example INR) converts every price at a rate you give.`}>
+        <Btn variant="outline" size="sm" onClick={() => setOpen(true)}>
+          Change main currency…
+        </Btn>
+      </Section>
+    )
+  }
+  return (
+    <Section
+      title="Change the main currency"
+      description={
+        <>
+          Converts every product and size price, compare-at price, coupon amount, shipping threshold and rate from {from} into the new currency, in one go. Amounts you already set in the new currency are kept. {from} stays on as an extra currency with exactly today&apos;s amounts, and past orders keep the currency they were paid in. Check your announcement bar afterwards: any price written in its text does not change by itself.
+        </>
+      }
+    >
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Input label="New main currency" value={code} maxLength={3} error={fieldErrors.code} onChange={(e) => setCode(e.target.value.toUpperCase())} className="font-mono uppercase" placeholder="INR" />
+        <Input label={`1 ${from} = ? ${to || '…'}`} type="number" min={0} step="0.0001" value={rate} error={fieldErrors.rate} onChange={(e) => setRate(e.target.value)} hint="Today's exchange rate, or the rate you want to price at." />
+        <label className="block text-sm">
+          <span className="mb-1.5 block text-xs font-medium text-ink/70">Round prices to</span>
+          <select value={rounding} onChange={(e) => setRounding(e.target.value as Rounding)} className="h-11 w-full rounded-xl border border-ink/15 bg-white px-3 text-sm outline-none focus:border-ink/50">
+            <option value="whole">Whole amounts (₹11,537)</option>
+            <option value="ninety-nine">Ending in 99 (₹11,499)</option>
+            <option value="exact">Exact, with paise/cents</option>
+          </select>
+        </label>
+      </div>
+      {own ? <p className="text-xs text-stone">{to} is already an extra currency: its shipping settings and every price you set in it are kept; only the missing ones are converted.</p> : null}
+      {conv && to.length === 3 && to !== from ? (
+        <p className="text-xs text-stone">
+          For example: {examples.map((n) => `${fmt(n, from)} → ${fmt(conv(n), to)}`).join(' · ')}
+        </p>
+      ) : null}
+      {dirty ? <p className="text-xs text-error">Save or discard the other changes on this page first.</p> : null}
+      <div className="flex gap-2">
+        <Btn
+          size="sm"
+          loading={busy}
+          disabled={dirty || !(r > 0) || to.length !== 3 || to === from}
+          onClick={async () => {
+            if (!window.confirm(`Change the main currency from ${from} to ${to} at 1 ${from} = ${r} ${to}? Every price is converted now.`)) return
+            if (await run('POST', '/api/admin/settings/currency', { code: to, rate: r, rounding }, `The shop is now priced in ${to}.`)) setOpen(false)
+          }}
+        >
+          Convert to {to || '…'}
+        </Btn>
+        <Btn size="sm" variant="ghost" onClick={() => setOpen(false)}>
+          Cancel
+        </Btn>
+      </div>
+    </Section>
+  )
+}
+
 function CommerceForm({ initial, payments }: { initial: SiteSettings['commerce']; payments: RazorpayConnection }) {
   const s = useSection('commerce', initial)
   const d = s.draft
@@ -178,10 +260,11 @@ function CommerceForm({ initial, payments }: { initial: SiteSettings['commerce']
       <Card>
         <Section title="Currency" description={<>The base currency: every price, rate and threshold on this page is in it. Preview: <strong className="font-medium text-ink">{preview}</strong></>}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Input label="Currency code" value={d.currency} maxLength={3} error={s.err.currency} onChange={(e) => set({ currency: e.target.value.toUpperCase() })} hint="ISO code, e.g. USD, EUR, GBP, INR." className="font-mono uppercase" />
+            <Input label="Main currency" value={d.currency} readOnly hint="Change it with the tool below: it converts every price." className="font-mono uppercase" />
             <Input label="Locale" value={d.locale} error={s.err.locale} onChange={(e) => set({ locale: e.target.value })} hint="Number format, e.g. en-US, en-GB, fr-FR." className="font-mono" />
           </div>
         </Section>
+        <ChangeMainCurrency commerce={initial} dirty={s.dirty} />
         <Section
           title="More currencies"
           description="Sell in another currency too, such as INR next to USD. You set every price in it yourself (Products → Pricing), plus its shipping. Shoppers in the countries you list see it first, and anyone can switch in the footer. Orders are charged in the currency the shopper sees."
@@ -486,7 +569,8 @@ export function SettingsAdmin({ settings, tab, payments }: { settings: SiteSetti
       </div>
       <div role="tabpanel" aria-label={current.label}>
         {current.key === 'store' ? <StoreForm initial={settings.store} /> : null}
-        {current.key === 'commerce' ? <CommerceForm initial={settings.commerce} payments={payments} /> : null}
+        {/* Keyed by the currency: after a switch the form starts again from the converted values. */}
+        {current.key === 'commerce' ? <CommerceForm key={settings.commerce.currency} initial={settings.commerce} payments={payments} /> : null}
         {current.key === 'announcement' ? <AnnouncementForm initial={settings.announcement} /> : null}
         {current.key === 'reviews' ? <ReviewsForm initial={settings.reviews} /> : null}
         {current.key === 'homepage' ? <HomepageForm initial={settings.homepage} /> : null}
