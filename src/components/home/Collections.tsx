@@ -19,9 +19,12 @@ export default function Collections({ collections, products }: { collections: Co
     <section aria-labelledby="collections-title" className="bg-bone py-[clamp(3.5rem,7vw,6rem)] text-ink">
       <div className="container-wide">
         <div className="flex items-end justify-between gap-6">
-          <h2 id="collections-title" className="text-headline">
-            Collections
-          </h2>
+          <div>
+            <p className="text-eyebrow text-stone">Edits to wear together</p>
+            <h2 id="collections-title" className="mt-3 text-headline">
+              Collections
+            </h2>
+          </div>
           <Link href="/collections" className="shrink-0 border-b border-ink pb-1 text-[0.74rem] font-medium uppercase tracking-[0.14em]">
             View all
           </Link>

@@ -30,9 +30,12 @@ export default function CategoryGrid({ tiles }: { tiles: CategoryTile[] }) {
     <section aria-labelledby="category-grid-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
       <div className="container-wide">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <h2 id="category-grid-title" className="text-headline">
-            Shop by category
-          </h2>
+          <div>
+            <p className="text-eyebrow text-stone">Find your fit</p>
+            <h2 id="category-grid-title" className="mt-3 text-headline">
+              Shop by <em>category</em>
+            </h2>
+          </div>
           {departments.length > 1 ? (
             <div role="tablist" aria-label="Department" className="flex gap-6">
               {departments.map((d) => (

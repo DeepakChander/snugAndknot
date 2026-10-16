@@ -10,9 +10,12 @@ export default function JournalCards({ posts }: { posts: JournalPost[] }) {
     <section aria-labelledby="journal-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
       <div className="container-wide">
         <div className="flex items-end justify-between gap-6">
-          <h2 id="journal-title" className="text-headline">
-            Journal
-          </h2>
+          <div>
+            <p className="text-eyebrow text-stone">Stories</p>
+            <h2 id="journal-title" className="mt-3 text-headline">
+              The <em>journal</em>
+            </h2>
+          </div>
           <Link href="/journal" className="shrink-0 border-b border-ink pb-1 text-[0.74rem] font-medium uppercase tracking-[0.14em]">
             All stories
           </Link>

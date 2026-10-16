@@ -8,9 +8,12 @@ export default function NewIn({ products }: { products: CardProduct[] }) {
     <section aria-labelledby="new-in-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
       <div className="container-wide">
         <div className="flex items-end justify-between gap-6">
-          <h2 id="new-in-title" className="text-headline">
-            New in
-          </h2>
+          <div>
+            <p className="text-eyebrow text-stone">Just landed</p>
+            <h2 id="new-in-title" className="mt-3 text-headline">
+              New <em>in</em>
+            </h2>
+          </div>
           <Link href="/shop?sort=newest" className="shrink-0 border-b border-ink pb-1 text-[0.74rem] font-medium uppercase tracking-[0.14em]">
             View all
           </Link>

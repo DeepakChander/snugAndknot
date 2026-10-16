@@ -24,9 +24,12 @@ export default function ClientReviews({ reviews, average, count }: { reviews: Ho
     <section aria-labelledby="reviews-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
       <div className="container-wide">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 id="reviews-title" className="text-headline">
-            What customers say
-          </h2>
+          <div>
+            <p className="text-eyebrow text-stone">Reviews</p>
+            <h2 id="reviews-title" className="mt-3 text-headline">
+              What customers <em>say</em>
+            </h2>
+          </div>
           <p className="flex items-center gap-2 text-[0.86rem]">
             <Stars value={average} size={14} />
             <span className="font-medium">{average.toFixed(1)}</span>
