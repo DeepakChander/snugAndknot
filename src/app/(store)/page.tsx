@@ -1,7 +1,7 @@
 import HomeHero, { type HeroPanelView } from '@/components/home/HomeHero'
 import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
 import MaterialRows from '@/components/home/MaterialRows'
-import NewInRing from '@/components/home/NewInRing'
+import NewIn from '@/components/home/NewIn'
 import CollectionSheets from '@/components/home/CollectionSheets'
 import ShopIndex, { type IndexRow } from '@/components/home/ShopIndex'
 import Statement from '@/components/home/Statement'
@@ -82,7 +82,7 @@ export default async function HomePage() {
       <HomeHero home={settings.homepage} storeName={settings.store.name} panels={heroPanels} />
       <CategoryGrid tiles={tiles} />
       <MaterialRows />
-      <NewInRing products={products.slice(0, 8)} />
+      <NewIn products={[...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 8)} />
       <CollectionSheets collections={collections} products={products} />
       <ShopIndex rows={rows} />
       <Statement />
