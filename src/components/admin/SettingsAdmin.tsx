@@ -387,7 +387,14 @@ function AnnouncementForm({ initial }: { initial: SiteSettings['announcement'] }
         <Section title="Show the bar">
           <Toggle checked={d.enabled} onChange={(v) => set({ enabled: v })} label="Show the announcement bar" description="When off, the bar is hidden on every page." />
         </Section>
-        <Section title="Messages" description="Up to 8. They rotate every few seconds in this order.">
+        <Section
+          title="Messages"
+          description={
+            <>
+              Up to 8. They rotate every few seconds in this order. Write <code className="font-mono">{'{free-shipping}'}</code> for the free-shipping amount: each shopper sees it in their own currency, and it follows your checkout settings.
+            </>
+          }
+        >
           <div className="rounded-xl bg-noir px-4 py-2.5 text-center text-xs tracking-wide text-bone/85">{msgs.find((m) => m.trim()) ?? 'Preview'}</div>
           <ul className="space-y-2">
             {msgs.map((m, i) => (

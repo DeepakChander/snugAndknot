@@ -9,7 +9,7 @@ import { useUIStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWishlistStore } from '@/stores/wishlist-store'
 import { useHydrated } from '@/hooks/use-hydrated'
-import { useSettings } from '@/components/providers/SettingsProvider'
+import { useCurrency, useMoney, useSettings } from '@/components/providers/SettingsProvider'
 import { cn } from '@/lib/format'
 import { DEPARTMENT_TITLES, openDepartments, type Department } from '@/lib/categories'
 import MegaMenu from './MegaMenu'
@@ -18,19 +18,38 @@ import { BagIcon, HeartIcon, SearchIcon, UserIcon } from '@/components/kit/icons
 
 const ANNOUNCE_H = 32
 
-function AnnouncementBar({ messages, link, hidden }: { messages: string[]; link: string; hidden: boolean }) {
+const FREE_SHIPPING = '{free-shipping}'
+
+function AnnouncementBar({ messages: raw, link, hidden }: { messages: string[]; link: string; hidden: boolean }) {
+  // {free-shipping} → the free-shipping amount in the shopper's currency; a message that needs it is
+  // left out while there is no free-shipping amount.
+  const money = useMoney()
+  const { currency } = useCurrency()
+  const free = currency.freeShippingThreshold
+  const messages = raw.filter((m) => !m.includes(FREE_SHIPPING) || free > 0).map((m) => m.split(FREE_SHIPPING).join(money(free)))
   const [i, setI] = useState(0)
   useEffect(() => {
     if (messages.length < 2) return
     const t = setInterval(() => setI((n) => (n + 1) % messages.length), 5000)
     return () => clearInterval(t)
   }, [messages.length])
+  if (!messages.length) return null
+  const shown = messages[i % messages.length]
   return (
     <div className={cn('overflow-hidden bg-ink text-white transition-[height] duration-300', hidden ? 'h-0' : 'h-8')}>
       <Link href={link || '/shop'} className="relative flex h-8 items-center justify-center text-[0.7rem] font-medium uppercase tracking-[0.14em] text-white/90 hover:text-white">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.span key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="px-4 text-center">
-            {messages[i]}
+          <motion.span
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            // A message with an amount waits, like every price, until the shopper's currency is known.
+            data-money={raw[i % raw.length]?.includes(FREE_SHIPPING) ? '' : undefined}
+            className="px-4 text-center"
+          >
+            {shown}
           </motion.span>
         </AnimatePresence>
       </Link>
@@ -64,7 +83,8 @@ export default function Navbar() {
 
   const bagCount = hydrated ? items.reduce((s, i) => s + i.quantity, 0) : 0
   const messages = settings.announcement.messages.filter(Boolean)
-  const announcement = settings.announcement.enabled && messages.length > 0
+  const shownMessages = messages.filter((m) => !m.includes('{free-shipping}') || settings.commerce.freeShippingThreshold > 0)
+  const announcement = settings.announcement.enabled && shownMessages.length > 0
 
   // Hide on the way down, return on the way up.
   useEffect(() => {

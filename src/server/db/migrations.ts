@@ -519,6 +519,20 @@ UPDATE categories SET image = '/images/categories/' || slug || '.webp'
 UPDATE categories SET show_on_home = true WHERE department <> '' AND show_on_home = false;
 `,
   },
+  {
+    version: 15,
+    name: 'announcement-free-shipping',
+    // The announcement's "Free shipping on orders over $150" was typed text, so it kept saying $150
+    // whatever the currency. {free-shipping} shows the amount in each shopper's currency; the default
+    // message moves to it only while it still reads exactly as shipped.
+    sql: `
+UPDATE settings SET value = jsonb_set(value, '{messages}', (
+    SELECT coalesce(jsonb_agg(CASE WHEN m = 'Free shipping on orders over $150' THEN 'Free shipping on orders over {free-shipping}' ELSE m END ORDER BY n), '[]'::jsonb)
+      FROM jsonb_array_elements_text(value->'messages') WITH ORDINALITY AS t (m, n)
+  )), updated_at = now()
+ WHERE key = 'announcement' AND jsonb_typeof(value->'messages') = 'array' AND value->'messages' ? 'Free shipping on orders over $150';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

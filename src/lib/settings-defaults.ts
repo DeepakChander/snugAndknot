@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   announcement: {
     enabled: true,
     messages: [
-      'Free shipping on orders over $150',
+      'Free shipping on orders over {free-shipping}',
       'Hand-finished in small batches',
       '30-day returns on unworn pieces',
     ],
