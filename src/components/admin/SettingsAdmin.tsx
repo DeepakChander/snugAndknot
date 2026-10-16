@@ -14,7 +14,7 @@ const TABS: { key: SettingsKey; label: string; blurb: string }[] = [
   { key: 'commerce', label: 'Checkout & shipping', blurb: 'Currency, shipping rates, tax, returns and rewards. Prices and totals are recalculated on the server with these values.' },
   { key: 'announcement', label: 'Announcement bar', blurb: 'The rotating line of text above the navigation on every page.' },
   { key: 'reviews', label: 'Reviews', blurb: 'Decide whether new customer reviews need your approval before they appear.' },
-  { key: 'homepage', label: 'Home page', blurb: 'The words in the home page hero and the manifesto section.' },
+  { key: 'homepage', label: 'Home page', blurb: 'The hero panels and words, which sections show, and the shop\'s short statement.' },
   { key: 'seo', label: 'Search & sharing', blurb: 'How the site appears in Google results and when a link is shared.' },
 ]
 
@@ -410,7 +410,23 @@ function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
             <Input label="Second button link" value={d.secondaryCtaHref} error={s.err.secondaryCtaHref} onChange={(e) => set({ secondaryCtaHref: e.target.value })} placeholder="/collections" />
           </div>
         </Section>
-        <Section title="Manifesto" description="The large statement that reveals word by word as visitors scroll.">
+        <Section title="Sections" description="Show or hide each part of the home page, in the order it appears. The video wall has its own switch under Video wall.">
+          <div className="space-y-4">
+            {(
+              [
+                ['categories', 'Shop by category', 'A tab per department with its categories (those set to Show on home page in Categories).'],
+                ['newIn', 'New in', 'The latest eight pieces.'],
+                ['collections', 'Collections', 'Up to three featured collections.'],
+                ['reviews', 'Customer reviews', 'The latest approved reviews; hidden anyway until there are some.'],
+                ['journal', 'Journal', 'The three latest stories.'],
+                ['promises', 'Promises', 'Shipping, returns and payment, from your checkout settings.'],
+              ] as const
+            ).map(([key, label, description]) => (
+              <Toggle key={key} checked={d.sections?.[key] ?? true} onChange={(v) => set({ sections: { ...d.sections, [key]: v } })} label={label} description={description} />
+            ))}
+          </div>
+        </Section>
+        <Section title="About the shop" description="A short statement about the shop, used where the site describes itself (for example to AI assistants reading /llms.txt).">
           <Textarea label="Manifesto" rows={4} value={d.manifesto} error={s.err.manifesto} onChange={(e) => set({ manifesto: e.target.value })} hint={<Counter value={d.manifesto} max={600} />} />
         </Section>
       </Card>

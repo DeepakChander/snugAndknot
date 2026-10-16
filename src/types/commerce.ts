@@ -358,7 +358,18 @@ export interface HeroPanel {
   image: string
 }
 
+/** Which home page sections show (the hero always does; the video wall has its own switch). */
+export interface HomeSections {
+  categories: boolean
+  newIn: boolean
+  collections: boolean
+  reviews: boolean
+  journal: boolean
+  promises: boolean
+}
+
 export interface HomepageSettings {
+  sections: HomeSections
   /** Side-by-side photograph panels at the top of the home page (a panel with no label is hidden). */
   heroPanels: HeroPanel[]
   heroEyebrow: string

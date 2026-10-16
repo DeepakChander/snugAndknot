@@ -570,6 +570,18 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   const panel = (href, label) => new RegExp(`href="${href}"[^>]*>(?:(?!</a>)[\\s\\S])*>${label}</span>(?:(?!</a>)[\\s\\S])*Shop now`).test(homeHtml)
   check('home hero shows the Women and Men panels (they have photographs)', panel('/shop/women', 'Women') && panel('/shop/men', 'Men'), null)
   check('…and no Kids panel while Kids has no photograph', !panel('/shop/kids', 'Kids'), null)
+  check('home page shows New in by default', homeHtml.includes('id="new-in-title"'), null)
+  const sections = settings.homepage.sections ?? {}
+  const hideNewIn = await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, sections: { ...sections, newIn: false } } })
+  check('admin hides the New in section → 200', hideNewIn.status === 200 && hideNewIn.data.value?.sections?.newIn === false, hideNewIn.data)
+  let gone = false
+  for (let i = 0; i < 10 && !gone; i++) {
+    gone = !new TextDecoder().decode((await anon.get('/')).data).includes('id="new-in-title"')
+    if (!gone) await new Promise((r) => setTimeout(r, 500))
+  }
+  check('…and the home page no longer shows it', gone, null)
+  const restoreSections = await admin.put('/api/admin/settings', { section: 'homepage', value: settings.homepage })
+  check('restore the home page sections', restoreSections.status === 200, restoreSections.status)
   const proto = await admin.put('/api/admin/settings', { section: 'announcement', value: { ...settings.announcement, link: '//evil.example/x' } })
   check('protocol-relative link refused → 422', proto.status === 422, proto.status)
   const social = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, social: { ...settings.store.social, instagram: 'http://insecure.example' } } })

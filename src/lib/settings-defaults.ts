@@ -45,6 +45,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     moderation: 'manual',
   },
   homepage: {
+    sections: { categories: true, newIn: true, collections: true, reviews: true, journal: true, promises: true },
     heroPanels: [
       { label: 'Women', href: '/shop/women', image: '' },
       { label: 'Men', href: '/shop/men', image: '' },

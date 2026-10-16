@@ -467,6 +467,10 @@ export const settingsSchemas = {
   }),
   reviews: z.object({ moderation: z.enum(['manual', 'auto']) }),
   homepage: z.object({
+    // Optional: a save without it shows every section (saveSettings fills in defaults).
+    sections: z
+      .object({ categories: z.boolean(), newIn: z.boolean(), collections: z.boolean(), reviews: z.boolean(), journal: z.boolean(), promises: z.boolean() })
+      .optional(),
     // Optional: a save without it gets the default Women / Men / Kids panels (saveSettings fills in defaults).
     heroPanels: z
       .array(z.object({ label: trimmed(40), href: linkUrl, image: imageUrl }))
