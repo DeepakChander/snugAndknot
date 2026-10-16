@@ -478,7 +478,7 @@ function HomepageForm({ initial, collections }: { initial: SiteSettings['homepag
           <div className="grid gap-4 rounded-xl border border-ink/10 p-4 xl:grid-cols-[1fr_22rem]">
             <div className="space-y-2">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-stone">Campaign photograph</p>
-              <p className="text-sm text-ink/70">Optional. With one, it fills the whole first screen with the title and buttons over it, and the panels below become a link per department. Without one, the panels show side by side.</p>
+              <p className="text-sm text-ink/70">Optional. With one, it fills the whole first screen with the title and buttons over it, and the panel photographs below become a row of department tiles under it. Remove it to show the panels side by side instead.</p>
               <p className="text-xs text-stone">A wide landscape photograph (about 16:9 or 3:2, at least 2400 px wide) with the people to the right and calm space at the lower left for the words.</p>
             </div>
             <ImageField label="Campaign photograph" aspect="aspect-[16/9]" value={d.heroImage ?? ''} onChange={(v) => set({ heroImage: v })} />

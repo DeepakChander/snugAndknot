@@ -1,7 +1,9 @@
 # Home hero photograph prompts
 
-The home page opens with up to three photograph panels side by side: Women, Men and Kids.
-Women and Men already show one of your real product photographs. **Kids stays hidden until it has a photograph**, so it is the one to make first.
+The home page opens on one wide campaign photograph (Option B below), with the Women, Men and Kids
+photographs as a row of tiles under it. Without the campaign photograph, the three panels show side
+by side instead. All four photographs made from these prompts are in place (`public/images/hero/`);
+use the prompts again to refresh them for a new season.
 
 **Where it goes:** Admin → Settings → **Home page** → Hero → Panel 1 / 2 / 3 → **Photograph** → Upload → **Save changes**.
 

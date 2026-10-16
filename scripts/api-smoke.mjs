@@ -589,8 +589,8 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   const homeHtml = new TextDecoder().decode((await anon.get('/')).data)
   // A hero panel is a link to the department holding its name and "Shop <name>" (the header links have neither).
   const panel = (href, label) => new RegExp(`href="${href}"[^>]*>(?:(?!</a>)[\\s\\S])*>${label}</span>(?:(?!</a>)[\\s\\S])*Shop (?:<!-- -->)?${label.toLowerCase()}`).test(homeHtml)
-  check('home hero shows the Women and Men panels (they have photographs)', panel('/shop/women', 'Women') && panel('/shop/men', 'Men'), null)
-  check('…and no Kids panel while Kids has no photograph', !panel('/shop/kids', 'Kids'), null)
+  check('home hero opens on the campaign photograph by default', homeHtml.includes('%2Fimages%2Fhero%2Fcampaign.webp'), null)
+  check('…with the Women, Men and Kids photographs under it', ['Women', 'Men', 'Kids'].every((l) => panel(`/shop/${l.toLowerCase()}`, l)), null)
   check('home page shows New in by default', homeHtml.includes('id="new-in-title"'), null)
   const sections = settings.homepage.sections ?? {}
   const hideNewIn = await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, sections: { ...sections, newIn: false } } })

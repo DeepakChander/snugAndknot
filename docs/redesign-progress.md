@@ -112,6 +112,9 @@ git diff origin/main premium-site --stat        # everything the redesign change
   departments), customer care and socials, the ways to pay from the checkout settings, the store
   name set large, and the small print.
 - Prompts for the campaign photograph and the band in `docs/hero-image-prompts.md`.
+- The hero now opens on the generated campaign photograph, with the Women, Men and Kids photographs
+  as a row of tiles under it (`public/images/hero/`). Removing the campaign photograph in the admin
+  brings back the three panels side by side.
 
 ## Before going live
 
@@ -120,6 +123,6 @@ git diff origin/main premium-site --stat        # everything the redesign change
    category photographs, categories on the home page, the announcement's free-shipping amount).
 3. Switch the main currency to INR in Admin → Settings → Checkout & shipping → Change the main
    currency, at the exchange rate you choose.
-4. Add the 15 Kids category photographs in Admin → Categories → Kids → Edit → Image (and a Kids
-   hero photograph in Settings → Home page) so Kids gets its tiles and hero panel.
+4. Add the 15 Kids category photographs in Admin → Categories → Kids → Edit → Image so Kids gets its
+   tiles under Shop by category. (The Kids hero photograph is already in place.)
 
