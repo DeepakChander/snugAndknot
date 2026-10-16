@@ -748,9 +748,13 @@ async function adminCatalogue() {
   expect(PA, 'admin', 'sold out sets every size to 0', await act({ action: 'sold-out', ids: [pid] }), 200, (await after())?.variants.every((v) => v.inventory === 0))
   expect(PA, 'admin', 'restock refills the sold-out sizes', await act({ action: 'restock', ids: [pid], quantity: 7 }), 200, (await after())?.variants.every((v) => v.inventory === 7))
   expect(PA, 'admin', 'stock per size', await act({ action: 'inventory', id: pid, variants: [{ id: vid, inventory: 3 }] }), 200, (await after())?.variants[0]?.inventory === 3)
+  // Read the other product's stock now (orders earlier in the audit have moved it since ctx was taken).
+  const stockOf = async (id, vid) => (await admin.get(`/api/admin/products/${id}`)).data?.product?.variants?.find((v) => v.id === vid)?.inventory
   const foreign = ctx.product.variants[0]
+  const foreignBefore = await stockOf(ctx.product.id, foreign.id)
   await act({ action: 'inventory', id: pid, variants: [{ id: foreign.id, inventory: 0 }] })
-  check(PA, 'admin', "another product's size is not touched", (await admin.get(`/api/admin/products/${ctx.product.id}`)).data?.product?.variants?.find((v) => v.id === foreign.id)?.inventory === foreign.inventory)
+  const foreignAfter = await stockOf(ctx.product.id, foreign.id)
+  check(PA, 'admin', "another product's size is not touched", foreignBefore > 0 && foreignAfter === foreignBefore, { foreignBefore, foreignAfter })
   const priced = await act({ action: 'price', id: pid, price: 60, compareAtPrice: 80, prices: {} })
   expect(PA, 'admin', 'one price for every size', priced, 200, (await after())?.variants.every((v) => v.price === 60 && v.compareAtPrice === 80))
   expect(PA, 'admin', 'compare-at below the price', await act({ action: 'price', id: pid, price: 60, compareAtPrice: 50, prices: {} }), 422)
