@@ -29,7 +29,7 @@ export async function GET() {
     <title>${xml(`${store.name} Journal`)}</title>
     <link>${xml(absoluteUrl('/journal'))}</link>
     <atom:link href="${xml(absoluteUrl('/journal/feed.xml'))}" rel="self" type="application/rss+xml" />
-    <description>${xml('Notes on knitwear: fibres, stitches and the case for fewer, better things.')}</description>
+    <description>${xml('Stories from Snug&Knot: fabrics, fit, care and the case for fewer, better things.')}</description>
     <language>en</language>
 ${posts[0] ? `    <lastBuildDate>${new Date(posts[0].date).toUTCString()}</lastBuildDate>\n` : ''}${items}
   </channel>
