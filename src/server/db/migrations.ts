@@ -499,6 +499,16 @@ UPDATE products SET category = gender || '-knitwear', updated_at = now() WHERE c
 DELETE FROM categories c WHERE c.slug IN ('tops', 'cardigans') AND NOT EXISTS (SELECT 1 FROM products p WHERE p.category = c.slug);
 `,
   },
+  {
+    version: 13,
+    name: 'category-images',
+    // Photographs for the Men and Women categories (public/images/categories/<slug>.webp). Only a
+    // category that still has no image gets one, so an image set in the admin stays.
+    sql: `
+UPDATE categories SET image = '/images/categories/' || slug || '.webp'
+ WHERE image = '' AND slug IN ('men-shirts', 'men-t-shirts', 'men-polos', 'men-knitwear', 'men-jackets', 'men-trousers', 'men-cargos', 'men-jeans', 'men-shorts', 'men-co-ords', 'women-tops', 'women-shirts', 'women-t-shirts', 'women-knitwear', 'women-jackets', 'women-dresses', 'women-trousers', 'women-jeans', 'women-skirts', 'women-co-ords');
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version
