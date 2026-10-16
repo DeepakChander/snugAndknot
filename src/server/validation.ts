@@ -467,6 +467,11 @@ export const settingsSchemas = {
   }),
   reviews: z.object({ moderation: z.enum(['manual', 'auto']) }),
   homepage: z.object({
+    // Optional: a save without it gets the default Women / Men / Kids panels (saveSettings fills in defaults).
+    heroPanels: z
+      .array(z.object({ label: trimmed(40), href: linkUrl, image: imageUrl }))
+      .max(3)
+      .optional(),
     heroEyebrow: trimmed(80),
     heroTitle: required(160, 'Hero title'),
     heroSubtitle: trimmed(400),

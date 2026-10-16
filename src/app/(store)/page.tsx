@@ -1,5 +1,4 @@
-import HomeHero from '@/components/home/HomeHero'
-import type { CarouselItem } from '@/components/home/GarmentCarousel'
+import HomeHero, { type HeroPanelView } from '@/components/home/HomeHero'
 import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
 import MaterialRows from '@/components/home/MaterialRows'
 import NewInRing from '@/components/home/NewInRing'
@@ -68,19 +67,17 @@ export default async function HomePage() {
       image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
     }))
 
-  // Hero carousel: the active pieces, two photographs each, so even a short catalogue makes a full ring.
-  const withPhotos = products.filter((p) => p.images[0])
-  const carousel: CarouselItem[] = [0, 1].flatMap((round) =>
-    withPhotos.map((p) => {
-      const img = p.images[round] ?? p.images[0]
-      return {
-        key: `${p.id}-${round}`,
-        src: img.src,
-        alt: img.alt || p.title,
-        product: { id: p.id, handle: p.handle, title: p.title, productType: p.productType, price: p.price, compareAtPrice: p.compareAtPrice, prices: p.prices },
-      }
+  // Hero panels from the admin, in order. A panel with no photograph of its own that links to a
+  // department shows one of that department's pieces; a panel with no photograph at all is left out
+  // (so Kids appears once it has one).
+  const department = (href: string) => /^\/shop\/(men|women|kids)\/?$/.exec(href)?.[1] as 'men' | 'women' | 'kids' | undefined
+  const heroPanels: HeroPanelView[] = (settings.homepage.heroPanels ?? [])
+    .filter((p) => p.label.trim() && p.href)
+    .map((p) => {
+      const d = department(p.href)
+      return { label: p.label, href: p.href, image: p.image || (d ? firstImage(forDept(d), '') : '') }
     })
-  ).slice(0, 10)
+    .filter((p) => p.image)
 
   // Video wall: nothing renders until the admin switches it on with at least one playable clip.
   const wall = settings.videos.enabled ? buildWall(settings.videos.items, products) : []
@@ -88,7 +85,7 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={[organizationLd(settings), websiteLd(settings)]} />
-      <HomeHero home={settings.homepage} commerce={settings.commerce} storeName={settings.store.name} items={carousel} />
+      <HomeHero home={settings.homepage} storeName={settings.store.name} panels={heroPanels} />
       <CategoryGrid tiles={tiles} />
       <MaterialRows />
       <NewInRing products={products.slice(0, 8)} />

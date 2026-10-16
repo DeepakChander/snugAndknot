@@ -558,6 +558,18 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   // eslint-disable-next-line no-script-url
   const js = await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, primaryCtaHref: 'javascript:alert(1)' } })
   check('script (javascript-scheme) link refused → 422', js.status === 422, js.status)
+  const panels = settings.homepage.heroPanels ?? []
+  check('home hero has the Women / Men / Kids panels by default', ['Women', 'Men', 'Kids'].every((l) => panels.some((p) => p.label === l)), panels)
+  // eslint-disable-next-line no-script-url
+  const panelJs = await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, heroPanels: [{ label: 'X', href: 'javascript:alert(1)', image: '' }] } })
+  check('script link in a hero panel refused → 422', panelJs.status === 422, panelJs.status)
+  const fourPanels = await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, heroPanels: [...panels, ...panels].slice(0, 4) } })
+  check('more than three hero panels refused → 422', fourPanels.status === 422, fourPanels.status)
+  const homeHtml = new TextDecoder().decode((await anon.get('/')).data)
+  // A hero panel is a link to the department holding its name and "Shop now" (the header links have neither).
+  const panel = (href, label) => new RegExp(`href="${href}"[^>]*>(?:(?!</a>)[\\s\\S])*>${label}</span>(?:(?!</a>)[\\s\\S])*Shop now`).test(homeHtml)
+  check('home hero shows the Women and Men panels (they have photographs)', panel('/shop/women', 'Women') && panel('/shop/men', 'Men'), null)
+  check('…and no Kids panel while Kids has no photograph', !panel('/shop/kids', 'Kids'), null)
   const proto = await admin.put('/api/admin/settings', { section: 'announcement', value: { ...settings.announcement, link: '//evil.example/x' } })
   check('protocol-relative link refused → 422', proto.status === 422, proto.status)
   const social = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, social: { ...settings.store.social, instagram: 'http://insecure.example' } } })

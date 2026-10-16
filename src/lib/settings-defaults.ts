@@ -45,6 +45,11 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     moderation: 'manual',
   },
   homepage: {
+    heroPanels: [
+      { label: 'Women', href: '/shop/women', image: '' },
+      { label: 'Men', href: '/shop/men', image: '' },
+      { label: 'Kids', href: '/shop/kids', image: '' },
+    ],
     heroEyebrow: 'Everyday clothing for',
     heroTitle: 'Men, Women & Kids',
     heroSubtitle: 'Trendy · Comfortable · Premium',

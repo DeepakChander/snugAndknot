@@ -377,13 +377,29 @@ function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
           title="Hero"
           description={
             <>
-              The first screen: this copy beside a 3D carousel of your active pieces (their first two photographs).{' '}
+              The first screen: up to three photograph panels side by side (one per department), with this copy and the buttons in a band underneath.{' '}
               <Link href="/" target="_blank" className="underline">
                 Open the home page ↗
               </Link>
             </>
           }
         >
+          <div className="space-y-4">
+            {(d.heroPanels ?? []).map((p, i) => {
+              const setPanel = (patch: Partial<typeof p>) => set({ heroPanels: (d.heroPanels ?? []).map((x, j) => (j === i ? { ...x, ...patch } : x)) })
+              return (
+                <div key={i} className="grid gap-4 rounded-xl border border-ink/10 p-4 xl:grid-cols-[1fr_22rem]">
+                  <div className="space-y-3">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-stone">Panel {i + 1}</p>
+                    <Input label="Label" value={p.label} error={s.err[`heroPanels.${i}.label`]} onChange={(e) => setPanel({ label: e.target.value })} placeholder="Women" hint="Leave empty to hide this panel." />
+                    <Input label="Link" value={p.href} error={s.err[`heroPanels.${i}.href`]} onChange={(e) => setPanel({ href: e.target.value })} placeholder="/shop/women" />
+                    <p className="text-xs text-stone">No photograph? A panel linking to /shop/women, /shop/men or /shop/kids shows one of that department&apos;s pieces; with none, the panel is hidden. Portrait photographs (about 4:5 or 2:3) fill it best.</p>
+                  </div>
+                  <ImageField label="Photograph" value={p.image} onChange={(v) => setPanel({ image: v })} />
+                </div>
+              )
+            })}
+          </div>
           <Input label="Eyebrow" value={d.heroEyebrow} error={s.err.heroEyebrow} onChange={(e) => set({ heroEyebrow: e.target.value })} hint="The small spaced line above the title." />
           <Input label="Title" value={d.heroTitle} error={s.err.heroTitle} onChange={(e) => set({ heroTitle: e.target.value })} />
           <Textarea label="Subtitle" rows={2} value={d.heroSubtitle} error={s.err.heroSubtitle} onChange={(e) => set({ heroSubtitle: e.target.value })} />

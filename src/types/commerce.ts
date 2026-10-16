@@ -350,7 +350,17 @@ export interface ReviewSettings {
   moderation: 'manual' | 'auto'
 }
 
+/** One photograph panel of the home hero, e.g. Women → /shop/women. */
+export interface HeroPanel {
+  label: string
+  href: string
+  /** Empty: a photograph of one of the department's pieces (for a /shop/<department> link). */
+  image: string
+}
+
 export interface HomepageSettings {
+  /** Side-by-side photograph panels at the top of the home page (a panel with no label is hidden). */
+  heroPanels: HeroPanel[]
   heroEyebrow: string
   heroTitle: string
   heroSubtitle: string
