@@ -243,7 +243,7 @@ export default function CheckoutView() {
 
   return (
     <div className="bg-ivory pb-28 pt-nav text-ink">
-      <form onSubmit={place} noValidate className="container-wide grid gap-12 pt-10 md:pt-14 lg:grid-cols-[1fr_440px] lg:gap-16">
+      <form onSubmit={place} noValidate className="container-wide grid grid-cols-1 gap-12 pt-10 md:pt-14 lg:grid-cols-[minmax(0,1fr)_440px] lg:gap-16">
         <div>
           <h1 className="text-display">Checkout</h1>
           <p className="mt-4 flex items-center gap-2 text-sm text-stone">
