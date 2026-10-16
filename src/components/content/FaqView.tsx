@@ -22,7 +22,7 @@ export default function FaqView({ groups }: { groups: FaqGroup[] }) {
 
   return (
     <>
-      <PageHero eyebrow="Client care" title="Questions, *answered*" intro="Everything about ordering, delivery, sizing and returns. Can’t find it? Write to us — a person will reply." />
+      <PageHero eyebrow="Customer care" title="Questions, *answered*" intro="Everything about ordering, delivery, sizing and returns. Can’t find it? Write to us — a person will reply." />
       <div className="bg-ivory pb-28 text-ink">
         <div className="container-wide border-t border-ink/10 pt-12">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
@@ -42,7 +42,7 @@ export default function FaqView({ groups }: { groups: FaqGroup[] }) {
           <div className="mt-14 grid gap-14 lg:grid-cols-2 lg:gap-x-20">
             {filtered.map((g, gi) => (
               <motion.section key={g.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: (gi % 2) * 0.08 }}>
-                <h2 className="font-display text-4xl">{g.name}</h2>
+                <h2 className="text-[1.6rem] font-medium">{g.name}</h2>
                 <div className="mt-4">
                   {g.items.map((it) => (
                     <AccordionItem key={it.q} title={it.q} defaultOpen={!!q.trim()}>
@@ -54,8 +54,8 @@ export default function FaqView({ groups }: { groups: FaqGroup[] }) {
             ))}
             {!filtered.length ? <p className="text-stone">No questions match “{q}”.</p> : null}
           </div>
-          <div className="mt-20 flex flex-wrap items-center justify-between gap-6 rounded-[2rem] bg-signal p-10 text-bone [&_:focus-visible]:outline-bone">
-            <p className="font-display text-4xl">Still wondering?</p>
+          <div className="mt-20 flex flex-wrap items-center justify-between gap-6 bg-signal p-10 text-bone [&_:focus-visible]:outline-bone">
+            <p className="text-[1.6rem] font-medium">Still wondering?</p>
             <ButtonLink href="/contact" variant="light" arrow>
               Write to us
             </ButtonLink>

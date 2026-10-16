@@ -6,7 +6,6 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useSettings } from '@/components/providers/SettingsProvider'
 import { useAuthStore } from '@/stores/auth-store'
-import SplitReveal from '@/components/motion/SplitReveal'
 import { Button } from '@/components/kit/Button'
 import { Field, Select, TextArea } from '@/components/kit/Field'
 import { CheckIcon, MailIcon, PhoneIcon } from '@/components/kit/icons'
@@ -48,28 +47,28 @@ export default function ContactView() {
     <div className="bg-ivory pt-nav text-ink">
       <div className="container-wide grid gap-14 pb-28 pt-12 md:pt-20 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div>
-          <p className="text-eyebrow slash text-stone">Contact</p>
-          <SplitReveal as="h1" type="words" intro className="mt-5 font-display text-[clamp(2.75rem,10.5vw,5.5rem)] font-[650] uppercase leading-[0.86] tracking-[-0.055em] lg:text-[clamp(4rem,7vw,8rem)]">
+          <p className="text-eyebrow text-stone">Contact</p>
+          <h1 className="mt-4 text-display">
             Write to <em>us</em>
-          </SplitReveal>
+          </h1>
           <p className="mt-8 max-w-md text-lead text-stone">A real person reads every message. Tell us what you need and we will reply by email.</p>
           <ul className="mt-12 space-y-5">
             <li className="flex items-start gap-4">
-              <MailIcon size={22} className="mt-0.5 text-signal" />
+              <MailIcon size={20} className="mt-0.5 text-ink" />
               <a href={`mailto:${store.email}`} className="link-wipe text-lg">
                 {store.email}
               </a>
             </li>
             {store.phone ? (
               <li className="flex items-start gap-4">
-                <PhoneIcon size={22} className="mt-0.5 text-signal" />
+                <PhoneIcon size={20} className="mt-0.5 text-ink" />
                 <a href={`tel:${store.phone.replace(/[^+\d]/g, '')}`} className="link-wipe text-lg">
                   {store.phone}
                 </a>
               </li>
             ) : null}
           </ul>
-          <div className="relative mt-14 hidden aspect-[5/4] overflow-hidden rounded-[2rem] lg:block">
+          <div className="relative mt-14 hidden aspect-[5/4] overflow-hidden lg:block">
             <Image src="/images/collection-home/Lived-In.png" alt="" fill sizes="40vw" className="object-cover" />
           </div>
           <p className="mt-8 text-sm text-stone">
@@ -88,11 +87,11 @@ export default function ContactView() {
         <div className="lg:pt-24">
           <AnimatePresence mode="wait">
             {sent ? (
-              <motion.div key="sent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-[2rem] bg-burgundy-deep p-10 text-bone [&_:focus-visible]:outline-bone md:p-14">
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gold text-ink">
+              <motion.div key="sent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-ink p-10 text-ivory [&_:focus-visible]:outline-ivory md:p-14">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ivory text-ink">
                   <CheckIcon size={26} />
                 </span>
-                <p className="mt-8 font-display text-5xl leading-none">Thank you, {name.split(' ')[0]}.</p>
+                <p className="mt-6 text-[1.8rem] font-medium leading-tight">Thank you, {name.split(' ')[0]}.</p>
                 <p className="mt-5 max-w-sm text-bone">Your message is with us. We will reply to {email}.</p>
                 <Button
                   variant="outline-light"
@@ -106,7 +105,7 @@ export default function ContactView() {
                 </Button>
               </motion.div>
             ) : (
-              <motion.form key="form" exit={{ opacity: 0, y: -10 }} onSubmit={submit} noValidate className="space-y-4 rounded-[2rem] bg-bone/70 p-6 md:p-10">
+              <motion.form key="form" exit={{ opacity: 0, y: -10 }} onSubmit={submit} noValidate className="space-y-4 bg-bone/70 p-6 md:p-10">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field label="Name" required autoComplete="name" value={name} onChange={(e) => setForm({ ...form, name: e.target.value })} error={errors.name} />
                   <Field label="Email" type="email" required autoComplete="email" value={email} onChange={(e) => setForm({ ...form, email: e.target.value })} error={errors.email} />
