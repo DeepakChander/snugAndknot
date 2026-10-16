@@ -370,8 +370,21 @@ export interface HomeSections {
   promises: boolean
 }
 
+/** The campaign band on the home page: one of the shop's collections, set large. */
+export interface HomeFeature {
+  enabled: boolean
+  /** The collection it shows (its name, line, description and pieces). */
+  collectionHandle: string
+  /** Optional photograph in place of the collection's own. */
+  image: string
+  ctaLabel: string
+}
+
 export interface HomepageSettings {
   sections: HomeSections
+  /** A wide campaign photograph across the whole hero (the department panels sit on it). Empty: the panels. */
+  heroImage: string
+  feature: HomeFeature
   /** Side-by-side photograph panels at the top of the home page (a panel with no label is hidden). */
   heroPanels: HeroPanel[]
   heroEyebrow: string

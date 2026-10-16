@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useMemo, useState, type ReactNode } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Btn, Card, Input, PageHeader, Textarea, Toggle, useMutate } from './ui'
+import { Btn, Card, Input, PageHeader, Select, Textarea, Toggle, useMutate } from './ui'
 import { ImageField } from './ImagePicker'
 import { cn } from '@/lib/format'
 import { currencySymbol } from '@/lib/currency'
@@ -456,10 +456,11 @@ function ReviewsForm({ initial }: { initial: SiteSettings['reviews'] }) {
   )
 }
 
-function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
+function HomepageForm({ initial, collections }: { initial: SiteSettings['homepage']; collections: { handle: string; title: string }[] }) {
   const s = useSection('homepage', initial)
   const d = s.draft
   const set = (patch: Partial<typeof d>) => s.setDraft({ ...d, ...patch })
+  const feature = d.feature ?? { enabled: true, collectionHandle: '', image: '', ctaLabel: 'Shop the edit' }
   return (
     <>
       <Card>
@@ -467,13 +468,21 @@ function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
           title="Hero"
           description={
             <>
-              The first screen: up to three photograph panels side by side (one per department), with this copy and the buttons in a band underneath.{' '}
+              The first screen: a wide campaign photograph, or up to three photograph panels side by side (one per department) with this copy and the buttons in a band underneath.{' '}
               <Link href="/" target="_blank" className="underline">
                 Open the home page ↗
               </Link>
             </>
           }
         >
+          <div className="grid gap-4 rounded-xl border border-ink/10 p-4 xl:grid-cols-[1fr_22rem]">
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-stone">Campaign photograph</p>
+              <p className="text-sm text-ink/70">Optional. With one, it fills the whole first screen with the title and buttons over it, and the panels below become a link per department. Without one, the panels show side by side.</p>
+              <p className="text-xs text-stone">A wide landscape photograph (about 16:9 or 3:2, at least 2400 px wide) with the people to the right and calm space at the lower left for the words.</p>
+            </div>
+            <ImageField label="Campaign photograph" aspect="aspect-[16/9]" value={d.heroImage ?? ''} onChange={(v) => set({ heroImage: v })} />
+          </div>
           <div className="space-y-4">
             {(d.heroPanels ?? []).map((p, i) => {
               const setPanel = (patch: Partial<typeof p>) => set({ heroPanels: (d.heroPanels ?? []).map((x, j) => (j === i ? { ...x, ...patch } : x)) })
@@ -498,6 +507,24 @@ function HomepageForm({ initial }: { initial: SiteSettings['homepage'] }) {
             <Input label="Main button link" value={d.primaryCtaHref} error={s.err.primaryCtaHref} onChange={(e) => set({ primaryCtaHref: e.target.value })} placeholder="/shop" />
             <Input label="Second button label" value={d.secondaryCtaLabel} error={s.err.secondaryCtaLabel} onChange={(e) => set({ secondaryCtaLabel: e.target.value })} hint="Leave empty to hide it." />
             <Input label="Second button link" value={d.secondaryCtaHref} error={s.err.secondaryCtaHref} onChange={(e) => set({ secondaryCtaHref: e.target.value })} placeholder="/collections" />
+          </div>
+        </Section>
+        <Section title="Campaign band" description="One collection set large on a dark band after New in: its photograph, name and description, three of its pieces and a button.">
+          <Toggle checked={d.feature?.enabled ?? true} onChange={(v) => set({ feature: { ...feature, enabled: v } })} label="Show the campaign band" description="It also stays hidden while the chosen collection is missing or has no photograph." />
+          <div className="grid gap-4 xl:grid-cols-[1fr_22rem]">
+            <div className="space-y-4">
+              <Select label="Collection" value={feature.collectionHandle} error={s.err['feature.collectionHandle']} onChange={(e) => set({ feature: { ...feature, collectionHandle: e.target.value } })}>
+                {collections.some((c) => c.handle === feature.collectionHandle) ? null : <option value={feature.collectionHandle}>{feature.collectionHandle ? `${feature.collectionHandle} (missing)` : 'Choose a collection'}</option>}
+                {collections.map((c) => (
+                  <option key={c.handle} value={c.handle}>
+                    {c.title.replace(/\*/g, '')}
+                  </option>
+                ))}
+              </Select>
+              <Input label="Button label" value={feature.ctaLabel} error={s.err['feature.ctaLabel']} onChange={(e) => set({ feature: { ...feature, ctaLabel: e.target.value } })} placeholder="Shop the edit" />
+              <p className="text-xs text-stone">The name, line and description come from the collection itself (Collections). Leave the photograph empty to use the collection&apos;s own.</p>
+            </div>
+            <ImageField label="Photograph (optional)" value={feature.image} onChange={(v) => set({ feature: { ...feature, image: v } })} />
           </div>
         </Section>
         <Section title="Sections" description="Show or hide each part of the home page, in the order it appears. The video wall has its own switch under Video wall.">
@@ -553,7 +580,7 @@ function SeoForm({ initial }: { initial: SiteSettings['seo'] }) {
 
 /* ─────────────────────────── Page ─────────────────────────── */
 
-export function SettingsAdmin({ settings, tab, payments }: { settings: SiteSettings; tab: SettingsKey; payments: RazorpayConnection }) {
+export function SettingsAdmin({ settings, tab, payments, collections = [] }: { settings: SiteSettings; tab: SettingsKey; payments: RazorpayConnection; collections?: { handle: string; title: string }[] }) {
   const router = useRouter()
   const pathname = usePathname()
   const current = TABS.find((t) => t.key === tab) ?? TABS[0]
@@ -580,7 +607,7 @@ export function SettingsAdmin({ settings, tab, payments }: { settings: SiteSetti
         {current.key === 'commerce' ? <CommerceForm key={settings.commerce.currency} initial={settings.commerce} payments={payments} /> : null}
         {current.key === 'announcement' ? <AnnouncementForm initial={settings.announcement} /> : null}
         {current.key === 'reviews' ? <ReviewsForm initial={settings.reviews} /> : null}
-        {current.key === 'homepage' ? <HomepageForm initial={settings.homepage} /> : null}
+        {current.key === 'homepage' ? <HomepageForm initial={settings.homepage} collections={collections} /> : null}
         {current.key === 'seo' ? <SeoForm initial={settings.seo} /> : null}
       </div>
     </>

@@ -2,6 +2,7 @@ import HomeHero, { type HeroPanelView } from '@/components/home/HomeHero'
 import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
 import NewIn from '@/components/home/NewIn'
 import Collections from '@/components/home/Collections'
+import HomeFeature from '@/components/home/HomeFeature'
 import ClientReviews from '@/components/home/ClientReviews'
 import VideoWall from '@/components/home/VideoWall'
 import JournalCards from '@/components/home/JournalCards'
@@ -18,7 +19,7 @@ import { categoryHref, openDepartments, type Department } from '@/lib/categories
 export const metadata: Metadata = { alternates: { canonical: '/', types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: 'Snug&Knot Journal' }] } } }
 
 /**
- * The home page, top to bottom: hero, Shop by category, New in, Collections, the video wall,
+ * The home page, top to bottom: hero, Shop by category, New in, the campaign band, Collections, the video wall,
  * customer reviews, Journal and the service promises. Each section after the hero can be switched
  * off in Admin → Settings → Home page (the video wall under Video wall); each also stays out of the
  * page on its own while it has nothing to show.
@@ -50,7 +51,14 @@ export default async function HomePage() {
       const d = department(p.href)
       return { label: p.label, href: p.href, image: p.image || (d ? firstImage(forDept(d)) : '') }
     })
-    .filter((p) => p.image)
+    // Over a campaign photograph the panels are only links, so they need no photograph of their own.
+    .filter((p) => p.image || settings.homepage.heroImage)
+
+  // The campaign band: the chosen collection, while it exists and there is a photograph for it, with
+  // its pieces that are on sale.
+  const feature = settings.homepage.feature
+  const featured = feature?.enabled ? collections.find((c) => c.handle === feature.collectionHandle && (feature.image || c.image)) : undefined
+  const featuredPieces = featured ? featured.productIds.map((id) => products.find((p) => p.id === id)).filter((p): p is Product => !!p) : []
 
   // "Shop by category": each department's categories that the admin left on the home page and that
   // have an image, in admin order (empty ones included: their page says what is coming).
@@ -69,6 +77,7 @@ export default async function HomePage() {
       <HomeHero home={settings.homepage} storeName={settings.store.name} panels={heroPanels} />
       {on('categories') ? <CategoryGrid tiles={tiles} /> : null}
       {on('newIn') ? <NewIn products={newest} /> : null}
+      {feature && featured ? <HomeFeature feature={feature} collection={featured} pieces={featuredPieces} /> : null}
       {on('collections') ? <Collections collections={collections} products={products} /> : null}
       {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} /> : null}
       {on('reviews') ? <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} /> : null}

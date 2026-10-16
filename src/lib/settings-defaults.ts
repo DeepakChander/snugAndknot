@@ -47,9 +47,11 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   },
   homepage: {
     sections: { categories: true, newIn: true, collections: true, reviews: true, journal: true, promises: true },
+    heroImage: '',
+    feature: { enabled: true, collectionHandle: 'coastal-escape', image: '', ctaLabel: 'Shop the edit' },
     heroPanels: [
-      { label: 'Women', href: '/shop/women', image: '' },
-      { label: 'Men', href: '/shop/men', image: '' },
+      { label: 'Women', href: '/shop/women', image: '/images/products/women/ivory-cable-cardigan-2.jpg' },
+      { label: 'Men', href: '/shop/men', image: '/images/products/men/black-red-contrast-tee-2.jpg' },
       { label: 'Kids', href: '/shop/kids', image: '' },
     ],
     heroEyebrow: 'Everyday clothing for',

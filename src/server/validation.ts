@@ -502,6 +502,11 @@ export const settingsSchemas = {
   }),
   reviews: z.object({ moderation: z.enum(['manual', 'auto']) }),
   homepage: z.object({
+    // Optional (saveSettings fills in defaults): the wide campaign photograph and the campaign band.
+    heroImage: imageUrl.optional(),
+    feature: z
+      .object({ enabled: z.boolean(), collectionHandle: trimmed(120), image: imageUrl, ctaLabel: trimmed(40) })
+      .optional(),
     // Optional: a save without it shows every section (saveSettings fills in defaults).
     sections: z
       .object({ categories: z.boolean(), newIn: z.boolean(), collections: z.boolean(), reviews: z.boolean(), journal: z.boolean(), promises: z.boolean() })
