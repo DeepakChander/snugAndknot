@@ -147,8 +147,8 @@ export default function AboutView({ storeName }: { storeName: string }) {
           </div>
 
           <div className="sk-rise order-1 lg:order-2 lg:col-span-5 lg:col-start-8 [animation-delay:160ms]">
-            <figure className="relative mx-auto aspect-[4/5] max-w-md overflow-hidden rounded-[1.5rem] bg-parchment shadow-[0_40px_80px_-45px_rgba(22,16,14,0.55)] ring-1 ring-ink/5 lg:max-w-none">
-              <Image src="/images/about/about-hero.png" alt={`${storeName} founder in the studio`} fill priority sizes="(min-width:1024px) 40vw, 90vw" className="sk-settle object-cover object-[50%_40%]" />
+            <figure className="relative mx-auto aspect-[4/5] max-w-md overflow-hidden bg-parchment shadow-[0_40px_80px_-45px_rgba(22,16,14,0.55)] ring-1 ring-ink/5 lg:max-w-none">
+              <Image src="/images/about/about-hero.png" alt={`${storeName} founder in the studio`} fill priority sizes="(min-width:1024px) 40vw, 90vw" className="object-cover object-[50%_40%]" />
             </figure>
           </div>
         </div>
@@ -201,20 +201,20 @@ export default function AboutView({ storeName }: { storeName: string }) {
       <section data-nav-theme="dark" aria-labelledby="about-philosophy" className="section-pad bg-ink text-bone">
         <div className="container-wide">
           <Reveal className="mx-auto max-w-3xl text-center">
-            <Eyebrow className="text-gold">Philosophy</Eyebrow>
+            <Eyebrow className="text-bone/60">Philosophy</Eyebrow>
             <h2 id="about-philosophy" className="mt-4 font-serif text-[clamp(2.3rem,4.6vw,4rem)] font-normal leading-[1.05]">
               Three knots that hold <em>everything together</em>
             </h2>
           </Reveal>
-          <RevealGroup className="mt-16 grid gap-px overflow-hidden rounded-[1.5rem] bg-bone/10 md:grid-cols-3">
+          <RevealGroup className="mt-16 grid gap-px overflow-hidden bg-bone/10 md:grid-cols-3">
             {PILLARS.map((p, i) => (
               <RevealItem key={p.title} className="flex flex-col bg-ink p-8 md:p-10">
-                <p className="font-mono text-xs text-gold/80">{String(i + 1).padStart(2, '0')}</p>
+                <p className="font-mono text-xs text-bone/50">{String(i + 1).padStart(2, '0')}</p>
                 <p className="mt-8 text-[0.7rem] font-medium uppercase tracking-[0.26em] text-bone/50">{p.subtitle}</p>
                 <h3 className="mt-3 font-serif text-[clamp(1.8rem,2.6vw,2.3rem)] font-normal leading-[1.08]">{p.title}</h3>
                 <p className="mt-4 flex-1 leading-relaxed text-bone/65">{p.body}</p>
                 <div className="mt-10 flex items-baseline gap-3 border-t border-bone/10 pt-6">
-                  <span className="font-serif text-[2.4rem] leading-none text-gold">{p.stat.value}</span>
+                  <span className="font-serif text-[2.4rem] leading-none text-ivory">{p.stat.value}</span>
                   <span className="text-[0.72rem] uppercase tracking-[0.22em] text-bone/50">{p.stat.label}</span>
                 </div>
               </RevealItem>
@@ -257,7 +257,7 @@ export default function AboutView({ storeName }: { storeName: string }) {
       {/* Join the story. */}
       <section data-nav-theme="light" aria-labelledby="about-join" className="bg-ivory pb-[clamp(4.5rem,9vw,8rem)] text-ink">
         <div className="container-wide">
-          <Reveal className="rounded-[2rem] border border-ink/10 bg-bone px-6 py-16 text-center md:px-16 md:py-24">
+          <Reveal className="border border-ink/10 bg-bone px-6 py-16 text-center md:px-16 md:py-24">
             <Eyebrow>Join the story</Eyebrow>
             <h2 id="about-join" className="mx-auto mt-4 max-w-3xl font-serif text-[clamp(2.4rem,5vw,4.5rem)] font-normal leading-[1.02]">
               Every knot tells <em>a story</em>
