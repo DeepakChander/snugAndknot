@@ -3,26 +3,24 @@
 import Link from 'next/link'
 import { forwardRef, type ComponentPropsWithoutRef, type PointerEvent, type ReactNode } from 'react'
 import { cn } from '@/lib/format'
-import Magnetic from '@/components/motion/Magnetic'
 
 type Variant = 'primary' | 'light' | 'outline' | 'outline-light' | 'gold' | 'signal' | 'ghost'
 type Size = 'sm' | 'md' | 'lg'
 
 const VARIANT: Record<Variant, string> = {
-  // Fills under small labels use the deeper red: bone on signal red is only 4.0:1.
-  primary: 'bg-ink text-bone [--btn-fill:var(--color-burgundy-deep)] [--btn-ink-hover:var(--color-bone)]',
-  light: 'bg-bone text-ink hover:text-bone focus-visible:text-bone [--btn-fill:var(--color-burgundy-deep)] [--btn-ink-hover:var(--color-bone)]',
+  primary: 'bg-ink text-ivory [--btn-fill:var(--color-smoke)] [--btn-ink-hover:var(--color-ivory)]',
+  light: 'bg-ivory text-ink [--btn-fill:var(--color-parchment)] [--btn-ink-hover:var(--color-ink)]',
   gold: 'bg-butter text-ink hover:text-butter focus-visible:text-butter [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-butter)]',
   signal: 'bg-signal text-bone [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-bone)]',
-  outline: 'border border-ink/25 text-ink hover:text-ivory focus-visible:text-ivory [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-ivory)]',
-  'outline-light': 'border border-bone/35 text-bone hover:text-ink focus-visible:text-ink [--btn-fill:var(--color-bone)] [--btn-ink-hover:var(--color-ink)]',
+  outline: 'border border-ink text-ink [--btn-fill:var(--color-ink)] [--btn-ink-hover:var(--color-ivory)]',
+  'outline-light': 'border border-ivory text-ivory [--btn-fill:var(--color-ivory)] [--btn-ink-hover:var(--color-ink)]',
   ghost: 'text-current [--btn-fill:color-mix(in_srgb,currentColor_10%,transparent)] [--btn-ink-hover:currentColor]',
 }
 
 const SIZE: Record<Size, string> = {
-  sm: 'h-10 px-5 text-[0.84rem]',
-  md: 'h-12 px-6 text-[0.92rem]',
-  lg: 'h-14 px-8 text-[1rem]',
+  sm: 'h-10 px-5 text-[0.7rem]',
+  md: 'h-12 px-7 text-[0.74rem]',
+  lg: 'h-[3.25rem] px-9 text-[0.78rem]',
 }
 
 export function Arrow({ className }: { className?: string }) {
@@ -68,11 +66,9 @@ function Inner({ children, arrow, icon, loading }: Pick<Common, 'children' | 'ar
       <span className="btn-fill" aria-hidden />
       {loading ? <Spinner /> : null}
       {label ? (
-        <span className="roll font-display font-medium tracking-[-0.02em]">
-          <span data-text={label}>{label}</span>
-        </span>
+        <span className="font-sans font-medium uppercase tracking-[0.14em]">{label}</span>
       ) : (
-        <span className="inline-flex items-center gap-2 font-display font-medium tracking-[-0.02em]">{children}</span>
+        <span className="inline-flex items-center gap-2 font-sans font-medium uppercase tracking-[0.14em]">{children}</span>
       )}
       {icon ?? (arrow ? <Arrow className="btn-icon" /> : null)}
     </>
@@ -102,7 +98,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       </Inner>
     </button>
   )
-  return magnetic ? <Magnetic className={block ? 'w-full' : undefined}>{el}</Magnetic> : el
+  // `magnetic` is accepted for older call sites; buttons no longer follow the pointer.
+  void magnetic
+  return el
 })
 
 type LinkButtonProps = Common & { href: string; external?: boolean } & Omit<ComponentPropsWithoutRef<'a'>, 'children' | 'href'>
@@ -123,7 +121,8 @@ export function ButtonLink({ variant = 'primary', size = 'md', arrow, icon, magn
       {inner}
     </Link>
   )
-  return magnetic ? <Magnetic className={block ? 'w-full' : undefined}>{el}</Magnetic> : el
+  void magnetic
+  return el
 }
 
 /** Circular icon button (bag, search, close …). */
