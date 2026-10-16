@@ -280,6 +280,32 @@ export const collectionSchema = z.object({
   position: z.coerce.number().int().min(0).max(10_000).default(0),
 })
 
+const productIds = z.array(z.string().trim().min(1).max(120)).min(1, 'Choose at least one product').max(200)
+
+/** Quick actions from the admin's product list (one product or many). */
+export const productActionSchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('status'), ids: productIds, status: z.enum(['active', 'draft', 'archived']) }),
+  z.object({ action: z.literal('delete'), ids: productIds }),
+  // Every size of each product to 0.
+  z.object({ action: z.literal('sold-out'), ids: productIds }),
+  // Every size of each product that is at 0 back to `quantity`.
+  z.object({ action: z.literal('restock'), ids: productIds, quantity: z.coerce.number().int().min(1).max(100_000) }),
+  z.object({
+    action: z.literal('inventory'),
+    id: z.string().trim().min(1).max(120),
+    variants: z.array(z.object({ id: z.string().trim().min(1).max(160), inventory: z.coerce.number().int().min(0).max(1_000_000) })).min(1).max(200),
+  }),
+  z
+    .object({ action: z.literal('price'), id: z.string().trim().min(1).max(120), price: money, compareAtPrice: money.nullable().default(null), prices: priceBookSchema })
+    .superRefine((p, ctx) => {
+      const check = (price: number, compareAt: number | null, path: (string | number)[]) => {
+        if (compareAt !== null && compareAt > 0 && compareAt <= price) ctx.addIssue({ code: 'custom', path, message: 'Compare-at price must be higher than the price' })
+      }
+      check(p.price, p.compareAtPrice, ['compareAtPrice'])
+      for (const [code, cp] of Object.entries(p.prices)) check(cp.price, cp.compareAtPrice, ['prices', code, 'compareAtPrice'])
+    }),
+])
+
 export const categorySchema = z.object({
   slug: handle,
   title: required(80, 'Title'),

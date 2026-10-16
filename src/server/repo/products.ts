@@ -345,3 +345,42 @@ export async function deleteProduct(id: string): Promise<boolean> {
     return rows.length > 0
   })
 }
+
+/* ─────────────── Quick admin actions (product list) ─────────────── */
+
+/** Sets the status of several products at once. Returns the ids that existed. */
+export async function setProductsStatus(ids: string[], status: Product['status']): Promise<string[]> {
+  const rows = await query<{ id: string }>('UPDATE products SET status = $2, updated_at = now() WHERE id = ANY($1::text[]) RETURNING id', [ids, status])
+  return rows.map((r) => r.id)
+}
+
+/** Sets the stock of some of a product's sizes. Sizes of other products are ignored. */
+export async function setVariantInventory(productId: string, entries: { id: string; inventory: number }[]): Promise<boolean> {
+  return tx(async (q) => {
+    const rows = await q.query('UPDATE products SET updated_at = now() WHERE id = $1 RETURNING id', [productId])
+    if (!rows.length) return false
+    for (const e of entries) {
+      await q.query('UPDATE variants SET inventory = $3 WHERE id = $1 AND product_id = $2', [e.id, productId, Math.max(0, Math.trunc(e.inventory))])
+    }
+    return true
+  })
+}
+
+/**
+ * One price for the whole product: the base price, the compare-at price and the prices in the
+ * additional currencies, written to the product and to every one of its sizes (any size's own
+ * price is replaced).
+ */
+export async function setProductPricing(productId: string, p: { price: number; compareAtPrice: number | null; prices: PriceBook }): Promise<boolean> {
+  return tx(async (q) => {
+    const rows = await q.query('UPDATE products SET price = $2, compare_at_price = $3, prices = $4::jsonb, updated_at = now() WHERE id = $1 RETURNING id', [
+      productId,
+      p.price,
+      p.compareAtPrice,
+      JSON.stringify(p.prices),
+    ])
+    if (!rows.length) return false
+    await q.query('UPDATE variants SET price = $2, compare_at_price = $3, prices = $4::jsonb WHERE product_id = $1', [productId, p.price, p.compareAtPrice, JSON.stringify(p.prices)])
+    return true
+  })
+}
