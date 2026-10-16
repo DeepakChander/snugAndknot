@@ -4,8 +4,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/motion/gsap'
-import SplitReveal from '@/components/motion/SplitReveal'
 import { ButtonLink } from '@/components/kit/Button'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { ProductPrice } from '@/components/kit/Price'
@@ -189,8 +187,8 @@ function Tile({ item, index, paused, reduced, onOpen }: { item: WallItem; index:
     .join(', ')
 
   const body: ReactNode = (
-    <div data-reveal className="relative aspect-[9/16] overflow-hidden rounded-[1.1rem] bg-umber ring-1 ring-bone/10 transition-shadow duration-700 group-hover/tile:shadow-[0_40px_70px_-30px_rgba(0,0,0,0.85)] group-focus-visible/tile:ring-2 group-focus-visible/tile:ring-gold">
-      <div data-zoom className="absolute inset-0">
+    <div className="relative aspect-[9/16] overflow-hidden bg-parchment group-focus-visible/tile:outline group-focus-visible/tile:outline-2 group-focus-visible/tile:outline-ink">
+      <div className="absolute inset-0">
         <Poster src={item.poster} sizes="(min-width: 768px) 25vw, 50vw" className="transition-transform duration-[1400ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover/tile:scale-[1.04]" />
         {source.kind === 'file' && !reduced ? <FileClip src={source.src} active={active} /> : null}
         {source.kind === 'youtube' && !reduced ? <YouTubeClip id={source.id} shorts={source.shorts} active={active} load={seen} /> : null}
@@ -504,7 +502,8 @@ function Viewer({ items, index, onIndex, onClose }: { items: WallItem[]; index: 
 
 /**
  * The shoppable video wall: customers' clips in a portrait grid that plays muted while on
- * screen. Each tile opens a full-screen viewer with sound and the pieces worn in it.
+ * screen. Each tile opens a full-screen viewer with sound and the pieces worn in it. A light
+ * section like the rest of the page; the tiles simply appear (no clip-in, no drifting columns).
  */
 export default function VideoWall({ heading, intro, ctaLabel, ctaHref, items }: { heading: string; intro: string; ctaLabel: string; ctaHref: string; items: WallItem[] }) {
   const root = useRef<HTMLElement>(null)
@@ -512,37 +511,6 @@ export default function VideoWall({ heading, intro, ctaLabel, ctaHref, items }: 
   const reduced = useReducedMotionPref()
   const [open, setOpen] = useState<number | null>(null)
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || !grid.current) return
-      const tiles = gsap.utils.toArray<HTMLElement>('[data-reveal]', grid.current)
-      gsap.set(tiles, { clipPath: 'inset(100% 0% 0% 0% round 1.1rem)' })
-      gsap.set(tiles.map((t) => t.querySelector('[data-zoom]')), { scale: 1.25 })
-      ScrollTrigger.batch(tiles, {
-        start: 'top 92%',
-        once: true,
-        onEnter: (batch) => {
-          gsap.to(batch, { clipPath: 'inset(0% 0% 0% 0% round 1.1rem)', duration: 1.4, ease: 'silk', stagger: 0.09 })
-          gsap.to(
-            batch.map((t) => (t as HTMLElement).querySelector('[data-zoom]')),
-            { scale: 1, duration: 1.8, ease: 'silk', stagger: 0.09 }
-          )
-        },
-      })
-
-      // Alternate columns drift against the scroll, so the wall reads as hung, not tiled.
-      const mm = gsap.matchMedia()
-      const drift = (cols: number, amount: number) => {
-        gsap.utils.toArray<HTMLElement>('[data-drift]', grid.current).forEach((el, i) => {
-          if ((i % cols) % 2 === 0) return
-          gsap.fromTo(el, { y: amount }, { y: -amount, ease: 'none', scrollTrigger: { trigger: grid.current, start: 'top bottom', end: 'bottom top', scrub: true } })
-        })
-      }
-      mm.add('(min-width: 768px)', () => drift(4, 56))
-      mm.add('(max-width: 767px)', () => drift(2, 22))
-    },
-    { scope: root, dependencies: [items.length] }
-  )
 
   const onIndex = useCallback((i: number) => setOpen(i), [])
   // The tile that opened the viewer gets focus back on close, however it was opened (a mouse
@@ -561,41 +529,28 @@ export default function VideoWall({ heading, intro, ctaLabel, ctaHref, items }: 
     })
   }, [])
 
-  const hash = heading.startsWith('#')
   return (
-    <section ref={root} data-nav-theme="dark" aria-labelledby="video-wall-title" className="relative overflow-hidden bg-noir py-[clamp(5rem,10vw,9rem)] text-bone">
-      <div className="container-wide flex flex-col items-center text-center">
-        <p className="text-eyebrow slash text-bone/60">Worn by you</p>
-        {heading ? (
-          <SplitReveal as="h2" id="video-wall-title" type="chars" className="mt-5 max-w-full break-words font-display text-[clamp(2.75rem,9vw,9rem)] font-semibold leading-[0.86] tracking-[-0.06em]">
-            {hash ? (
-              <>
-                <span className="text-signal">#</span>
-                {heading.slice(1)}
-              </>
-            ) : (
-              heading
-            )}
-          </SplitReveal>
-        ) : (
-          <h2 id="video-wall-title" className="sr-only">
-            Customer videos
+    <section ref={root} aria-labelledby="video-wall-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
+      <div className="container-wide flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div className="max-w-2xl">
+          <h2 id="video-wall-title" className="text-headline break-words">
+            {heading || 'Worn by you'}
           </h2>
-        )}
-        {intro ? (
-          <p className="mt-6 max-w-xl text-balance text-lead text-bone/65">
-            <Highlight text={intro} />
-          </p>
-        ) : null}
+          {intro ? (
+            <p className="mt-3 text-[0.95rem] text-stone">
+              <Highlight text={intro} />
+            </p>
+          ) : null}
+        </div>
         {ctaLabel && ctaHref ? (
-          <ButtonLink href={ctaHref} external variant="light" size="md" magnetic icon={<InstagramIcon size={18} />} className="mt-8">
+          <ButtonLink href={ctaHref} external variant="outline" size="sm" icon={<InstagramIcon size={16} />} className="self-start md:self-auto">
             {ctaLabel}
           </ButtonLink>
         ) : null}
       </div>
 
-      <div className="container-wide mt-[clamp(3rem,6vw,5rem)]">
-        <ul ref={grid} role="list" className="mx-auto grid max-w-[1400px] grid-cols-2 gap-2.5 pb-6 sm:gap-4 md:grid-cols-4 md:gap-5 md:pb-14">
+      <div className="container-wide mt-8">
+        <ul ref={grid} role="list" className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           {items.map((item, i) => (
             <Tile key={item.id} item={item} index={i} paused={open !== null} reduced={reduced} onOpen={openAt} />
           ))}
