@@ -24,6 +24,7 @@ git diff origin/main premium-site --stat        # everything the redesign change
 | 7 | Cart and checkout | `p7-checkout` | Done |
 | 8 | Account | `p8-account` | Done |
 | 9 | Info pages (about, contact, FAQ, policies, journal, lookbook, collections, 404) | `p9-info` | Done |
+| 10 | Premium polish: serif headings, hero photographs and campaign mode, campaign band, dark footer | `p10-polish` | Done |
 
 ## Phase 1 · Header and categories
 
@@ -98,6 +99,19 @@ git diff origin/main premium-site --stat        # everything the redesign change
 - Light, still headers everywhere; Journal articles, Collections, the Lookbook and the 404 page
   rebuilt without dark full-screen heroes, pinned scrolling or letter-by-letter titles. The scroll
   and text animation code and the GSAP packages are removed; one calm fade-in remains.
+
+## Phase 10 · Premium polish
+
+- Display headings in the serif (Instrument Serif) across the site; section lines above each heading.
+- Hero: new default photographs for the Women and Men panels, the department named large on each
+  panel, and an optional wide **campaign photograph** (Settings → Home page → Hero) that fills the
+  first screen with the title, buttons and department links over it.
+- A dark **campaign band** after New in: one collection set large with three of its pieces, chosen
+  in Settings → Home page → Campaign band (switch, collection, photograph, button label).
+- A dark footer: serif sign-off with the newsletter, link columns (Shop built from the open
+  departments), customer care and socials, the ways to pay from the checkout settings, the store
+  name set large, and the small print.
+- Prompts for the campaign photograph and the band in `docs/hero-image-prompts.md`.
 
 ## Before going live
 
