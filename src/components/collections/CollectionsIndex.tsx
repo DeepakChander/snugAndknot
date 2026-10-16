@@ -1,51 +1,39 @@
-'use client'
-
+import Image from 'next/image'
 import Link from 'next/link'
-import SplitReveal from '@/components/motion/SplitReveal'
-import UnmaskImage from '@/components/motion/UnmaskImage'
-import Reveal from '@/components/motion/Reveal'
-import { ButtonLink } from '@/components/kit/Button'
+import { plain } from '@/lib/accent'
 import type { Collection } from '@/types/commerce'
-import { cn } from '@/lib/format'
 
+/** Every collection as a photograph tile with its name, its line, a short description and how many pieces it holds. */
 export default function CollectionsIndex({ collections }: { collections: (Collection & { count: number })[] }) {
   return (
-    <div data-nav-theme="dark" className="bg-noir pb-24 text-bone">
-      <header className="container-wide pb-16 pt-[calc(var(--nav-h)+var(--announce-h)+4rem)]">
-        <p className="text-eyebrow text-gold">Collections · {String(collections.length).padStart(2, '0')}</p>
-        <SplitReveal as="h1" type="chars" intro className="mt-6 text-mega">
-          Stories in wool
-        </SplitReveal>
-        <Reveal delay={0.3} className="mt-8 max-w-xl text-lead text-bone/60">
-          Each collection gathers pieces around a feeling — a cold morning, a long walk, a quiet evening in.
-        </Reveal>
+    <div className="bg-ivory pb-24 pt-nav text-ink">
+      <header className="container-wide border-b border-ink/10 pb-10 pt-10 md:pb-14 md:pt-14">
+        <p className="text-eyebrow text-stone">Collections</p>
+        <h1 className="mt-4 text-display">Edits to shop together</h1>
+        <p className="mt-5 max-w-xl text-lead text-stone">Each collection gathers pieces made to be worn together.</p>
       </header>
 
-      <div className="container-wide space-y-24 md:space-y-36">
+      <ul className="container-wide mt-10 grid gap-x-4 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
         {collections.map((c, i) => (
-          <article key={c.id} className={cn('grid items-center gap-8 md:grid-cols-12 md:gap-12')}>
-            <Link href={`/collections/${c.handle}`} className={cn('block md:col-span-7', i % 2 === 1 && 'md:order-2 md:col-start-6')} data-cursor="view" data-cursor-label="Explore">
-              <UnmaskImage src={c.image} alt={c.title} sizes="(min-width:768px) 58vw, 100vw" className="aspect-[4/5] md:aspect-[5/6]" />
+          <li key={c.id}>
+            <Link href={`/collections/${c.handle}`} className="group block">
+              <span className="relative block aspect-[4/5] overflow-hidden bg-parchment">
+                {c.image ? (
+                  <Image src={c.image} alt="" fill priority={i < 3} sizes="(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw" className="object-cover transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]" unoptimized={c.image.startsWith('/api/media/')} />
+                ) : null}
+              </span>
+              <span className="mt-4 flex items-baseline justify-between gap-4">
+                <span className="text-[1.15rem] font-medium group-hover:underline group-hover:underline-offset-4">{plain(c.title)}</span>
+                <span className="shrink-0 text-[0.72rem] uppercase tracking-[0.12em] text-stone">
+                  {c.count} piece{c.count === 1 ? '' : 's'}
+                </span>
+              </span>
+              {c.subtitle ? <span className="mt-1 block text-[0.86rem] text-stone">{c.subtitle}</span> : null}
+              {c.description ? <span className="mt-2 line-clamp-2 block text-[0.9rem] text-ink/70">{c.description}</span> : null}
             </Link>
-            <div className={cn('md:col-span-5', i % 2 ? 'md:order-1 md:col-start-1' : '')}>
-              <Reveal>
-                <p className="font-mono text-sm text-gold">{String(i + 1).padStart(2, '0')}</p>
-                <p className="mt-4 text-eyebrow text-taupe">{c.subtitle}</p>
-                <h2 className="mt-3 text-headline uppercase">{c.title}</h2>
-                <p className="mt-6 max-w-md text-bone/60">{c.description}</p>
-                <div className="mt-8 flex items-center gap-6">
-                  <ButtonLink href={`/collections/${c.handle}`} variant="light" arrow>
-                    Explore
-                  </ButtonLink>
-                  <span className="text-label text-bone/50">
-                    {c.count} piece{c.count === 1 ? '' : 's'}
-                  </span>
-                </div>
-              </Reveal>
-            </div>
-          </article>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

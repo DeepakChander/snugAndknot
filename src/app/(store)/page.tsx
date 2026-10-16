@@ -1,84 +1,72 @@
-import HomeHero from '@/components/home/HomeHero'
-import type { CarouselItem } from '@/components/home/GarmentCarousel'
+import HomeHero, { type HeroPanelView } from '@/components/home/HomeHero'
 import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
-import MaterialRows from '@/components/home/MaterialRows'
-import NewInRing from '@/components/home/NewInRing'
-import CollectionSheets from '@/components/home/CollectionSheets'
-import ShopIndex, { type IndexRow } from '@/components/home/ShopIndex'
-import Statement from '@/components/home/Statement'
-import CraftCards from '@/components/home/CraftCards'
+import NewIn from '@/components/home/NewIn'
+import Collections from '@/components/home/Collections'
+import HomeFeature from '@/components/home/HomeFeature'
 import ClientReviews from '@/components/home/ClientReviews'
 import VideoWall from '@/components/home/VideoWall'
 import JournalCards from '@/components/home/JournalCards'
 import Promises from '@/components/home/Promises'
 import type { Metadata } from 'next'
-import { getCategories, getCollections, getLatestReviews, getProducts, getStoreSettings } from '@/server/catalog'
+import { getAllCategories, getCollections, getLatestReviews, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { organizationLd, websiteLd } from '@/lib/seo'
 import { JOURNAL } from '@/lib/journal'
 import { buildWall } from '@/lib/video'
-import type { Product } from '@/types/commerce'
-
-/** Knitwear-only editorial frames, the fallback images for the "Shop by" index. */
-const LOOKS = [
-  '/images/lookbook/soft-focus-2.png',
-  '/images/lookbook/quiet-luxury-1.png',
-  '/images/Collections-Hero/Winter.png',
-]
+import type { HomeSections, Product } from '@/types/commerce'
+import { categoryHref, openDepartments, type Department } from '@/lib/categories'
 
 export const metadata: Metadata = { alternates: { canonical: '/', types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: 'Snug&Knot Journal' }] } } }
 
-const pieces = (n: number) => `${n} piece${n === 1 ? '' : 's'}`
-
+/**
+ * The home page, top to bottom: hero, Shop by category, New in, the campaign band, Collections, the video wall,
+ * customer reviews, Journal and the service promises. Each section after the hero can be switched
+ * off in Admin → Settings → Home page (the video wall under Video wall); each also stays out of the
+ * page on its own while it has nothing to show.
+ */
 export default async function HomePage() {
-  const [products, collections, categories, latest, settings] = await Promise.all([
+  const [products, collections, allCategories, latest, settings] = await Promise.all([
     getProducts({ sort: 'featured' }),
     getCollections(),
-    getCategories(),
+    getAllCategories(),
     getLatestReviews(6),
     getStoreSettings(),
   ])
+  // A setting saved before the switches existed has none: every section shows.
+  const on = (k: keyof HomeSections) => settings.homepage.sections?.[k] ?? true
+  const open = openDepartments(settings.store)
 
-  // "Shop by": departments that have pieces, then the active categories, then everything.
-  const forDept = (d: 'women' | 'men' | 'kids') =>
-    products.filter((p) => p.gender === d || (d !== 'kids' && p.gender === 'unisex'))
-  const firstImage = (list: Product[], fallback: string) => list.find((p) => p.images[0])?.images[0].src ?? fallback
-  const rows: IndexRow[] = []
-  for (const [id, label] of [['women', 'Women'], ['men', 'Men'], ['kids', 'Kids']] as const) {
-    const list = forDept(id)
-    if (list.length) rows.push({ label, href: `/shop/${id}`, meta: pieces(list.length), image: firstImage(list, LOOKS[0]) })
-  }
-  for (const c of categories) {
-    const list = products.filter((p) => p.category === c.slug)
-    rows.push({ label: c.title, href: `/shop/${c.slug}`, meta: pieces(c.productCount), image: c.image || firstImage(list, LOOKS[1]) })
-  }
-  rows.push({ label: 'All pieces', href: '/shop', meta: pieces(products.length), image: LOOKS[2] })
+  const forDept = (d: Department) => products.filter((p) => p.gender === d || (d !== 'kids' && p.gender === 'unisex'))
+  const firstImage = (list: Product[]) => list.find((p) => p.images[0])?.images[0].src ?? ''
 
-  // "Shop by category" tiles: categories with active pieces (getCategories) that the admin left on
-  // the home page, in their admin order. A category without its own image shows one of its pieces.
-  // A cached read from before the badge/showOnHome columns lacks both, so missing means "shown, no badge".
-  const tiles: CategoryTile[] = categories
-    .filter((c) => c.showOnHome !== false)
-    .map((c) => ({
-      slug: c.slug,
-      title: c.title,
-      badge: c.badge ?? '',
-      image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
-    }))
-
-  // Hero carousel: the active pieces, two photographs each, so even a short catalogue makes a full ring.
-  const withPhotos = products.filter((p) => p.images[0])
-  const carousel: CarouselItem[] = [0, 1].flatMap((round) =>
-    withPhotos.map((p) => {
-      const img = p.images[round] ?? p.images[0]
-      return {
-        key: `${p.id}-${round}`,
-        src: img.src,
-        alt: img.alt || p.title,
-        product: { id: p.id, handle: p.handle, title: p.title, productType: p.productType, price: p.price, compareAtPrice: p.compareAtPrice, prices: p.prices },
-      }
+  // Hero panels from the admin, in order. A panel with no photograph of its own that links to a
+  // department shows one of that department's pieces; a panel with no photograph at all is left out
+  // (so Kids appears once it has one).
+  const department = (href: string) => /^\/shop\/(men|women|kids)\/?$/.exec(href)?.[1] as Department | undefined
+  const heroPanels: HeroPanelView[] = (settings.homepage.heroPanels ?? [])
+    .filter((p) => p.label.trim() && p.href)
+    // A panel for a closed department goes with it.
+    .filter((p) => !department(p.href) || open.includes(department(p.href)!))
+    .map((p) => {
+      const d = department(p.href)
+      return { label: p.label, href: p.href, image: p.image || (d ? firstImage(forDept(d)) : '') }
     })
-  ).slice(0, 10)
+    // Over a campaign photograph the panels are only links, so they need no photograph of their own.
+    .filter((p) => p.image || settings.homepage.heroImage)
+
+  // The campaign band: the chosen collection, while it exists and there is a photograph for it, with
+  // its pieces that are on sale.
+  const feature = settings.homepage.feature
+  const featured = feature?.enabled ? collections.find((c) => c.handle === feature.collectionHandle && (feature.image || c.image)) : undefined
+  const featuredPieces = featured ? featured.productIds.map((id) => products.find((p) => p.id === id)).filter((p): p is Product => !!p) : []
+
+  // "Shop by category": each department's categories that the admin left on the home page and that
+  // have an image, in admin order (empty ones included: their page says what is coming).
+  const tiles: CategoryTile[] = allCategories
+    .filter((c) => c.department && open.includes(c.department as Department) && c.showOnHome && c.image)
+    .map((c) => ({ slug: c.slug, href: categoryHref(c), title: c.title, badge: c.badge, image: c.image, department: c.department as Department }))
+
+  const newest = [...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 8)
 
   // Video wall: nothing renders until the admin switches it on with at least one playable clip.
   const wall = settings.videos.enabled ? buildWall(settings.videos.items, products) : []
@@ -86,18 +74,15 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={[organizationLd(settings), websiteLd(settings)]} />
-      <HomeHero home={settings.homepage} commerce={settings.commerce} storeName={settings.store.name} items={carousel} />
-      <CategoryGrid tiles={tiles} />
-      <MaterialRows />
-      <NewInRing products={products.slice(0, 8)} />
-      <CollectionSheets collections={collections} products={products} />
-      <ShopIndex rows={rows} />
-      <Statement />
-      <CraftCards />
-      <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} />
-      {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} /> : null}
-      <JournalCards posts={JOURNAL} />
-      <Promises />
+      <HomeHero home={settings.homepage} storeName={settings.store.name} panels={heroPanels} />
+      {on('categories') ? <CategoryGrid tiles={tiles} /> : null}
+      {on('newIn') ? <NewIn products={newest} /> : null}
+      {feature && featured ? <HomeFeature feature={feature} collection={featured} pieces={featuredPieces} /> : null}
+      {on('collections') ? <Collections collections={collections} products={products} /> : null}
+      {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} tabs departments={open} /> : null}
+      {on('reviews') ? <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} /> : null}
+      {on('journal') ? <JournalCards posts={JOURNAL} /> : null}
+      {on('promises') ? <Promises /> : null}
     </>
   )
 }

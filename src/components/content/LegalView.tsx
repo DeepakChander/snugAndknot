@@ -36,7 +36,7 @@ export default function LegalView({ eyebrow, title, intro, sections }: { eyebrow
                   <button
                     type="button"
                     onClick={() => scrollToTarget(`#${s.id}`, -120)}
-                    className={cn('flex w-full items-baseline gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors', active === s.id ? 'bg-ink text-ivory' : 'text-stone hover:text-ink')}
+                    className={cn('flex w-full items-baseline gap-3 px-3 py-2 text-left text-sm transition-colors', active === s.id ? 'bg-ink text-ivory' : 'text-stone hover:text-ink')}
                   >
                     <span className="font-mono text-[0.65rem] opacity-60">{String(i + 1).padStart(2, '0')}</span>
                     {s.title}
@@ -49,7 +49,7 @@ export default function LegalView({ eyebrow, title, intro, sections }: { eyebrow
             {sections.map((s, i) => (
               <section key={s.id} id={s.id} className="scroll-mt-32">
                 <p className="font-mono text-xs text-burgundy">{String(i + 1).padStart(2, '0')}</p>
-                <h2 className="mt-2 font-display text-[clamp(1.8rem,3vw,2.5rem)] font-semibold leading-[1] tracking-[-0.04em]">{s.title}</h2>
+                <h2 className="mt-2 text-[1.35rem] font-medium leading-snug">{s.title}</h2>
                 <div className="mt-5 space-y-4 leading-relaxed text-stone">
                   {s.body.map((p, j) => (
                     <p key={j}>{p}</p>

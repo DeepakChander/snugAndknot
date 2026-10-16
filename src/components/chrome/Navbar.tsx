@@ -9,47 +9,47 @@ import { useUIStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useWishlistStore } from '@/stores/wishlist-store'
 import { useHydrated } from '@/hooks/use-hydrated'
-import { useSettings } from '@/components/providers/SettingsProvider'
-import { getLenis } from '@/lib/motion/lenis'
+import { useCurrency, useMoney, useSettings } from '@/components/providers/SettingsProvider'
 import { cn } from '@/lib/format'
-import Wordmark from './Wordmark'
-import MegaMenu, { type MegaKind } from './MegaMenu'
-import { HeartIcon, SearchIcon, UserIcon } from '@/components/kit/icons'
+import { DEPARTMENT_TITLES, openDepartments, type Department } from '@/lib/categories'
+import MegaMenu from './MegaMenu'
+import CurrencySwitcher from './CurrencySwitcher'
+import { BagIcon, HeartIcon, SearchIcon, UserIcon } from '@/components/kit/icons'
 
-const NAV: { label: string; href: string; mega?: MegaKind }[] = [
-  { label: 'Shop', href: '/shop', mega: 'shop' },
-  { label: 'Collections', href: '/collections', mega: 'collections' },
-  { label: 'Lookbook', href: '/lookbook' },
-  { label: 'Journal', href: '/journal' },
-  { label: 'Atelier', href: '/about' },
-]
+const ANNOUNCE_H = 32
 
-function AnnouncementBar({ messages, link, hidden }: { messages: string[]; link: string; hidden: boolean }) {
+const FREE_SHIPPING = '{free-shipping}'
+
+function AnnouncementBar({ messages: raw, link, hidden }: { messages: string[]; link: string; hidden: boolean }) {
+  // {free-shipping} → the free-shipping amount in the shopper's currency; a message that needs it is
+  // left out while there is no free-shipping amount.
+  const money = useMoney()
+  const { currency } = useCurrency()
+  const free = currency.freeShippingThreshold
+  const messages = raw.filter((m) => !m.includes(FREE_SHIPPING) || free > 0).map((m) => m.split(FREE_SHIPPING).join(money(free)))
   const [i, setI] = useState(0)
   useEffect(() => {
     if (messages.length < 2) return
-    const t = setInterval(() => setI((n) => (n + 1) % messages.length), 4200)
+    const t = setInterval(() => setI((n) => (n + 1) % messages.length), 5000)
     return () => clearInterval(t)
   }, [messages.length])
+  if (!messages.length) return null
+  const shown = messages[i % messages.length]
   return (
-    <div
-      className={cn(
-        'overflow-hidden bg-ink text-bone transition-[height] duration-500 ease-[cubic-bezier(.16,1,.3,1)]',
-        hidden ? 'h-0' : 'h-[34px]'
-      )}
-    >
-      <Link href={link || '/shop'} className="relative flex h-[34px] items-center justify-center text-eyebrow text-bone/80 transition-colors hover:text-butter">
-        <AnimatePresence mode="popLayout" initial={false}>
+    <div className={cn('overflow-hidden bg-ink text-white transition-[height] duration-300', hidden ? 'h-0' : 'h-8')}>
+      <Link href={link || '/shop'} className="relative flex h-8 items-center justify-center text-[0.7rem] font-medium uppercase tracking-[0.14em] text-white/90 hover:text-white">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={i}
-            initial={{ y: '110%', opacity: 0 }}
-            animate={{ y: '0%', opacity: 1 }}
-            exit={{ y: '-110%', opacity: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute px-4 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            // A message with an amount waits, like every price, until the shopper's currency is known.
+            data-money={raw[i % raw.length]?.includes(FREE_SHIPPING) ? '' : undefined}
+            className="px-4 text-center"
           >
-            <span className="mr-2 inline-block h-1.5 w-1.5 -translate-y-px rounded-full bg-signal align-middle" aria-hidden />
-            {messages[i]}
+            {shown}
           </motion.span>
         </AnimatePresence>
       </Link>
@@ -57,52 +57,36 @@ function AnnouncementBar({ messages, link, hidden }: { messages: string[]; link:
   )
 }
 
-/** `tone` names the ink of an empty bubble: 'dark' on the bone chip, 'light' on the ink chip. */
-function CountBubble({ count, pulse, tone }: { count: number; pulse?: number; tone: 'light' | 'dark' }) {
-  return (
-    <motion.span
-      key={pulse}
-      initial={{ scale: 0.4 }}
-      animate={{ scale: 1 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-      className={cn(
-        'flex h-[22px] min-w-[22px] items-center justify-center rounded-full px-1.5 font-mono text-[11px] leading-none tabular-nums',
-        count > 0 ? 'bg-burgundy-deep text-bone' : tone === 'dark' ? 'bg-ink/10 text-ink' : 'bg-bone/15 text-bone'
-      )}
-    >
-      {count}
-    </motion.span>
-  )
-}
+const iconBtn = 'relative flex h-10 w-10 items-center justify-center text-ink/85 transition-colors hover:text-ink'
 
-/** Chip surfaces: frosted glass for groups and icons, solid for the logo and the bag. */
-const glassChip = (dark: boolean) =>
-  dark ? 'bg-noir/45 text-bone ring-1 ring-bone/12 backdrop-blur-xl' : 'bg-bone/70 text-ink ring-1 ring-ink/[0.07] backdrop-blur-xl'
-const solidChip = (dark: boolean) => (dark ? 'bg-bone text-ink' : 'bg-ink text-bone')
-
+/**
+ * The header: departments on the left (each opens its menu on hover or focus), the name in the
+ * middle, search, account, wishlist and bag on the right. A plain white bar that steps out of the
+ * way while scrolling down and comes back on the way up.
+ */
 export default function Navbar() {
   const pathname = usePathname()
   const settings = useSettings()
   const hydrated = useHydrated()
   const items = useCartStore((s) => s.items)
-  const lastAddedAt = useCartStore((s) => s.lastAddedAt)
   const openCart = useCartStore((s) => s.openCart)
   const wishCount = useWishlistStore((s) => s.items.length)
   const user = useAuthStore((s) => s.user)
   const openAuthModal = useAuthStore((s) => s.openAuthModal)
   const { isMenuOpen, toggleMenu, closeMenu, openSearch } = useUIStore()
 
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
-  const [mega, setMega] = useState<MegaKind | null>(null)
+  const [mega, setMega] = useState<Department | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const headerRef = useRef<HTMLElement>(null)
 
   const bagCount = hydrated ? items.reduce((s, i) => s + i.quantity, 0) : 0
-  const announcement = settings.announcement.enabled && settings.announcement.messages.filter(Boolean).length > 0
+  const messages = settings.announcement.messages.filter(Boolean)
+  const shownMessages = messages.filter((m) => !m.includes('{free-shipping}') || settings.commerce.freeShippingThreshold > 0)
+  const announcement = settings.announcement.enabled && shownMessages.length > 0
 
-  // Scroll: hide on the way down, return on the way up; pick nav colour from the section underneath.
+  // Hide on the way down, return on the way up.
   useEffect(() => {
     let last = window.scrollY
     let raf = 0
@@ -115,36 +99,17 @@ export default function Navbar() {
         setHidden(delta > 0 && y > 160)
         last = y
       }
-      const probe = (headerRef.current?.offsetHeight ?? 80) * 0.6
-      // The centre of the bar decides; the x test matters for panels that slide sideways.
-      const probeX = window.innerWidth / 2
-      let t: 'light' | 'dark' = 'light'
-      for (const el of document.querySelectorAll<HTMLElement>('[data-nav-theme]')) {
-        const r = el.getBoundingClientRect()
-        if (r.top <= probe && r.bottom > probe && r.left <= probeX && r.right > probeX) t = el.dataset.navTheme === 'dark' ? 'dark' : 'light'
-      }
-      setTheme(t)
     }
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(sample)
     }
     sample()
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-    const lenis = getLenis()
-    lenis?.on('scroll', onScroll)
-    // Pages stream in after the shell (Suspense), so re-sample when the content changes.
-    const main = document.getElementById('main')
-    const mo = main ? new MutationObserver(onScroll) : null
-    if (main && mo) mo.observe(main, { childList: true, subtree: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-      lenis?.off('scroll', onScroll)
-      mo?.disconnect()
       if (raf) cancelAnimationFrame(raf)
     }
-  }, [pathname])
+  }, [])
 
   useEffect(() => {
     setMega(null)
@@ -154,23 +119,23 @@ export default function Navbar() {
   }, [pathname, closeMenu])
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--announce-h', announcement && !scrolled ? '34px' : '0px')
+    document.documentElement.style.setProperty('--announce-h', announcement && !scrolled ? `${ANNOUNCE_H}px` : '0px')
   }, [announcement, scrolled])
 
   // Sticky page elements (shop toolbar, summaries) sit under the visible header only.
-  const overlayVisible = !!mega || isMenuOpen
+  const overlayOpen = !!mega || isMenuOpen
   useEffect(() => {
-    const offset = hidden && !overlayVisible ? '0px' : `calc(var(--nav-h) + ${announcement && !scrolled ? '34px' : '0px'})`
+    const offset = hidden && !overlayOpen ? '0px' : `calc(var(--nav-h) + ${announcement && !scrolled ? ANNOUNCE_H : 0}px)`
     document.documentElement.style.setProperty('--nav-offset', offset)
-  }, [hidden, overlayVisible, announcement, scrolled])
+  }, [hidden, overlayOpen, announcement, scrolled])
 
-  const openMega = useCallback((kind: MegaKind) => {
+  const openMega = useCallback((d: Department) => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
-    setMega(kind)
+    setMega(d)
   }, [])
   const scheduleClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
-    closeTimer.current = setTimeout(() => setMega(null), 180)
+    closeTimer.current = setTimeout(() => setMega(null), 150)
   }, [])
 
   useEffect(() => {
@@ -180,19 +145,7 @@ export default function Navbar() {
     return () => document.removeEventListener('keydown', onKey)
   }, [mega])
 
-  const overlayOpen = !!mega || isMenuOpen
-  const dark = isMenuOpen ? true : !!mega ? false : theme === 'dark'
-
-  const logo = (cls: string) => (
-    <Link
-      href="/"
-      aria-label={`${settings.store.name} — home`}
-      onMouseEnter={scheduleClose}
-      className={cn('group flex h-10 items-center rounded-full px-3.5 transition-colors duration-500 sm:px-4', solidChip(dark), cls)}
-    >
-      <Wordmark name={settings.store.name} variant="chip" className="text-[0.74rem] sm:text-[0.8rem]" />
-    </Link>
-  )
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
   return (
     <>
@@ -203,131 +156,96 @@ export default function Navbar() {
         onBlur={(e) => {
           if (!headerRef.current?.contains(e.relatedTarget as Node | null)) setMega(null)
         }}
-        className={cn(
-          'fixed inset-x-0 top-0 z-[100] transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)]',
-          hidden && !overlayOpen ? '-translate-y-full' : 'translate-y-0'
-        )}
+        className={cn('fixed inset-x-0 top-0 z-[100] transition-transform duration-300 ease-out', hidden && !overlayOpen ? '-translate-y-full' : 'translate-y-0')}
       >
-        {announcement ? <AnnouncementBar messages={settings.announcement.messages.filter(Boolean)} link={settings.announcement.link} hidden={scrolled} /> : null}
+        {announcement ? <AnnouncementBar messages={messages} link={settings.announcement.link} hidden={scrolled} /> : null}
 
-        <div className={cn('relative transition-colors duration-500', mega && 'bg-ivory')}>
-          <nav aria-label="Main" className="mx-auto grid h-[var(--nav-h)] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-gutter">
-            {/* Left — menu chip (mobile) and logo chip (desktop) */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleMenu}
-                aria-expanded={isMenuOpen}
-                aria-controls="mobile-menu"
-                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-                data-cursor="hover"
-                className={cn('group flex h-10 min-w-10 items-center justify-center gap-2.5 rounded-full px-3 transition-colors duration-500 sm:pl-3.5 sm:pr-4 lg:hidden', glassChip(dark))}
-              >
-                <span className="relative flex h-2.5 w-[18px] flex-col justify-between">
-                  <span className={cn('h-[1.5px] w-full origin-center rounded bg-current transition-transform duration-500', isMenuOpen && 'translate-y-[4.25px] rotate-45')} />
-                  <span className={cn('h-[1.5px] w-full origin-center rounded bg-current transition-transform duration-500', isMenuOpen && '-translate-y-[4.25px] -rotate-45')} />
-                </span>
-                <span className="roll hidden font-display text-[0.84rem] font-medium tracking-[-0.01em] sm:inline-flex">
-                  <span data-text={isMenuOpen ? 'Close' : 'Menu'}>{isMenuOpen ? 'Close' : 'Menu'}</span>
+        <div className={cn('relative bg-white transition-shadow duration-300', (scrolled || mega) && !isMenuOpen ? 'shadow-[0_1px_0_rgba(22,21,19,0.08)]' : '')}>
+          <nav aria-label="Main" className="mx-auto grid h-[var(--nav-h)] max-w-[1920px] grid-cols-[1fr_auto_1fr] items-center px-gutter">
+            {/* Left: menu and search (phones), departments (desktop) */}
+            <div className="flex items-center">
+              <button type="button" onClick={toggleMenu} aria-expanded={isMenuOpen} aria-controls="mobile-menu" aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} className={cn(iconBtn, '-ml-2.5 lg:hidden')}>
+                <span className="relative flex h-3 w-5 flex-col justify-between">
+                  <span className={cn('h-[1.5px] w-full origin-center bg-current transition-transform duration-300', isMenuOpen && 'translate-y-[5.25px] rotate-45')} />
+                  <span className={cn('h-[1.5px] w-full bg-current transition-opacity duration-200', isMenuOpen && 'opacity-0')} />
+                  <span className={cn('h-[1.5px] w-full origin-center bg-current transition-transform duration-300', isMenuOpen && '-translate-y-[5.25px] -rotate-45')} />
                 </span>
               </button>
-              {logo('hidden lg:flex')}
-            </div>
-
-            {/* Centre — logo (mobile) / link pill (desktop) */}
-            <div className="justify-self-center">
-              {logo('lg:hidden')}
-              <ul className={cn('hidden items-center gap-0.5 rounded-full p-1 transition-colors duration-500 lg:flex', glassChip(dark))}>
-                {NAV.map((item) => {
-                  const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
-                  const highlighted = active || (!!item.mega && mega === item.mega)
+              <button type="button" onClick={openSearch} aria-label="Search" className={cn(iconBtn, 'lg:hidden')}>
+                <SearchIcon size={20} />
+              </button>
+              <ul className="-ml-3 hidden items-center lg:flex">
+                {openDepartments(settings.store).map((d) => {
+                  const href = `/shop/${d}`
+                  const active = isActive(href)
                   return (
-                    <li key={item.href} onMouseEnter={() => (item.mega ? openMega(item.mega) : scheduleClose())}>
+                    <li key={d} onMouseEnter={() => openMega(d)}>
                       <Link
-                        href={item.href}
+                        href={href}
                         aria-current={active ? 'page' : undefined}
-                        aria-expanded={item.mega ? mega === item.mega : undefined}
-                        aria-haspopup={item.mega ? 'true' : undefined}
-                        onFocus={() => item.mega && openMega(item.mega)}
+                        aria-expanded={mega === d}
+                        aria-controls="mega-menu"
+                        onFocus={() => openMega(d)}
                         className={cn(
-                          'group relative flex h-9 items-center gap-1.5 rounded-full px-4 font-display text-[0.86rem] font-medium tracking-[-0.01em] transition-colors duration-500',
-                          highlighted ? solidChip(dark) : dark ? 'text-bone/80 hover:text-bone' : 'text-ink/75 hover:text-ink'
+                          'relative flex h-[var(--nav-h)] items-center px-3 text-[0.82rem] font-medium uppercase tracking-[0.08em] text-ink/80 transition-colors hover:text-ink',
+                          'after:absolute after:inset-x-3 after:bottom-[18px] after:h-px after:origin-left after:scale-x-0 after:bg-ink after:transition-transform after:duration-300',
+                          (active || mega === d) && 'text-ink after:scale-x-100'
                         )}
                       >
-                        {active ? <span className="h-1.5 w-1.5 rounded-full bg-signal" aria-hidden /> : null}
-                        <span className="roll">
-                          <span data-text={item.label}>{item.label}</span>
-                        </span>
+                        {DEPARTMENT_TITLES[d]}
                       </Link>
                     </li>
                   )
                 })}
+                <li onMouseEnter={scheduleClose}>
+                  <Link
+                    href="/shop?sort=newest"
+                    className="flex h-[var(--nav-h)] items-center px-3 text-[0.82rem] font-medium uppercase tracking-[0.08em] text-ink/80 transition-colors hover:text-ink"
+                  >
+                    New in
+                  </Link>
+                </li>
               </ul>
             </div>
 
-            {/* Right — utility chips */}
-            <div className="flex items-center justify-end gap-1.5" onMouseEnter={scheduleClose}>
-              <button
-                type="button"
-                onClick={openSearch}
-                data-cursor="hover"
-                aria-label="Search"
-                className={cn('hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 sm:flex xl:w-auto xl:gap-2 xl:px-4', glassChip(dark))}
-              >
-                <SearchIcon size={17} />
-                <span className="roll hidden font-display text-[0.84rem] font-medium tracking-[-0.01em] xl:inline-flex">
-                  <span data-text="Search">Search</span>
-                </span>
+            {/* Centre: the name */}
+            <Link href="/" aria-label={`${settings.store.name}, home`} onMouseEnter={scheduleClose} className="justify-self-center px-2 text-[1.05rem] font-semibold uppercase tracking-[0.22em] text-ink sm:text-[1.2rem]">
+              {settings.store.name}
+            </Link>
+
+            {/* Right: currency, search, account, wishlist, bag */}
+            <div className="-mr-2.5 flex items-center justify-end" onMouseEnter={scheduleClose}>
+              <CurrencySwitcher className="mr-2 hidden text-ink/75 xl:inline-flex" />
+              <button type="button" onClick={openSearch} aria-label="Search" className={cn(iconBtn, 'hidden lg:flex')}>
+                <SearchIcon size={20} />
               </button>
               {user ? (
-                <Link
-                  href="/account"
-                  aria-label="Your account"
-                  className={cn('hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 sm:flex', glassChip(dark))}
-                >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-butter font-mono text-[11px] uppercase text-ink">
-                    {user.name.trim().split(/\s+/).map((p) => p[0]).slice(0, 2).join('')}
-                  </span>
+                <Link href="/account" aria-label="Your account" className={cn(iconBtn, 'hidden sm:flex')}>
+                  <UserIcon size={20} />
                 </Link>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => openAuthModal('login')}
-                  data-cursor="hover"
-                  aria-label="Sign in"
-                  className={cn('hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 sm:flex', glassChip(dark))}
-                >
-                  <UserIcon size={17} />
+                <button type="button" onClick={() => openAuthModal('login')} aria-label="Sign in" className={cn(iconBtn, 'hidden sm:flex')}>
+                  <UserIcon size={20} />
                 </button>
               )}
-              <Link
-                href="/account/wishlist"
-                aria-label={`Wishlist${hydrated && wishCount ? ` (${wishCount})` : ''}`}
-                className={cn('relative hidden h-10 w-10 items-center justify-center rounded-full transition-colors duration-500 md:flex', glassChip(dark))}
-              >
-                <HeartIcon size={17} />
-                {hydrated && wishCount > 0 ? <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-signal" aria-hidden /> : null}
+              <Link href="/account/wishlist" aria-label={`Wishlist${hydrated && wishCount ? `, ${wishCount} saved` : ''}`} className={cn(iconBtn, 'hidden sm:flex')}>
+                <HeartIcon size={20} />
+                {hydrated && wishCount > 0 ? <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-ink" aria-hidden /> : null}
               </Link>
-              <button
-                type="button"
-                onClick={openCart}
-                data-cursor="hover"
-                aria-label={`Bag, ${bagCount} item${bagCount === 1 ? '' : 's'}`}
-                className={cn('group flex h-10 items-center gap-2 rounded-full pl-4 pr-1.5 transition-colors duration-500', solidChip(dark))}
-              >
-                <span className="roll font-display text-[0.84rem] font-medium tracking-[-0.01em]">
-                  <span data-text="Bag">Bag</span>
-                </span>
-                <CountBubble count={bagCount} pulse={lastAddedAt} tone={dark ? 'dark' : 'light'} />
+              <button type="button" onClick={openCart} aria-label={`Bag, ${bagCount} item${bagCount === 1 ? '' : 's'}`} className={iconBtn}>
+                <BagIcon size={20} />
+                {bagCount > 0 ? (
+                  <span className="absolute right-0.5 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-ink px-1 text-[0.62rem] font-semibold leading-none text-white tabular-nums">{bagCount}</span>
+                ) : null}
               </button>
             </div>
           </nav>
         </div>
 
-        <MegaMenu kind={mega} onEnter={() => closeTimer.current && clearTimeout(closeTimer.current)} onLeave={scheduleClose} onNavigate={() => setMega(null)} />
+        <MegaMenu dept={mega} onEnter={() => closeTimer.current && clearTimeout(closeTimer.current)} onLeave={scheduleClose} onNavigate={() => setMega(null)} />
       </header>
 
-      {/* Dim the page behind an open mega menu */}
+      {/* Dim the page under an open menu. */}
       <AnimatePresence>
         {mega ? (
           <motion.div
@@ -335,8 +253,8 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[90] bg-ink/30 backdrop-blur-[3px]"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[90] hidden bg-ink/20 lg:block"
             onMouseEnter={scheduleClose}
             onClick={() => setMega(null)}
             aria-hidden

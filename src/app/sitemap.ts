@@ -1,20 +1,24 @@
 import type { MetadataRoute } from 'next'
-import { getCategories, getCollections, getProducts } from '@/server/catalog'
+import { getCategories, getCollections, getProducts, getStoreSettings } from '@/server/catalog'
 import { JOURNAL } from '@/lib/journal'
 import { absoluteUrl } from '@/lib/site'
 import type { Product } from '@/types/commerce'
+import { categoryHref, openDepartments } from '@/lib/categories'
 
 type Entry = MetadataRoute.Sitemap[number]
 
 /** Every indexable page, with its photographs so they can appear in image search. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, collections, categories] = await Promise.all([getProducts({}), getCollections(), getCategories()])
+  const [products, collections, allCategories, settings] = await Promise.all([getProducts({}), getCollections(), getCategories(), getStoreSettings()])
+  const open = openDepartments(settings.store)
+  // Closed departments have no pages.
+  const categories = allCategories.filter((c) => !c.department || open.includes(c.department))
   const latest = (list: Product[]) => (list.length ? new Date(Math.max(...list.map((p) => Date.parse(p.updatedAt)))) : undefined)
   const page = (path: string, priority: number, extra: Partial<Entry> = {}): Entry => ({ url: absoluteUrl(path), priority, ...extra })
   const images = (srcs: (string | undefined)[]) => srcs.filter((s): s is string => !!s).map(absoluteUrl)
 
   // Departments only when they have pieces (the kids' page is a "coming soon" note).
-  const departments = (['women', 'men', 'kids'] as const).flatMap((d) => {
+  const departments = (['women', 'men', 'kids'] as const).filter((d) => open.includes(d)).flatMap((d) => {
     const list = products.filter((p) => p.gender === d || (d !== 'kids' && p.gender === 'unisex'))
     return list.length ? [page(`/shop/${d}`, 0.8, { lastModified: latest(list), changeFrequency: 'weekly' })] : []
   })
@@ -25,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...departments,
     ...categories.map((c) => {
       const list = products.filter((p) => p.category === c.slug)
-      return page(`/shop/${c.slug}`, 0.7, { lastModified: latest(list), changeFrequency: 'weekly', images: images([c.image]) })
+      return page(categoryHref(c), 0.7, { lastModified: latest(list), changeFrequency: 'weekly', images: images([c.image]) })
     }),
     page('/collections', 0.8, { changeFrequency: 'weekly' }),
     ...collections.map((c) => {

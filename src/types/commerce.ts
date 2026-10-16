@@ -95,7 +95,15 @@ export interface Category {
   badge: string
   /** Whether the category gets a tile in the home page's "Shop by category" grid. */
   showOnHome: boolean
+  /** Men, Women or Kids; '' for an older category that belongs to no department. */
+  department: CategoryDepartment
+  /** Optional heading the category sits under in the menu, e.g. "Topwear" or "Boys". */
+  group: string
+  /** Listed in the navigation menu (once it has active pieces). */
+  showInMenu: boolean
 }
+
+export type CategoryDepartment = '' | 'men' | 'women' | 'kids'
 
 export interface Collection {
   id: string
@@ -297,6 +305,8 @@ export interface StoreSettings {
   phone: string
   address: { street: string; city: string; state: string; zip: string; country: string }
   social: { instagram: string; pinterest: string; tiktok: string; twitter: string }
+  /** Departments open in the shop. A closed one is gone from the menus, the home page and the shop. */
+  departments: { men: boolean; women: boolean; kids: boolean }
 }
 
 /** An additional currency the shop sells in, with its own prices, shipping and points. */
@@ -342,7 +352,41 @@ export interface ReviewSettings {
   moderation: 'manual' | 'auto'
 }
 
+/** One photograph panel of the home hero, e.g. Women → /shop/women. */
+export interface HeroPanel {
+  label: string
+  href: string
+  /** Empty: a photograph of one of the department's pieces (for a /shop/<department> link). */
+  image: string
+}
+
+/** Which home page sections show (the hero always does; the video wall has its own switch). */
+export interface HomeSections {
+  categories: boolean
+  newIn: boolean
+  collections: boolean
+  reviews: boolean
+  journal: boolean
+  promises: boolean
+}
+
+/** The campaign band on the home page: one of the shop's collections, set large. */
+export interface HomeFeature {
+  enabled: boolean
+  /** The collection it shows (its name, line, description and pieces). */
+  collectionHandle: string
+  /** Optional photograph in place of the collection's own. */
+  image: string
+  ctaLabel: string
+}
+
 export interface HomepageSettings {
+  sections: HomeSections
+  /** A wide campaign photograph across the whole hero (the department panels sit on it). Empty: the panels. */
+  heroImage: string
+  feature: HomeFeature
+  /** Side-by-side photograph panels at the top of the home page (a panel with no label is hidden). */
+  heroPanels: HeroPanel[]
   heroEyebrow: string
   heroTitle: string
   heroSubtitle: string
@@ -359,15 +403,17 @@ export interface SeoSettings {
   ogImage: string
 }
 
-/** One clip on the home page video wall. `url` is a video file, a YouTube link or an Instagram post. */
+/** One clip on the video wall. `url` is a video file, a YouTube link or an Instagram post or reel. */
 export interface VideoWallItem {
   id: string
   url: string
-  /** Still shown before the clip plays (and instead of it for Instagram). Optional for YouTube. */
+  /** Still shown before the clip plays. Optional: YouTube and Instagram show their own cover. */
   poster: string
   caption: string
   /** Who made it, e.g. "@handle". */
   credit: string
+  /** '' for none: then it shows only under All on the home page. */
+  department?: '' | 'men' | 'women' | 'kids'
   productIds: string[]
 }
 

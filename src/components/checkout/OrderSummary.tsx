@@ -18,12 +18,12 @@ export function CouponForm({ quote }: { quote: Quote | null }) {
 
   if (couponCode && quote?.coupon) {
     return (
-      <div className="flex items-center justify-between rounded-2xl border border-dashed border-gold bg-gold/10 px-4 py-3 text-sm">
+      <div className="flex items-center justify-between border border-dashed border-ink/30 bg-bone px-4 py-3 text-sm">
         <span>
           <span className="font-mono tracking-[0.1em]">{quote.coupon.code}</span>
           <span className="ml-2 text-stone">{quote.coupon.description}</span>
         </span>
-        <button type="button" onClick={() => setCouponCode(null)} className="rounded-full p-1.5 hover:bg-ink/10" aria-label="Remove code">
+        <button type="button" onClick={() => setCouponCode(null)} className="p-1.5 hover:bg-ink/10" aria-label="Remove code">
           <XIcon size={12} />
         </button>
       </div>
@@ -53,9 +53,9 @@ export function CouponForm({ quote }: { quote: Quote | null }) {
             onChange={(e) => setValue(e.target.value.toUpperCase())}
             placeholder="Discount code"
             autoComplete="off"
-            className="min-w-0 flex-1 rounded-full border border-ink/15 bg-transparent px-4 py-2.5 font-mono text-sm uppercase tracking-[0.08em] outline-none focus:border-ink/60"
+            className="min-w-0 flex-1 border border-ink/15 bg-transparent px-4 py-2.5 font-mono text-sm uppercase tracking-[0.08em] outline-none focus:border-ink/60"
           />
-          <button type="submit" className="shrink-0 rounded-full bg-ink px-5 text-sm text-ivory hover:bg-burgundy">
+          <button type="submit" className="shrink-0 bg-ink px-5 text-[0.72rem] font-medium uppercase tracking-[0.12em] text-ivory hover:bg-smoke">
             Apply
           </button>
         </form>
@@ -82,13 +82,13 @@ export default function OrderSummary({ quote, loading, compact = false, children
   const { commerce } = useSettings()
   const lines = quote?.lines ?? []
   return (
-    <div className="rounded-[1.75rem] bg-bone/70 p-6 md:p-8">
-      <h2 className="font-display text-3xl">Summary</h2>
+    <div className="bg-bone/70 p-6 md:p-8">
+      <h2 className="text-[1.25rem] font-medium">Summary</h2>
       {!compact && lines.length ? (
         <ul className="mt-6 space-y-4 border-b border-ink/10 pb-6">
           {lines.map((l) => (
             <li key={l.id} className="flex items-center gap-4">
-              <span className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-parchment">
+              <span className="relative h-20 w-16 shrink-0 overflow-hidden bg-parchment">
                 {l.image ? <Image src={l.image} alt="" fill sizes="64px" className="object-cover" /> : null}
                 <span className="absolute -right-0 -top-0 flex h-5 min-w-5 items-center justify-center rounded-bl-lg bg-ink px-1 font-mono text-[10px] text-ivory">{l.quantity}</span>
               </span>

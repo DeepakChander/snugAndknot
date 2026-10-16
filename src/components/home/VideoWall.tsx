@@ -4,14 +4,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/motion/gsap'
-import SplitReveal from '@/components/motion/SplitReveal'
 import { ButtonLink } from '@/components/kit/Button'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { ProductPrice } from '@/components/kit/Price'
 import { ArrowLeft, ArrowRight, BagIcon, InstagramIcon } from '@/components/kit/icons'
 import { cn } from '@/lib/format'
-import { youtubeCommand, youtubeEmbed, type WallItem } from '@/lib/video'
+import InstagramFrame from '@/components/kit/InstagramFrame'
+import { DEPARTMENT_TITLES } from '@/lib/categories'
+import { youtubeCommand, youtubeEmbed, type WallDepartment, type WallItem } from '@/lib/video'
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
@@ -45,13 +45,13 @@ function Poster({ src, sizes, className }: { src: string; sizes: string; classNa
   return <Image src={src} alt="" fill sizes={sizes} unoptimized={raw} className={cn('object-cover', className)} />
 }
 
-/** "@handle" and "#tag" in the intro line are set brighter than the rest. */
+/** "@handle" and "#tag" in the intro line are set darker than the rest. */
 function Highlight({ text }: { text: string }) {
   return (
     <>
       {text.split(/([@#][A-Za-z0-9_.]*[A-Za-z0-9_])/g).map((part, i) =>
         i % 2 ? (
-          <span key={i} className="text-bone">
+          <span key={i} className="font-medium text-ink">
             {part}
           </span>
         ) : (
@@ -180,7 +180,7 @@ function Tile({ item, index, paused, reduced, onOpen }: { item: WallItem; index:
   const n = item.products.length
   const { source } = item
   const label = [
-    source.kind === 'instagram' ? 'Watch on Instagram (opens in a new tab)' : `Play video ${index + 1}`,
+    `Play video ${index + 1}`,
     item.caption,
     item.credit ? `by ${item.credit}` : '',
     n ? `${n} piece${n === 1 ? '' : 's'} tagged` : '',
@@ -189,48 +189,54 @@ function Tile({ item, index, paused, reduced, onOpen }: { item: WallItem; index:
     .join(', ')
 
   const body: ReactNode = (
-    <div data-reveal className="relative aspect-[9/16] overflow-hidden rounded-[1.1rem] bg-umber ring-1 ring-bone/10 transition-shadow duration-700 group-hover/tile:shadow-[0_40px_70px_-30px_rgba(0,0,0,0.85)] group-focus-visible/tile:ring-2 group-focus-visible/tile:ring-gold">
-      <div data-zoom className="absolute inset-0">
-        <Poster src={item.poster} sizes="(min-width: 768px) 25vw, 50vw" className="transition-transform duration-[1400ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover/tile:scale-[1.04]" />
+    <div className="relative aspect-[4/5] overflow-hidden bg-parchment group-focus-visible/tile:outline group-focus-visible/tile:outline-2 group-focus-visible/tile:outline-offset-2 group-focus-visible/tile:outline-ink">
+      <div className="@container absolute inset-0 transition-transform duration-[1400ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover/tile:scale-[1.03]">
+        {source.kind === 'instagram' && !item.poster ? (
+          <>
+            {/* Under the embed while Instagram draws its cover, which can take a few seconds. */}
+            <span aria-hidden className="absolute inset-0 grid animate-pulse place-items-center text-ink/20">
+              <InstagramIcon size={30} />
+            </span>
+            <InstagramFrame src={source.embed} reel={!source.href.includes('/p/')} title="" load={seen} />
+          </>
+        ) : (
+          <Poster src={item.poster} sizes="(min-width: 768px) 25vw, 50vw" />
+        )}
         {source.kind === 'file' && !reduced ? <FileClip src={source.src} active={active} /> : null}
         {source.kind === 'youtube' && !reduced ? <YouTubeClip id={source.id} shorts={source.shorts} active={active} load={seen} /> : null}
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-noir/85 via-noir/25 to-transparent opacity-50 transition-opacity duration-500 group-hover/tile:opacity-100 group-focus-visible/tile:opacity-100" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-60 transition-opacity duration-500 group-hover/tile:opacity-100 group-focus-visible/tile:opacity-100" />
 
       {n ? (
-        <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-bone py-1 pl-1.5 pr-2 text-ink shadow-[0_4px_14px_-4px_rgba(0,0,0,0.5)]">
-          <BagIcon size={14} strokeWidth={1.8} />
-          <span className="font-mono text-[0.72rem] font-medium leading-none tabular-nums">{n}</span>
+        <span className="absolute left-2 top-2 inline-flex items-center gap-1.5 bg-white/95 px-2 py-1 text-ink md:left-2.5 md:top-2.5">
+          <BagIcon size={13} strokeWidth={1.8} />
+          <span className="text-[0.64rem] font-semibold uppercase leading-none tracking-[0.1em] tabular-nums">
+            {n}
+            <span className="hidden sm:inline"> · View products</span>
+          </span>
         </span>
       ) : null}
 
-      {reduced || source.kind === 'instagram' ? <PlayGlyph className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 group-hover/tile:scale-110" /> : null}
+      {reduced && source.kind !== 'instagram' ? <PlayGlyph className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" /> : null}
 
-      <div className="absolute inset-x-3 bottom-3 pr-8">
+      <div className="pointer-events-none absolute inset-x-3 bottom-3 pr-8">
         {item.caption ? (
-          <p className="line-clamp-3 translate-y-3 text-[0.9rem] leading-snug text-bone opacity-0 transition duration-500 ease-[cubic-bezier(.16,1,.3,1)] group-hover/tile:translate-y-0 group-hover/tile:opacity-100 group-focus-visible/tile:translate-y-0 group-focus-visible/tile:opacity-100 [@media(hover:none)]:hidden">
+          <p className="line-clamp-2 text-[0.86rem] font-medium leading-snug text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] [@media(hover:hover)]:translate-y-2 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:transition [@media(hover:hover)]:duration-500 [@media(hover:hover)]:group-hover/tile:translate-y-0 [@media(hover:hover)]:group-hover/tile:opacity-100 [@media(hover:hover)]:group-focus-visible/tile:translate-y-0 [@media(hover:hover)]:group-focus-visible/tile:opacity-100">
             {item.caption}
           </p>
         ) : null}
-        {item.credit ? <p className="mt-1.5 truncate font-mono text-[0.7rem] tracking-wide text-bone/85">{item.credit}</p> : null}
+        {item.credit ? <p className="mt-1 truncate text-[0.7rem] tracking-wide text-white/85">{item.credit}</p> : null}
       </div>
-      <span className="absolute bottom-3 right-3 text-bone drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">{sourceGlyph(item)}</span>
+      <span className="pointer-events-none absolute bottom-3 right-3 text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">{sourceGlyph(item, 16)}</span>
     </div>
   )
 
-  const shell = 'group/tile relative block w-full rounded-[1.1rem] text-left outline-none transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] md:hover:-translate-y-2 focus-visible:-translate-y-2'
   return (
-    <li ref={ref} data-drift>
-      {source.kind === 'instagram' && !n ? (
-        <a href={source.href} target="_blank" rel="noopener noreferrer" aria-label={label} data-cursor="view" data-cursor-label="Open" className={shell}>
-          {body}
-        </a>
-      ) : (
-        <button type="button" onClick={() => onOpen(index)} aria-label={label} aria-haspopup="dialog" data-cursor="view" data-cursor-label="Play" className={shell}>
-          {body}
-        </button>
-      )}
+    <li ref={ref}>
+      <button type="button" onClick={() => onOpen(index)} aria-label={label} aria-haspopup="dialog" className="group/tile relative block w-full text-left outline-none">
+        {body}
+      </button>
     </li>
   )
 }
@@ -257,7 +263,7 @@ function Stage({ item, muted, playing, onProgress, onEnded }: { item: WallItem; 
 
   return (
     <>
-      <Poster src={item.poster} sizes="(min-width: 768px) 45vh, 90vw" />
+      {source.kind === 'instagram' ? null : <Poster src={item.poster} sizes="(min-width: 768px) 45vh, 90vw" />}
       {source.kind === 'file' ? (
         <video
           ref={video}
@@ -291,12 +297,12 @@ function Stage({ item, muted, playing, onProgress, onEnded }: { item: WallItem; 
         />
       ) : null}
       {source.kind === 'instagram' ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-noir/35 p-6 text-center">
-          <PlayGlyph />
-          <a href={source.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-bone px-5 py-2.5 font-display text-sm font-medium text-ink transition-colors hover:bg-butter" onPointerDownCapture={(e) => e.stopPropagation()}>
-            <InstagramIcon size={16} /> Watch on Instagram <span aria-hidden>↗</span>
-          </a>
-        </div>
+        <>
+          <span aria-hidden className="absolute inset-0 grid animate-pulse place-items-center text-bone/30">
+            <InstagramIcon size={36} />
+          </span>
+          <InstagramFrame key={source.code} src={source.embed} reel={!source.href.includes('/p/')} title={item.caption || 'Instagram video'} interactive load />
+        </>
       ) : null}
     </>
   )
@@ -401,18 +407,18 @@ function Viewer({ items, index, onIndex, onClose }: { items: WallItem[]; index: 
                   animate="center"
                   exit="exit"
                   transition={{ duration: 0.45, ease: EASE }}
-                  drag={many ? 'x' : false}
+                  drag={many && item.source.kind !== 'instagram' ? 'x' : false}
                   dragConstraints={{ left: 0, right: 0 }}
                   dragElastic={0.4}
                   onDragEnd={(_, info) => {
                     if (info.offset.x < -60 || info.velocity.x < -500) go(1)
                     else if (info.offset.x > 60 || info.velocity.x > 500) go(-1)
                   }}
-                  className="absolute inset-0 touch-pan-y overflow-hidden rounded-[1.25rem] bg-umber shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]"
+                  className={cn('@container absolute inset-0 overflow-hidden bg-umber shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)]', item.source.kind === 'instagram' ? '' : 'touch-pan-y')}
                 >
                   <Stage item={item} muted={muted} playing={playing} onProgress={setProgress} />
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-noir/60 to-transparent" />
-                  {many ? (
+                  {item.source.kind === 'instagram' ? null : <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-noir/60 to-transparent" />}
+                  {many && item.source.kind !== 'instagram' ? (
                     <div className="pointer-events-none absolute inset-x-3 top-3 flex gap-1" aria-hidden>
                       {items.map((x, j) => (
                         <span key={x.id} className="h-[3px] flex-1 overflow-hidden rounded-full bg-bone/25">
@@ -465,6 +471,11 @@ function Viewer({ items, index, onIndex, onClose }: { items: WallItem[]; index: 
                 </span>
               ) : null}
             </div>
+            {item.source.kind === 'instagram' ? (
+              <a href={item.source.href} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 self-start border-b border-bone/40 pb-0.5 text-[0.72rem] uppercase tracking-[0.14em] text-bone/80 hover:border-bone hover:text-bone md:mt-6">
+                Open on Instagram <span aria-hidden>↗</span>
+              </a>
+            ) : null}
             {item.caption ? <p className="mt-2 line-clamp-2 text-[0.95rem] leading-snug text-bone md:mt-4 md:line-clamp-none md:font-display md:text-[1.6rem] md:font-medium md:leading-[1.08] md:tracking-[-0.03em]">{item.caption}</p> : null}
 
             {item.products.length ? (
@@ -502,47 +513,46 @@ function Viewer({ items, index, onIndex, onClose }: { items: WallItem[]; index: 
 
 /* ─────────────────────────── Section ─────────────────────────── */
 
+/** How many tiles show before "View all": two rows of four. */
+const FIRST = 8
+const TAB_ORDER = ['women', 'men', 'kids'] as const
+
 /**
- * The shoppable video wall: customers' clips in a portrait grid that plays muted while on
- * screen. Each tile opens a full-screen viewer with sound and the pieces worn in it.
+ * The shoppable video wall: customers' clips in a 4:5 grid (video files and YouTube play muted
+ * while on screen; Instagram shows its own cover). Each tile opens a full-screen viewer with sound,
+ * the clip, and the pieces worn in it. On the home page it has a tab per department (with All);
+ * a department page passes only its own clips and no tabs.
  */
-export default function VideoWall({ heading, intro, ctaLabel, ctaHref, items }: { heading: string; intro: string; ctaLabel: string; ctaHref: string; items: WallItem[] }) {
-  const root = useRef<HTMLElement>(null)
+export default function VideoWall({
+  heading,
+  intro,
+  ctaLabel,
+  ctaHref,
+  items,
+  tabs = false,
+  departments,
+}: {
+  heading: string
+  intro: string
+  ctaLabel: string
+  ctaHref: string
+  items: WallItem[]
+  /** Show a tab per department that has clips (home page). */
+  tabs?: boolean
+  /** The departments open in the shop; clips of a closed one are left out. */
+  departments?: readonly string[]
+}) {
   const grid = useRef<HTMLUListElement>(null)
   const reduced = useReducedMotionPref()
   const [open, setOpen] = useState<number | null>(null)
+  const [tab, setTab] = useState<WallDepartment | 'all'>('all')
+  const [all, setAll] = useState(false)
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion() || !grid.current) return
-      const tiles = gsap.utils.toArray<HTMLElement>('[data-reveal]', grid.current)
-      gsap.set(tiles, { clipPath: 'inset(100% 0% 0% 0% round 1.1rem)' })
-      gsap.set(tiles.map((t) => t.querySelector('[data-zoom]')), { scale: 1.25 })
-      ScrollTrigger.batch(tiles, {
-        start: 'top 92%',
-        once: true,
-        onEnter: (batch) => {
-          gsap.to(batch, { clipPath: 'inset(0% 0% 0% 0% round 1.1rem)', duration: 1.4, ease: 'silk', stagger: 0.09 })
-          gsap.to(
-            batch.map((t) => (t as HTMLElement).querySelector('[data-zoom]')),
-            { scale: 1, duration: 1.8, ease: 'silk', stagger: 0.09 }
-          )
-        },
-      })
-
-      // Alternate columns drift against the scroll, so the wall reads as hung, not tiled.
-      const mm = gsap.matchMedia()
-      const drift = (cols: number, amount: number) => {
-        gsap.utils.toArray<HTMLElement>('[data-drift]', grid.current).forEach((el, i) => {
-          if ((i % cols) % 2 === 0) return
-          gsap.fromTo(el, { y: amount }, { y: -amount, ease: 'none', scrollTrigger: { trigger: grid.current, start: 'top bottom', end: 'bottom top', scrub: true } })
-        })
-      }
-      mm.add('(min-width: 768px)', () => drift(4, 56))
-      mm.add('(max-width: 767px)', () => drift(2, 22))
-    },
-    { scope: root, dependencies: [items.length] }
-  )
+  const usable = departments ? items.filter((it) => !it.department || departments.includes(it.department)) : items
+  const groups = tabs ? TAB_ORDER.filter((d) => usable.some((it) => it.department === d)) : []
+  const showTabs = groups.length > 0 && (groups.length > 1 || usable.some((it) => it.department !== groups[0]))
+  const inTab = showTabs && tab !== 'all' ? usable.filter((it) => it.department === tab) : usable
+  const shown = all ? inTab : inTab.slice(0, FIRST)
 
   const onIndex = useCallback((i: number) => setOpen(i), [])
   // The tile that opened the viewer gets focus back on close, however it was opened (a mouse
@@ -557,52 +567,71 @@ export default function VideoWall({ heading, intro, ctaLabel, ctaHref, items }: 
     const i = opener.current
     requestAnimationFrame(() => {
       if (i === null) return
-      grid.current?.children[i]?.querySelector<HTMLElement>('button, a')?.focus({ preventScroll: true })
+      grid.current?.children[i]?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true })
     })
   }, [])
 
-  const hash = heading.startsWith('#')
+  if (!usable.length) return null
+  const pick = (t: WallDepartment | 'all') => {
+    setTab(t)
+    setAll(false)
+    setOpen(null)
+  }
+
   return (
-    <section ref={root} data-nav-theme="dark" aria-labelledby="video-wall-title" className="relative overflow-hidden bg-noir py-[clamp(5rem,10vw,9rem)] text-bone">
+    <section aria-labelledby="video-wall-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
       <div className="container-wide flex flex-col items-center text-center">
-        <p className="text-eyebrow slash text-bone/60">Worn by you</p>
-        {heading ? (
-          <SplitReveal as="h2" id="video-wall-title" type="chars" className="mt-5 max-w-full break-words font-display text-[clamp(2.75rem,9vw,9rem)] font-semibold leading-[0.86] tracking-[-0.06em]">
-            {hash ? (
-              <>
-                <span className="text-signal">#</span>
-                {heading.slice(1)}
-              </>
-            ) : (
-              heading
-            )}
-          </SplitReveal>
-        ) : (
-          <h2 id="video-wall-title" className="sr-only">
-            Customer videos
-          </h2>
-        )}
+        <h2 id="video-wall-title" className="text-headline break-words">
+          {heading || 'Worn by you'}
+        </h2>
         {intro ? (
-          <p className="mt-6 max-w-xl text-balance text-lead text-bone/65">
+          <p className="mt-3 max-w-xl text-[0.95rem] text-stone">
             <Highlight text={intro} />
           </p>
         ) : null}
         {ctaLabel && ctaHref ? (
-          <ButtonLink href={ctaHref} external variant="light" size="md" magnetic icon={<InstagramIcon size={18} />} className="mt-8">
+          <ButtonLink href={ctaHref} external size="sm" icon={<InstagramIcon size={16} />} className="mt-6">
             {ctaLabel}
           </ButtonLink>
         ) : null}
+        {showTabs ? (
+          <div role="tablist" aria-label="Department" className="mt-8 flex gap-6">
+            {(['all', ...groups] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                role="tab"
+                aria-selected={tab === d}
+                aria-controls="video-wall-grid"
+                onClick={() => pick(d)}
+                className={cn(
+                  'relative pb-1.5 text-[0.78rem] font-medium uppercase tracking-[0.14em] transition-colors',
+                  tab === d ? 'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-ink' : 'text-ink/50 hover:text-ink'
+                )}
+              >
+                {d === 'all' ? 'All' : DEPARTMENT_TITLES[d]}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
-      <div className="container-wide mt-[clamp(3rem,6vw,5rem)]">
-        <ul ref={grid} role="list" className="mx-auto grid max-w-[1400px] grid-cols-2 gap-2.5 pb-6 sm:gap-4 md:grid-cols-4 md:gap-5 md:pb-14">
-          {items.map((item, i) => (
+      <div className="container-wide mt-8">
+        <ul ref={grid} id="video-wall-grid" role={showTabs ? 'tabpanel' : 'list'} className="grid grid-cols-2 gap-1.5 md:grid-cols-4 md:gap-2">
+          {shown.map((item, i) => (
             <Tile key={item.id} item={item} index={i} paused={open !== null} reduced={reduced} onOpen={openAt} />
           ))}
         </ul>
+        {inTab.length > FIRST ? (
+          <div className="mt-8 text-center">
+            <button type="button" onClick={() => setAll((v) => !v)} aria-expanded={all} aria-controls="video-wall-grid" className="border-b border-ink pb-1 text-[0.74rem] font-medium uppercase tracking-[0.14em]">
+              {all ? 'Show fewer' : `View all ${inTab.length}`}
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      <Viewer items={items} index={open} onIndex={onIndex} onClose={closeViewer} />
+      <Viewer items={shown} index={open} onIndex={onIndex} onClose={closeViewer} />
     </section>
   )
 }

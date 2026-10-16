@@ -16,7 +16,7 @@ export function ShippingView() {
   const { currency: cur } = useCurrency()
   const steps = [
     { title: 'Order placed', body: 'You receive an order number straight away. Keep it to track your parcel.' },
-    { title: 'Prepared by hand', body: 'Each piece is checked, folded and packed in the atelier.' },
+    { title: 'Prepared by hand', body: 'Each piece is checked, folded and packed with care.' },
     { title: 'On its way', body: 'A tracking number appears in your account (or on Track an order) once it ships.' },
     {
       title: 'Delivered',
@@ -29,26 +29,26 @@ export function ShippingView() {
   ]
   return (
     <>
-      <PageHero eyebrow="Client care" title="Shipping & *returns*" intro="How your knitwear reaches you, and how to send it back if it is not quite right." image="/images/blog/wardrobe-essentials.png" />
+      <PageHero eyebrow="Customer care" title="Shipping & *returns*" intro="How your order reaches you, and how to send a piece back if it is not quite right." image="/images/blog/wardrobe-essentials.png" />
       <section className="bg-ivory pb-24 text-ink" aria-label="Shipping rates">
         <div className="container-wide">
           <RevealGroup className="grid gap-4 md:grid-cols-3">
-            <RevealItem className="rounded-[1.75rem] bg-noir p-8 text-bone">
-              <TruckIcon size={28} className="text-gold" />
-              <p className="mt-8 text-eyebrow text-bone/50">Standard</p>
-              <p data-money className="mt-2 font-display text-5xl">{money(cur.standardShippingRate)}</p>
-              {cur.freeShippingThreshold > 0 ? <p data-money className="mt-3 text-sm text-bone/60">Free on orders over {money(cur.freeShippingThreshold)} (after discounts).</p> : null}
+            <RevealItem className="border border-ink/10 p-8">
+              <TruckIcon size={26} className="text-ink" />
+              <p className="mt-8 text-eyebrow text-stone">Standard</p>
+              <p data-money className="mt-2 text-[2rem] font-medium leading-none">{money(cur.standardShippingRate)}</p>
+              {cur.freeShippingThreshold > 0 ? <p data-money className="mt-3 text-sm text-stone">Free on orders over {money(cur.freeShippingThreshold)} (after discounts).</p> : null}
             </RevealItem>
-            <RevealItem className="rounded-[1.75rem] border border-ink/10 p-8">
-              <PackageIcon size={28} className="text-burgundy" />
+            <RevealItem className="border border-ink/10 p-8">
+              <PackageIcon size={26} className="text-ink" />
               <p className="mt-8 text-eyebrow text-stone">Express</p>
-              <p data-money className="mt-2 font-display text-5xl">{money(cur.expressShippingRate)}</p>
+              <p data-money className="mt-2 text-[2rem] font-medium leading-none">{money(cur.expressShippingRate)}</p>
               <p className="mt-3 text-sm text-stone">Priority dispatch, chosen at checkout.</p>
             </RevealItem>
-            <RevealItem className="rounded-[1.75rem] border border-ink/10 p-8">
-              <ReturnIcon size={28} className="text-burgundy" />
+            <RevealItem className="border border-ink/10 p-8">
+              <ReturnIcon size={26} className="text-ink" />
               <p className="mt-8 text-eyebrow text-stone">Returns</p>
-              <p className="mt-2 font-display text-5xl">{commerce.returnWindowDays} days</p>
+              <p className="mt-2 text-[2rem] font-medium leading-none">{commerce.returnWindowDays} days</p>
               <p className="mt-3 text-sm text-stone">From delivery, for unworn pieces in their original condition.</p>
             </RevealItem>
           </RevealGroup>
@@ -60,8 +60,8 @@ export function ShippingView() {
               {steps.map((s, i) => (
                 <li key={s.title} className="relative list-none">
                   <Reveal delay={i * 0.08}>
-                    <span className="relative z-[1] flex h-9 w-9 items-center justify-center rounded-full bg-gold font-mono text-xs text-ink">{String(i + 1).padStart(2, '0')}</span>
-                    <p className="mt-6 font-display text-3xl">{s.title}</p>
+                    <span className="relative z-[1] flex h-9 w-9 items-center justify-center rounded-full bg-ink font-mono text-xs text-ivory">{String(i + 1).padStart(2, '0')}</span>
+                    <p className="mt-6 text-[1.25rem] font-medium">{s.title}</p>
                     <p className="mt-2 text-sm text-stone">{s.body}</p>
                   </Reveal>
                 </li>
@@ -118,13 +118,13 @@ export function CareView() {
         <div className="container-wide space-y-6">
           {FIBRES.map((f, i) => (
             <Reveal key={f.name} delay={0.05 * i}>
-              <article className="grid overflow-hidden rounded-[2rem] bg-bone/70 md:grid-cols-[1fr_1.3fr]">
+              <article className="grid overflow-hidden bg-bone/70 md:grid-cols-[1fr_1.3fr]">
                 <div className="relative aspect-[4/3] md:aspect-auto">
                   <Image src={f.image} alt="" fill sizes="(min-width:768px) 40vw, 100vw" className="object-cover" />
                 </div>
                 <div className="p-8 md:p-12">
                   <p className="font-mono text-xs text-burgundy">{String(i + 1).padStart(2, '0')}</p>
-                  <h2 className="mt-3 font-display text-4xl">{f.name}</h2>
+                  <h2 className="mt-3 text-[1.6rem] font-medium">{f.name}</h2>
                   <ol className="mt-6 space-y-3">
                     {f.steps.map((s, j) => (
                       <li key={s} className="flex gap-4">
@@ -144,16 +144,16 @@ export function CareView() {
               ['Rest between wears', 'A day off lets the fibres recover their shape.'],
               ['Mind the pills', 'A little pilling is natural; remove it gently with a knit comb.'],
             ].map(([t, b]) => (
-              <div key={t} className="rounded-[1.5rem] border border-ink/10 p-7">
-                <p className="font-display text-2xl">{t}</p>
+              <div key={t} className="border border-ink/10 p-7">
+                <p className="text-[1.05rem] font-medium">{t}</p>
                 <p className="mt-2 text-sm text-stone">{b}</p>
               </div>
             ))}
           </div>
-          <div className="mt-12 flex flex-wrap items-center justify-between gap-6 rounded-[2rem] bg-signal p-10 text-bone [&_:focus-visible]:outline-bone">
-            <p className="max-w-lg font-display text-3xl leading-tight">A loose button or a pulled thread? Write to us and we will help.</p>
+          <div className="mt-12 flex flex-wrap items-center justify-between gap-6 bg-signal p-10 text-bone [&_:focus-visible]:outline-bone">
+            <p className="max-w-lg text-[1.3rem] font-medium leading-tight">A loose button or a pulled thread? Write to us and we will help.</p>
             <ButtonLink href="/contact" variant="light" arrow>
-              Contact the atelier
+              Contact us
             </ButtonLink>
           </div>
         </div>
@@ -169,7 +169,7 @@ export function SizeGuideView() {
       <section className="bg-ivory pb-24 text-ink">
         <div className="container-wide grid gap-12 lg:grid-cols-[1.4fr_1fr]">
           <SizeGuideTable />
-          <div className="relative hidden aspect-[3/4] overflow-hidden rounded-[2rem] lg:block">
+          <div className="relative hidden aspect-[3/4] overflow-hidden lg:block">
             <Image src="/images/products/women/ivory-cable-cardigan-2.jpg" alt="" fill sizes="35vw" className="object-cover" />
           </div>
         </div>

@@ -1,43 +1,40 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/motion/gsap'
 import { scrollToTop } from '@/lib/motion/lenis'
 import { useSettings } from '@/components/providers/SettingsProvider'
-import Magnetic from '@/components/motion/Magnetic'
+import { DEPARTMENT_TITLES, openDepartments } from '@/lib/categories'
 import NewsletterForm from './NewsletterForm'
 import CurrencySwitcher from './CurrencySwitcher'
-import { ArrowUp, InstagramIcon, PinterestIcon, TiktokIcon, XIcon } from '@/components/kit/icons'
+import { ArrowUp, InstagramIcon, MailIcon, PhoneIcon, PinterestIcon, TiktokIcon, XIcon } from '@/components/kit/icons'
 
 const COLUMNS = [
   {
     title: 'Shop',
     links: [
-      { label: 'Women', href: '/shop/women' },
-      { label: 'Men', href: '/shop/men' },
-      { label: 'Kids', href: '/shop/kids' },
-      { label: 'All pieces', href: '/shop' },
+      // The open departments are added in front.
+      { label: 'New in', href: '/shop?sort=newest' },
       { label: 'Collections', href: '/collections' },
+      { label: 'Shop all', href: '/shop' },
     ],
   },
   {
-    title: 'Care',
+    title: 'Help',
     links: [
       { label: 'Shipping & returns', href: '/shipping-returns' },
-      { label: 'Caring for knitwear', href: '/care-instructions' },
       { label: 'Size guide', href: '/size-guide' },
+      { label: 'Care guide', href: '/care-instructions' },
       { label: 'Track an order', href: '/track' },
       { label: 'FAQ', href: '/faq' },
+      { label: 'Contact', href: '/contact' },
     ],
   },
   {
-    title: 'Atelier',
+    title: 'About',
     links: [
       { label: 'Our story', href: '/about' },
-      { label: 'Lookbook', href: '/lookbook' },
       { label: 'Journal', href: '/journal' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'Lookbook', href: '/lookbook' },
     ],
   },
   {
@@ -51,60 +48,53 @@ const COLUMNS = [
   },
 ]
 
-function FooterContent() {
-  const { store } = useSettings()
-  const word = useRef<HTMLDivElement>(null)
-  const name = store.name
-  const [a, b] = name.includes('&') ? name.split('&') : [name, '']
-
-  useGSAP(
-    () => {
-      const letters = word.current?.querySelectorAll('[data-l]')
-      if (!letters?.length || prefersReducedMotion()) return
-      gsap.fromTo(
-        letters,
-        { yPercent: 105 },
-        {
-          yPercent: 0,
-          ease: 'expo.out',
-          duration: 1.4,
-          stagger: 0.05,
-          // The wordmark may sit inside a position:fixed layer, so measure the in-flow <footer>.
-          scrollTrigger: { trigger: word.current?.closest('footer'), start: 'bottom 125%', toggleActions: 'play none none reverse' },
-        }
-      )
-    },
-    { scope: word }
-  )
-
+/**
+ * The site footer on the one dark ground: a large serif sign-off with the newsletter, the link
+ * columns, contact and socials, the ways to pay (from the checkout settings, so it never promises a
+ * method that is switched off), the store's name set large, and the small print. Still, in flow.
+ */
+export default function Footer() {
+  const { store, commerce } = useSettings()
   const socials = [
     { href: store.social.instagram, label: 'Instagram', Icon: InstagramIcon },
     { href: store.social.pinterest, label: 'Pinterest', Icon: PinterestIcon },
     { href: store.social.tiktok, label: 'TikTok', Icon: TiktokIcon },
     { href: store.social.twitter, label: 'X', Icon: XIcon },
   ].filter((s) => s.href)
+  const pay = [
+    commerce.onlinePaymentsEnabled ? 'UPI' : null,
+    commerce.onlinePaymentsEnabled ? 'Cards' : null,
+    commerce.onlinePaymentsEnabled ? 'Net banking' : null,
+    commerce.codEnabled ? 'Cash on delivery' : null,
+  ].filter((p): p is string => !!p)
+  const columns = COLUMNS.map((c) => (c.title === 'Shop' ? { ...c, links: [...openDepartments(store).map((d) => ({ label: DEPARTMENT_TITLES[d], href: `/shop/${d}` })), ...c.links] } : c))
 
   return (
-    <div className="relative flex min-h-full flex-col overflow-hidden bg-ink text-bone">
-
-      <div className="container-wide relative grid gap-14 pt-20 md:pt-28 lg:grid-cols-12">
-        <div className="lg:col-span-5">
-          <p className="text-eyebrow slash text-butter">The atelier letter</p>
-          <h2 className="mt-5 text-headline text-balance">
-            Slow news from the <em className="text-butter">workroom</em>.
+    <footer className="bg-ink text-ivory">
+      {/* Sign-off and newsletter */}
+      <div className="container-wide grid gap-10 border-b border-ivory/10 py-14 md:py-20 lg:grid-cols-12 lg:items-end">
+        <div className="lg:col-span-7">
+          <p className="text-eyebrow text-ivory/50">The newsletter</p>
+          <h2 className="mt-4 font-serif text-[clamp(2.4rem,5vw,4.6rem)] leading-[0.98]">
+            New pieces, first. <em className="text-ivory/70">Never too often.</em>
           </h2>
-          <p className="mt-5 max-w-md text-bone/60">New pieces, restocks and the stories behind the yarn — a few times a season, never more.</p>
-          <NewsletterForm source="footer" className="mt-8 max-w-lg" />
         </div>
+        <div className="lg:col-span-5">
+          <p className="max-w-md text-[0.92rem] text-ivory/60">New arrivals, restocks and offers, a few times a month. Unsubscribe any time.</p>
+          <NewsletterForm source="footer" tone="dark" className="mt-5 max-w-md" />
+        </div>
+      </div>
 
-        <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-7 lg:pl-12">
-          {COLUMNS.map((col) => (
+      {/* Links */}
+      <div className="container-wide grid gap-12 py-12 md:py-16 lg:grid-cols-12">
+        <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-8">
+          {columns.map((col) => (
             <div key={col.title}>
-              <p className="text-eyebrow slash text-bone/60">{col.title}</p>
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ivory/50">{col.title}</p>
               <ul className="mt-5 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="link-wipe font-display text-[1.02rem] font-medium tracking-[-0.02em] text-bone/80 transition-colors hover:text-bone">
+                    <Link href={l.href} className="text-[0.9rem] text-ivory/80 transition-colors hover:text-ivory">
                       {l.label}
                     </Link>
                   </li>
@@ -113,124 +103,73 @@ function FooterContent() {
             </div>
           ))}
         </nav>
-      </div>
-
-      <div className="container-wide relative mt-16 grid gap-8 text-sm text-bone/65 md:grid-cols-3">
-        {/* No street address is published: the shop is online only. */}
-        <p className="leading-relaxed">{store.tagline}</p>
-        <div className="leading-relaxed">
-          <a href={`mailto:${store.email}`} className="link-wipe text-bone/85">
-            {store.email}
-          </a>
-          <br />
-          {store.phone ? (
-            <a href={`tel:${store.phone.replace(/[^+\d]/g, '')}`} className="link-wipe">
-              {store.phone}
-            </a>
+        <div className="space-y-8 lg:col-span-4 lg:pl-10">
+          <div>
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ivory/50">Customer care</p>
+            {/* No street address is published: the shop is online only. */}
+            <ul className="mt-5 space-y-3 text-[0.9rem] text-ivory/80">
+              <li>
+                <a href={`mailto:${store.email}`} className="flex items-center gap-2.5 hover:text-ivory">
+                  <MailIcon size={16} /> {store.email}
+                </a>
+              </li>
+              {store.phone ? (
+                <li>
+                  <a href={`tel:${store.phone.replace(/[^+\d]/g, '')}`} className="flex items-center gap-2.5 hover:text-ivory">
+                    <PhoneIcon size={16} /> {store.phone}
+                  </a>
+                </li>
+              ) : null}
+            </ul>
+          </div>
+          {socials.length ? (
+            <div className="flex gap-2">
+              {socials.map(({ href, label, Icon }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="flex h-10 w-10 items-center justify-center border border-ivory/20 text-ivory/80 transition-colors hover:border-ivory hover:text-ivory">
+                  <Icon size={17} />
+                </a>
+              ))}
+            </div>
+          ) : null}
+          {pay.length ? (
+            <div>
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ivory/50">We accept</p>
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {pay.map((p) => (
+                  <li key={p} className="border border-ivory/20 px-2.5 py-1 text-[0.72rem] text-ivory/80">
+                    {p}
+                  </li>
+                ))}
+              </ul>
+              {commerce.onlinePaymentsEnabled ? <p className="mt-3 text-[0.72rem] text-ivory/45">Online payments are processed securely by Razorpay.</p> : null}
+            </div>
           ) : null}
         </div>
-        <div className="flex items-start gap-2 md:justify-end">
-          {socials.map(({ href, label, Icon }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              data-cursor="hover"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-bone/15 transition-colors hover:border-signal hover:bg-signal"
-            >
-              <Icon size={17} />
-            </a>
-          ))}
-        </div>
       </div>
 
-      <div ref={word} className="relative mt-auto select-none overflow-hidden px-[2vw] pt-14" aria-hidden>
-        <div className="flex items-baseline justify-between font-display text-[17.2vw] font-[680] uppercase leading-[0.8] tracking-[-0.06em] text-bone">
-          {a.split('').map((c, i) => (
-            <span key={`a${i}`} data-l className="inline-block">
-              {c}
-            </span>
-          ))}
-          {name.includes('&') ? (
-            <span data-l className="inline-block font-accent font-normal normal-case italic tracking-normal text-signal">
-              &amp;
-            </span>
-          ) : null}
-          {b.split('').map((c, i) => (
-            <span key={`b${i}`} data-l className="inline-block">
-              {c}
-            </span>
-          ))}
-        </div>
+      {/* The name, set large and still */}
+      <div aria-hidden className="container-wide select-none overflow-hidden">
+        <p className="whitespace-nowrap text-center font-serif text-[clamp(3.5rem,15.5vw,15rem)] leading-[0.8] tracking-[-0.02em] text-ivory/[0.92]">{store.name}</p>
       </div>
 
-      <div className="container-wide relative flex flex-wrap items-center justify-between gap-4 border-t border-bone/10 py-6 text-xs text-bone/50">
+      {/* Small print */}
+      <div className="container-wide mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-ivory/10 py-6 text-[0.75rem] text-ivory/55">
         <p>
-          © {new Date().getFullYear()} {store.name}.{store.tagline ? ` ${store.tagline}` : ''}
+          © {new Date().getFullYear()} {store.name}
+          {store.tagline ? ` · ${store.tagline}` : ''}
         </p>
-        <div className="flex items-center gap-6">
-          <CurrencySwitcher />
-          <Link href="/privacy-policy" className="link-wipe">
+        <div className="flex items-center gap-5">
+          <CurrencySwitcher className="text-ivory/70" />
+          <Link href="/privacy-policy" className="hover:text-ivory">
             Privacy
           </Link>
-          <Link href="/terms-of-service" className="link-wipe">
+          <Link href="/terms-of-service" className="hover:text-ivory">
             Terms
           </Link>
-          <Magnetic>
-            <button
-              type="button"
-              onClick={() => scrollToTop(false)}
-              data-cursor="hover"
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-bone/20 text-bone transition-colors hover:bg-bone hover:text-ink"
-              aria-label="Back to top"
-            >
-              <ArrowUp size={18} />
-            </button>
-          </Magnetic>
+          <button type="button" onClick={() => scrollToTop(false)} className="flex items-center gap-1.5 hover:text-ivory" aria-label="Back to top">
+            <ArrowUp size={14} /> Top
+          </button>
         </div>
-      </div>
-    </div>
-  )
-}
-
-/**
- * On large screens the footer sits fixed beneath the page and is uncovered as the
- * last section scrolls away (clip-path reveal). On small screens it is in normal flow.
- */
-export default function Footer() {
-  const inner = useRef<HTMLDivElement>(null)
-  const [h, setH] = useState<number | null>(null)
-  const [reveal, setReveal] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)')
-    const measure = () => {
-      const height = inner.current?.offsetHeight ?? 0
-      const fits = mq.matches && height > 0 && height <= window.innerHeight
-      setReveal(fits)
-      setH(height)
-      ScrollTrigger.refresh()
-    }
-    measure()
-    const ro = new ResizeObserver(measure)
-    if (inner.current) ro.observe(inner.current)
-    mq.addEventListener('change', measure)
-    return () => {
-      ro.disconnect()
-      mq.removeEventListener('change', measure)
-    }
-  }, [])
-
-  return (
-    <footer
-      data-nav-theme="dark"
-      className="relative"
-      style={reveal && h ? { height: h, clipPath: 'polygon(0% 0, 100% 0%, 100% 100%, 0 100%)' } : undefined}
-    >
-      <div ref={inner} className={reveal ? 'fixed bottom-0 left-0 w-full lg:min-h-[100svh]' : 'lg:min-h-[100svh]'}>
-        <FooterContent />
       </div>
     </footer>
   )

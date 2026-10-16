@@ -15,8 +15,8 @@ const EASE = [0.16, 1, 0.3, 1] as const
 
 export function QtyStepper({ value, onChange, max = 10, label }: { value: number; onChange: (n: number) => void; max?: number; label: string }) {
   return (
-    <div className="inline-flex h-9 items-center rounded-full border border-ink/15" role="group" aria-label={`Quantity for ${label}`}>
-      <button type="button" onClick={() => onChange(value - 1)} aria-label="Decrease quantity" data-cursor="hover" className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-ink/5">
+    <div className="inline-flex h-9 items-center border border-ink/15" role="group" aria-label={`Quantity for ${label}`}>
+      <button type="button" onClick={() => onChange(value - 1)} aria-label="Decrease quantity" data-cursor="hover" className="flex h-9 w-9 items-center justify-center transition-colors hover:bg-ink/5">
         <MinusIcon size={14} />
       </button>
       <span className="w-6 text-center font-mono text-sm tabular-nums" aria-live="polite">
@@ -28,7 +28,7 @@ export function QtyStepper({ value, onChange, max = 10, label }: { value: number
         disabled={value >= max}
         aria-label="Increase quantity"
         data-cursor="hover"
-        className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-ink/5 disabled:opacity-30"
+        className="flex h-9 w-9 items-center justify-center transition-colors hover:bg-ink/5 disabled:opacity-30"
       >
         <PlusIcon size={14} />
       </button>
@@ -52,7 +52,7 @@ export function FreeShippingMeter({ remaining, threshold }: { remaining: number;
         )}
       </p>
       <div className="relative mt-3 h-[3px] overflow-hidden rounded-full bg-ink/10">
-        <motion.div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-gold-deep to-gold" initial={false} animate={{ width: `${pct}%` }} transition={{ duration: 1, ease: EASE }} />
+        <motion.div className="absolute inset-y-0 left-0 rounded-full bg-ink" initial={false} animate={{ width: `${pct}%` }} transition={{ duration: 1, ease: EASE }} />
       </div>
     </div>
   )
@@ -79,7 +79,7 @@ export default function CartDrawer() {
     <Overlay open={isOpen} onClose={closeCart} label="Shopping bag" side="right" className="flex flex-col bg-ivory text-ink">
       <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
         <div className="flex items-baseline gap-3">
-          <h2 className="font-display text-3xl">Your bag</h2>
+          <h2 className="text-[1.25rem] font-medium">Your bag</h2>
           <span className="font-mono text-sm text-stone">({count})</span>
         </div>
         <CloseButton onClick={closeCart} />
@@ -87,10 +87,10 @@ export default function CartDrawer() {
 
       {lines.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-          <span className="flex h-24 w-24 items-center justify-center rounded-full bg-parchment text-burgundy">
+          <span className="flex h-20 w-20 items-center justify-center bg-bone text-ink">
             <BagIcon size={40} />
           </span>
-          <h3 className="mt-6 font-display text-4xl">Your bag is empty</h3>
+          <h3 className="mt-6 text-[1.6rem] font-medium">Your bag is empty</h3>
           <p className="mt-3 max-w-xs text-stone">Begin with a piece made slowly, to be worn for years.</p>
           <ButtonLink href="/shop" onClick={closeCart} className="mt-8" arrow>
             Explore the collection
@@ -101,7 +101,7 @@ export default function CartDrawer() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 {nav.spotlight.slice(0, 2).map((p) => (
                   <Link key={p.handle} href={`/product/${p.handle}`} onClick={closeCart} className="group">
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-parchment">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-parchment">
                       {p.images[0] ? <Image src={p.images[0].src} alt={p.images[0].alt} fill sizes="200px" className="object-cover transition-transform duration-700 group-hover:scale-105" /> : null}
                     </div>
                     <p className="mt-2 truncate text-sm">{p.title}</p>
@@ -142,12 +142,12 @@ export default function CartDrawer() {
                   transition={{ duration: 0.6, ease: EASE }}
                   className="flex gap-4 py-5"
                 >
-                  <Link href={`/product/${item.handle}`} onClick={closeCart} className="relative h-32 w-24 shrink-0 overflow-hidden rounded-xl bg-parchment">
+                  <Link href={`/product/${item.handle}`} onClick={closeCart} className="relative h-32 w-24 shrink-0 overflow-hidden bg-parchment">
                     {item.image ? <Image src={item.image} alt={item.title} fill sizes="96px" className="object-cover" /> : null}
                   </Link>
                   <div className="flex min-w-0 flex-1 flex-col">
                     <div className="flex items-start justify-between gap-3">
-                      <Link href={`/product/${item.handle}`} onClick={closeCart} className="font-display text-xl leading-tight hover:text-burgundy">
+                      <Link href={`/product/${item.handle}`} onClick={closeCart} className="text-[0.95rem] font-medium leading-snug hover:underline">
                         {item.title}
                       </Link>
                       <span className="font-mono text-sm tabular-nums">{money(item.price * item.quantity)}</span>

@@ -4,7 +4,7 @@ import { getStoreSettings } from '@/server/catalog'
 import ContactView from '@/components/content/ContactView'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return pageMeta(await getStoreSettings(), { title: 'Contact', description: 'Write to the Snug&Knot atelier.', path: '/contact' })
+  return pageMeta(await getStoreSettings(), { title: 'Contact', description: 'Write to Snug&Knot customer care.', path: '/contact' })
 }
 
 export default function ContactPage() {

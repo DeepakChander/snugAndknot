@@ -1,10 +1,9 @@
 'use client'
 
 import { useMoney, useSettings, useCurrency } from '@/components/providers/SettingsProvider'
-import { RevealGroup, RevealItem } from '@/components/motion/Reveal'
 import { NeedleIcon, ReturnIcon, ShieldIcon, TruckIcon } from '@/components/kit/icons'
 
-/** Service promises — every figure comes from the store settings, so they stay true. */
+/** Service promises in a quiet strip; every figure comes from the store settings, so they stay true. */
 export default function Promises() {
   const { commerce } = useSettings()
   const money = useMoney()
@@ -25,18 +24,18 @@ export default function Promises() {
         : { Icon: ShieldIcon, title: 'Track every order', body: 'Follow each order from your account, or with your order number and email.' },
   ]
   return (
-    <section className="border-t border-ink/10 bg-ivory text-ink" aria-label="Our promises">
-      <RevealGroup className="container-wide grid grid-cols-1 divide-y divide-ink/10 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
+    <section className="border-y border-ink/10 bg-bone text-ink" aria-label="Our promises">
+      <ul className="container-wide grid grid-cols-1 divide-y divide-ink/10 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
         {items.map(({ Icon, title, body, money: hasMoney }) => (
-          <RevealItem key={title} className="flex gap-4 py-8 sm:px-6 lg:py-12 lg:first:pl-0">
-            <Icon size={26} className="shrink-0 text-burgundy" />
+          <li key={title} className="flex gap-3.5 py-6 sm:pr-6 lg:py-8">
+            <Icon size={22} className="mt-0.5 shrink-0 text-ink" />
             <div data-money={hasMoney ? '' : undefined}>
-              <p className="font-display text-2xl leading-tight">{title}</p>
-              <p className="mt-2 text-sm text-stone">{body}</p>
+              <p className="text-[0.92rem] font-medium">{title}</p>
+              <p className="mt-1 text-[0.82rem] leading-relaxed text-stone">{body}</p>
             </div>
-          </RevealItem>
+          </li>
         ))}
-      </RevealGroup>
+      </ul>
     </section>
   )
 }

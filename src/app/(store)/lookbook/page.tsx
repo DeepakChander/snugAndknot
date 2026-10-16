@@ -5,7 +5,7 @@ import lookbook from '@/data/lookbook.json'
 import { getProducts, getStoreSettings } from '@/server/catalog'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return pageMeta(await getStoreSettings(), { title: 'Lookbook', description: 'Four chapters in Snug&Knot knitwear — the cold months, by the water, every day, and finished by hand.', path: '/lookbook' })
+  return pageMeta(await getStoreSettings(), { title: 'Lookbook', description: 'The Snug&Knot lookbook: the pieces worn where they belong, chapter by chapter.', path: '/lookbook' })
 }
 
 type Chapter = Omit<Spread, 'pieces'> & { products: string[] }

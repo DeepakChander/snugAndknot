@@ -50,7 +50,7 @@ export default function FilterDrawer({
   return (
     <Overlay open={open} onClose={onClose} label="Filters" side="left" className="flex flex-col bg-ivory text-ink">
       <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
-        <h2 className="font-display text-3xl">Refine</h2>
+        <h2 className="text-[1.15rem] font-medium">Filter</h2>
         <CloseButton onClick={onClose} />
       </div>
       <div className="flex-1 space-y-10 overflow-y-auto px-6 py-8" data-lenis-prevent>
@@ -65,7 +65,7 @@ export default function FilterDrawer({
                   type="button"
                   aria-pressed={on}
                   onClick={() => setSizes(toggle(sizes, s))}
-                  className={cn('min-w-12 rounded-full border px-4 py-2.5 font-mono text-sm transition-colors', on ? 'border-ink bg-ink text-ivory' : 'border-ink/15 hover:border-ink/50')}
+                  className={cn('min-w-12 border px-4 py-2.5 text-sm transition-colors', on ? 'border-ink bg-ink text-ivory' : 'border-ink/15 hover:border-ink/50')}
                 >
                   {s}
                 </button>
@@ -84,9 +84,9 @@ export default function FilterDrawer({
                   type="button"
                   aria-pressed={on}
                   onClick={() => setColors(toggle(colors, c.name))}
-                  className={cn('flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left text-sm transition-colors', on ? 'border-ink bg-ink/[0.04]' : 'border-ink/10 hover:border-ink/40')}
+                  className={cn('flex items-center gap-3 border px-3 py-2.5 text-left text-sm transition-colors', on ? 'border-ink bg-ink/[0.04]' : 'border-ink/10 hover:border-ink/40')}
                 >
-                  <span className="h-5 w-5 shrink-0 rounded-full ring-1 ring-ink/15" style={{ background: c.hex }} />
+                  <span className="h-4 w-4 shrink-0 ring-1 ring-ink/15" style={{ background: c.hex }} />
                   {c.name}
                 </button>
               )
@@ -103,11 +103,11 @@ export default function FilterDrawer({
             <div className="mt-4 grid grid-cols-2 gap-3">
               <label className="block">
                 <span className="text-xs text-stone">From</span>
-                <input type="number" inputMode="numeric" min={0} value={min} onChange={(e) => setMin(e.target.value)} placeholder={String(Math.floor(lo))} className="mt-1 w-full rounded-xl border border-ink/15 bg-transparent px-3 py-2.5 font-mono text-sm outline-none focus:border-ink/60" />
+                <input type="number" inputMode="numeric" min={0} value={min} onChange={(e) => setMin(e.target.value)} placeholder={String(Math.floor(lo))} className="mt-1 w-full border border-ink/15 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-ink/60" />
               </label>
               <label className="block">
                 <span className="text-xs text-stone">To</span>
-                <input type="number" inputMode="numeric" min={0} value={max} onChange={(e) => setMax(e.target.value)} placeholder={String(Math.ceil(hi))} className="mt-1 w-full rounded-xl border border-ink/15 bg-transparent px-3 py-2.5 font-mono text-sm outline-none focus:border-ink/60" />
+                <input type="number" inputMode="numeric" min={0} value={max} onChange={(e) => setMax(e.target.value)} placeholder={String(Math.ceil(hi))} className="mt-1 w-full border border-ink/15 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-ink/60" />
               </label>
             </div>
           </fieldset>
@@ -132,7 +132,7 @@ export default function FilterDrawer({
         >
           {`Show results`}
         </Button>
-        <p className="col-span-2 text-center text-xs text-stone">{resultCount} piece{resultCount === 1 ? '' : 's'} currently shown</p>
+        <p className="col-span-2 text-center text-xs text-stone">{resultCount} item{resultCount === 1 ? '' : 's'} shown now</p>
       </div>
     </Overlay>
   )

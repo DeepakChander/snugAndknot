@@ -4,7 +4,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import SplitReveal from '@/components/motion/SplitReveal'
 import ProductCard, { type CardProduct } from '@/components/store/ProductCard'
 import NewsletterForm from '@/components/chrome/NewsletterForm'
 import { Button, ButtonLink } from '@/components/kit/Button'
@@ -13,7 +12,6 @@ import { useMoney } from '@/components/providers/SettingsProvider'
 import { cn } from '@/lib/format'
 import type { ShopFilters } from '@/lib/shop-filters'
 import { useQueryState } from './useQueryState'
-import FanDeck from './FanDeck'
 import FilterDrawer, { type Facets } from './FilterDrawer'
 
 const SORTS = [
@@ -42,7 +40,7 @@ export default function ShopView({
   filters,
   segments,
   categories,
-  deck,
+  tiles = [],
   comingSoon,
 }: {
   eyebrow: string
@@ -53,17 +51,18 @@ export default function ShopView({
   filters: ShopFilters
   segments: ShopLink[]
   categories: ShopLink[]
-  deck: { src: string; alt: string }[]
+  /** A department's categories as photograph tiles (its own page only). */
+  tiles?: { label: string; href: string; image: string }[]
   comingSoon?: { title: string; body: string }
 }) {
   const { set, pending } = useQueryState()
   const money = useMoney()
   const [drawer, setDrawer] = useState(false)
-  const [dense, setDense] = useState(false)
+  const [dense, setDense] = useState(true)
 
   useEffect(() => {
     try {
-      setDense(localStorage.getItem(DENSITY_KEY) === 'dense')
+      setDense(localStorage.getItem(DENSITY_KEY) !== 'roomy')
     } catch {}
   }, [])
   const toggleDensity = (d: boolean) => {
@@ -84,51 +83,56 @@ export default function ShopView({
   return (
     <>
       {/* Header */}
-      <section className="relative overflow-hidden bg-ivory pt-nav text-ink">
-        <div className="container-wide grid items-end gap-10 pb-12 pt-10 md:pt-16 lg:grid-cols-[1.2fr_1fr]">
-          <div>
-            <nav aria-label="Breadcrumb" className="text-eyebrow text-stone">
-              <Link href="/" className="link-wipe">
-                Home
-              </Link>{' '}
-              / <span className="text-burgundy">{eyebrow}</span>
-            </nav>
-            <SplitReveal as="h1" type="chars" intro className="mt-5 text-mega">
-              {title}
-            </SplitReveal>
-            <div className="mt-6 flex flex-wrap items-end gap-x-10 gap-y-4">
-              <p className="max-w-md text-lead text-stone">{description}</p>
-              <p className="font-mono text-sm text-stone">
-                <span className="text-ink">{String(products.length).padStart(2, '0')}</span> piece{products.length === 1 ? '' : 's'}
-              </p>
-            </div>
+      <section className="bg-ivory pt-nav text-ink">
+        <div className="container-wide pb-6 pt-8 md:pt-12">
+          <nav aria-label="Breadcrumb" className="text-[0.72rem] uppercase tracking-[0.12em] text-stone">
+            <Link href="/" className="hover:text-ink">
+              Home
+            </Link>{' '}
+            / <span className="text-ink">{eyebrow.replace(/^Shop \/ /, '')}</span>
+          </nav>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-x-10 gap-y-3">
+            <h1 className="text-display">{title}</h1>
+            <p className="text-[0.86rem] text-stone">
+              {products.length} item{products.length === 1 ? '' : 's'}
+            </p>
           </div>
-          {deck.length ? <FanDeck images={deck} className="mx-auto hidden h-[clamp(260px,32vw,440px)] w-full max-w-lg lg:block" /> : null}
+          {description ? <p className="mt-3 max-w-2xl text-[0.95rem] text-stone">{description}</p> : null}
         </div>
+        {tiles.length ? (
+          <ul aria-label="Categories" className="no-scrollbar container-wide flex gap-3 overflow-x-auto pb-6 md:gap-4">
+            {tiles.map((t) => (
+              <li key={t.href} className="w-[30vw] shrink-0 sm:w-[20vw] lg:w-[11.5%]">
+                <Link href={t.href} className="group block">
+                  <span className="relative block aspect-[4/5] overflow-hidden bg-bone">
+                    <Image src={t.image} alt="" fill sizes="(min-width: 1024px) 12vw, (min-width: 640px) 20vw, 30vw" className="object-cover transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.04]" unoptimized={t.image.startsWith('/api/media/')} />
+                  </span>
+                  <span className="mt-2 block text-[0.8rem] group-hover:underline group-hover:underline-offset-4">{t.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
       {/* Toolbar */}
-      <div className="sticky top-[var(--nav-offset)] z-30 border-y border-ink/10 bg-ivory/90 text-ink backdrop-blur-xl transition-[top] duration-700 ease-[cubic-bezier(.16,1,.3,1)]" data-shop-toolbar>
-        <div className="container-wide flex items-center gap-3 py-3">
-          <nav aria-label="Departments" className="no-scrollbar -mx-1 flex min-w-0 flex-1 items-center gap-1 overflow-x-auto px-1">
+      <div className="sticky top-[var(--nav-offset)] z-30 border-y border-ink/10 bg-ivory/95 text-ink backdrop-blur transition-[top] duration-300" data-shop-toolbar>
+        <div className="container-wide flex items-center gap-4 py-2.5">
+          <nav aria-label="Departments and categories" className="no-scrollbar -mx-1 flex min-w-0 flex-1 items-center gap-5 overflow-x-auto px-1">
             {segments.map((s) => (
               <Link
                 key={s.href}
                 href={s.href}
                 scroll={false}
                 aria-current={s.active ? 'page' : undefined}
-                className={cn('relative shrink-0 rounded-full px-4 py-2 text-sm transition-colors', s.active ? 'text-ivory' : 'text-ink/70 hover:text-ink')}
+                className={cn('relative shrink-0 py-1.5 text-[0.74rem] font-medium uppercase tracking-[0.12em] transition-colors', s.active ? 'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-ink' : 'text-ink/55 hover:text-ink')}
               >
-                {s.active ? <motion.span layoutId="shop-seg" className="absolute inset-0 rounded-full bg-ink" transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} /> : null}
-                <span className="relative">
-                  {s.label}
-                  {s.count !== undefined ? <span className="ml-1.5 font-mono text-[0.7rem] opacity-60">{s.count}</span> : null}
-                </span>
+                {s.label}
               </Link>
             ))}
-            {categories.length ? <span className="mx-2 h-5 w-px shrink-0 bg-ink/15" aria-hidden /> : null}
+            {categories.length ? <span className="h-4 w-px shrink-0 bg-ink/15" aria-hidden /> : null}
             {categories.map((c) => (
-              <Link key={c.href} href={c.href} aria-current={c.active ? 'page' : undefined} className={cn('shrink-0 rounded-full border px-3.5 py-1.5 text-xs transition-colors', c.active ? 'border-burgundy bg-burgundy text-ivory' : 'border-ink/15 hover:border-ink/40')}>
+              <Link key={c.href} href={c.href} aria-current={c.active ? 'page' : undefined} className={cn('shrink-0 py-1.5 text-[0.84rem] transition-colors', c.active ? 'font-medium text-ink underline underline-offset-4' : 'text-ink/65 hover:text-ink')}>
                 {c.label}
               </Link>
             ))}
@@ -138,36 +142,36 @@ export default function ShopView({
             <select
               value={filters.sort}
               onChange={(e) => set({ sort: e.target.value === 'featured' ? null : e.target.value })}
-              className="appearance-none rounded-full border border-ink/15 bg-transparent py-2 pl-4 pr-9 text-sm outline-none hover:border-ink/40 focus:border-ink"
+              className="appearance-none border-0 bg-transparent py-2 pl-2 pr-7 text-[0.84rem] outline-none hover:underline focus-visible:outline-2"
             >
               {SORTS.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {s.label}
+                  Sort: {s.label}
                 </option>
               ))}
             </select>
-            <svg className="pointer-events-none absolute right-3.5 h-3 w-3 opacity-60" viewBox="0 0 12 12" aria-hidden>
+            <svg className="pointer-events-none absolute right-1.5 h-3 w-3 opacity-60" viewBox="0 0 12 12" aria-hidden>
               <path d="M2 4.5 6 8l4-3.5" stroke="currentColor" strokeWidth="1.5" fill="none" />
             </svg>
           </label>
-          <button type="button" onClick={() => setDrawer(true)} data-cursor="hover" className="flex shrink-0 items-center gap-2 rounded-full border border-ink/15 px-4 py-2 text-sm hover:border-ink/40">
-            <FilterIcon size={16} /> Filter
-            {activeCount ? <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-burgundy px-1 font-mono text-[10px] text-ivory">{activeCount}</span> : null}
+          <button type="button" onClick={() => setDrawer(true)} className="flex shrink-0 items-center gap-2 border border-ink px-3.5 py-2 text-[0.72rem] font-medium uppercase tracking-[0.12em] hover:bg-ink hover:text-ivory">
+            <FilterIcon size={15} /> Filter
+            {activeCount ? <span className="flex h-4 min-w-4 items-center justify-center bg-ink px-1 text-[10px] text-ivory">{activeCount}</span> : null}
           </button>
-          <div className="hidden shrink-0 items-center rounded-full border border-ink/15 p-1 lg:flex" role="group" aria-label="Grid density">
-            <button type="button" onClick={() => toggleDensity(false)} aria-pressed={!dense} aria-label="Larger pieces" className={cn('rounded-full p-1.5', !dense && 'bg-ink text-ivory')}>
+          <div className="hidden shrink-0 items-center gap-1 lg:flex" role="group" aria-label="Pieces per row">
+            <button type="button" onClick={() => toggleDensity(false)} aria-pressed={!dense} aria-label="Three per row" className={cn('p-1.5', dense ? 'text-ink/40 hover:text-ink' : 'text-ink')}>
               <LargeIcon size={16} />
             </button>
-            <button type="button" onClick={() => toggleDensity(true)} aria-pressed={dense} aria-label="More pieces per row" className={cn('rounded-full p-1.5', dense && 'bg-ink text-ivory')}>
+            <button type="button" onClick={() => toggleDensity(true)} aria-pressed={dense} aria-label="Four per row" className={cn('p-1.5', dense ? 'text-ink' : 'text-ink/40 hover:text-ink')}>
               <GridIcon size={16} />
             </button>
           </div>
         </div>
         {/* Mobile sort */}
-        <div className="container-wide flex items-center gap-2 pb-3 md:hidden">
+        <div className="container-wide flex items-center gap-2 pb-2.5 md:hidden">
           <label className="relative flex flex-1 items-center">
             <span className="sr-only">Sort by</span>
-            <select value={filters.sort} onChange={(e) => set({ sort: e.target.value === 'featured' ? null : e.target.value })} className="w-full appearance-none rounded-full border border-ink/15 bg-transparent py-2 pl-4 pr-9 text-sm">
+            <select value={filters.sort} onChange={(e) => set({ sort: e.target.value === 'featured' ? null : e.target.value })} className="w-full appearance-none border border-ink/15 bg-transparent py-2 pl-3 pr-9 text-[0.84rem]">
               {SORTS.map((s) => (
                 <option key={s.id} value={s.id}>
                   Sort: {s.label}
@@ -197,28 +201,28 @@ export default function ShopView({
       </AnimatePresence>
 
       {/* Grid */}
-      <section className={cn('bg-ivory pb-28 pt-10 text-ink transition-opacity duration-300', pending && 'opacity-50')} aria-busy={pending} aria-label="Products">
+      <section className={cn('bg-ivory pb-24 pt-6 text-ink transition-opacity duration-300', pending && 'opacity-50')} aria-busy={pending} aria-label="Products">
         <div className="container-wide">
           {products.length ? (
-            <div className={cn('grid gap-x-4 gap-y-14 md:gap-x-6', dense ? 'grid-cols-2 md:grid-cols-3 xl:grid-cols-4' : 'grid-cols-2 md:grid-cols-2 lg:grid-cols-3')}>
+            <div className={cn('grid grid-cols-2 gap-x-3 gap-y-10 md:gap-x-4', dense ? 'md:grid-cols-3 lg:grid-cols-4' : 'md:grid-cols-3')}>
               {products.map((p, i) => (
-                <ProductCardSlot key={p.id} product={p} index={i} showInterlude={i === 1 && products.length > 2} dense={dense} />
+                <ProductCard key={p.id} product={p} priority={i < 2} sizes={dense ? '(min-width:1024px) 25vw, (min-width:768px) 33vw, 50vw' : '(min-width:768px) 33vw, 50vw'} />
               ))}
             </div>
           ) : comingSoon ? (
-            <div className="mx-auto max-w-2xl py-20 text-center">
-              <p className="text-eyebrow text-burgundy">In the workroom</p>
-              <h2 className="mt-5 text-headline">{comingSoon.title}</h2>
-              <p className="mx-auto mt-5 max-w-md text-stone">{comingSoon.body}</p>
-              <NewsletterForm source="coming-soon" tone="light" cta="Notify me" className="mx-auto mt-10 max-w-md text-left" />
-              <ButtonLink href="/shop" variant="outline" className="mt-10" arrow>
-                Browse all pieces
+            <div className="mx-auto max-w-xl py-20 text-center">
+              <p className="text-eyebrow text-stone">Coming soon</p>
+              <h2 className="mt-4 text-headline">{comingSoon.title}</h2>
+              <p className="mx-auto mt-4 max-w-md text-stone">{comingSoon.body}</p>
+              <NewsletterForm source="coming-soon" tone="light" cta="Notify me" className="mx-auto mt-8 max-w-md text-left" />
+              <ButtonLink href="/shop" variant="outline" className="mt-8">
+                Shop everything
               </ButtonLink>
             </div>
           ) : (
             <div className="mx-auto max-w-xl py-24 text-center">
-              <h2 className="text-headline">Nothing matches — yet.</h2>
-              <p className="mt-5 text-stone">Try removing a filter or two; we add pieces in small batches through the season.</p>
+              <h2 className="text-headline">No pieces match.</h2>
+              <p className="mt-4 text-stone">Try removing a filter or two.</p>
               <Button variant="outline" className="mt-8" onClick={() => set({ size: null, color: null, min: null, max: null })}>
                 Clear filters
               </Button>
@@ -228,34 +232,6 @@ export default function ShopView({
       </section>
 
       <FilterDrawer open={drawer} onClose={() => setDrawer(false)} facets={facets} filters={filters} resultCount={products.length} onApply={(f) => set({ size: f.sizes, color: f.colors, min: f.min === null ? null : String(f.min), max: f.max === null ? null : String(f.max) })} />
-    </>
-  )
-}
-
-const INTERLUDE = { src: '/images/collection-home/Material-Intimacy.png', alt: 'A hand resting on a cream cable knit' }
-
-function ProductCardSlot({ product, index, showInterlude, dense }: { product: CardProduct; index: number; showInterlude: boolean; dense: boolean }) {
-  return (
-    <>
-      <ProductCard product={product} index={index} priority={index < 2} sizes={dense ? '(min-width:1280px) 25vw, (min-width:768px) 33vw, 50vw' : '(min-width:1024px) 33vw, 50vw'} />
-      {showInterlude ? (
-        <motion.figure
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-          className="relative col-span-2 hidden overflow-hidden rounded-[1.25rem] bg-umber md:block md:col-span-1 lg:row-span-1"
-        >
-          <Image src={INTERLUDE.src} alt={INTERLUDE.alt} fill sizes="33vw" className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-noir/75 via-noir/10 to-transparent" />
-          <figcaption className="absolute inset-x-6 bottom-6 text-bone">
-            <span className="text-eyebrow slash text-butter">Small runs</span>
-            <span className="mt-3 block font-display text-[clamp(1.8rem,2.6vw,2.6rem)] font-semibold uppercase leading-[0.9] tracking-[-0.05em]">
-              Made to be <em>reached for</em> every cold morning.
-            </span>
-          </figcaption>
-        </motion.figure>
-      ) : null}
     </>
   )
 }

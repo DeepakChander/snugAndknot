@@ -1,7 +1,7 @@
 import StoreShell from '@/components/chrome/StoreShell'
 import Analytics from '@/components/layout/Analytics'
 import type { NavData, PublicSettings } from '@/components/providers/SettingsProvider'
-import { getCategories, getCollections, getProducts, getStoreSettings } from '@/server/catalog'
+import { getAllCategories, getCollections, getProducts, getStoreSettings } from '@/server/catalog'
 import { currencies } from '@/lib/currency'
 import type { CommerceSettings } from '@/types/commerce'
 
@@ -24,7 +24,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const [settings, collections, categories, products] = await Promise.all([
     getStoreSettings(),
     getCollections(),
-    getCategories(),
+    getAllCategories(),
     getProducts({ sort: 'featured' }),
   ])
 
@@ -37,14 +37,19 @@ export default async function StoreLayout({ children }: { children: React.ReactN
     reviews: settings.reviews,
   }
 
-  const count = (g: 'men' | 'women' | 'kids') =>
-    products.filter((p) => p.gender === g || (g !== 'kids' && p.gender === 'unisex')).length
+  const department = (g: 'men' | 'women' | 'kids') => {
+    const list = products.filter((p) => p.gender === g || (g !== 'kids' && p.gender === 'unisex'))
+    // A photograph of one of its pieces, else the first of its categories' images (a department can open before it has pieces).
+    const image = list.find((p) => p.images[0])?.images[0].src ?? categories.find((c) => c.department === g && c.showInMenu && c.image)?.image ?? ''
+    return { count: list.length, image }
+  }
 
   const nav: NavData = {
     collections: collections.map(({ handle, title, subtitle, image }) => ({ handle, title, subtitle, image })),
-    categories: categories.map(({ slug, title, image }) => ({ slug, title, image })),
+    // The whole range, empty categories included (their page says what is coming); the admin hides one with "Show in the menu".
+    categories: categories.filter((c) => c.showInMenu).map(({ slug, title, image, department, group, showInMenu }) => ({ slug, title, image, department, group, showInMenu })),
     spotlight: products.slice(0, 4).map(({ handle, title, price, compareAtPrice, prices, images, productType }) => ({ handle, title, price, compareAtPrice, prices, images: images.slice(0, 1), productType })),
-    genders: { men: count('men'), women: count('women'), kids: count('kids') },
+    departments: { men: department('men'), women: department('women'), kids: department('kids') },
   }
 
   return (

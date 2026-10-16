@@ -40,7 +40,7 @@ export default function AdminLogin({ problems, denied }: { problems: string[]; d
       <div className="relative hidden lg:block">
         <Image src="/images/collection-home/Material-Intimacy.png" alt="" fill preload sizes="50vw" className="object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/30" />
-        <p className="absolute bottom-10 left-10 max-w-sm font-display text-4xl leading-tight">Run the atelier: pieces, orders, reviews and every setting in one place.</p>
+        <p className="absolute bottom-10 left-10 max-w-sm font-display text-4xl leading-tight">Run the shop: pieces, orders, reviews and every setting in one place.</p>
       </div>
       <div className="flex items-center justify-center px-6 py-16">
         <form onSubmit={submit} className="w-full max-w-sm space-y-5" noValidate>

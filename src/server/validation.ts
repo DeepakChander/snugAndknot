@@ -1,6 +1,6 @@
 import 'server-only'
 import { z } from 'zod'
-import { MAX_WALL_PRODUCTS, MAX_WALL_VIDEOS, detectVideo } from '@/lib/video'
+import { MAX_WALL_PRODUCTS, MAX_WALL_VIDEOS, WALL_DEPARTMENTS, detectVideo } from '@/lib/video'
 
 /**
  * Removes characters that are invisible but dangerous in stored text: control characters
@@ -280,6 +280,40 @@ export const collectionSchema = z.object({
   position: z.coerce.number().int().min(0).max(10_000).default(0),
 })
 
+/** Changing the main currency (Admin → Settings → Checkout & shipping). */
+export const currencySwitchSchema = z.object({
+  // A real ISO 4217 currency (Intl formats any three letters, so it cannot tell on its own).
+  code: currencyCode.refine((c) => Intl.supportedValuesOf('currency').includes(c), 'Unknown currency code'),
+  rate: z.coerce.number().finite().positive('Enter the exchange rate').max(1_000_000),
+  rounding: z.enum(['exact', 'whole', 'ninety-nine']).default('whole'),
+})
+
+const productIds = z.array(z.string().trim().min(1).max(120)).min(1, 'Choose at least one product').max(200)
+
+/** Quick actions from the admin's product list (one product or many). */
+export const productActionSchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('status'), ids: productIds, status: z.enum(['active', 'draft', 'archived']) }),
+  z.object({ action: z.literal('delete'), ids: productIds }),
+  // Every size of each product to 0.
+  z.object({ action: z.literal('sold-out'), ids: productIds }),
+  // Every size of each product that is at 0 back to `quantity`.
+  z.object({ action: z.literal('restock'), ids: productIds, quantity: z.coerce.number().int().min(1).max(100_000) }),
+  z.object({
+    action: z.literal('inventory'),
+    id: z.string().trim().min(1).max(120),
+    variants: z.array(z.object({ id: z.string().trim().min(1).max(160), inventory: z.coerce.number().int().min(0).max(1_000_000) })).min(1).max(200),
+  }),
+  z
+    .object({ action: z.literal('price'), id: z.string().trim().min(1).max(120), price: money, compareAtPrice: money.nullable().default(null), prices: priceBookSchema })
+    .superRefine((p, ctx) => {
+      const check = (price: number, compareAt: number | null, path: (string | number)[]) => {
+        if (compareAt !== null && compareAt > 0 && compareAt <= price) ctx.addIssue({ code: 'custom', path, message: 'Compare-at price must be higher than the price' })
+      }
+      check(p.price, p.compareAtPrice, ['compareAtPrice'])
+      for (const [code, cp] of Object.entries(p.prices)) check(cp.price, cp.compareAtPrice, ['prices', code, 'compareAtPrice'])
+    }),
+])
+
 export const categorySchema = z.object({
   slug: handle,
   title: required(80, 'Title'),
@@ -288,7 +322,15 @@ export const categorySchema = z.object({
   position: z.coerce.number().int().min(0).max(10_000).default(0),
   badge: trimmed(24).default(''),
   showOnHome: z.boolean().default(true),
+  department: z.enum(['', 'men', 'women', 'kids']).default(''),
+  group: trimmed(40).default(''),
+  showInMenu: z.boolean().default(true),
 })
+  // A department's categories live at /shop/<department>/<rest of the slug>, so the slug starts with it.
+  .refine((c) => !c.department || c.slug.startsWith(`${c.department}-`), {
+    message: 'A category in a department needs a slug that starts with the department, e.g. men-shirts.',
+    path: ['slug'],
+  })
 
 export const couponSchema = z
   .object({
@@ -350,15 +392,12 @@ const wallItem = z
     poster: imageUrl.default(''),
     caption: trimmed(200).default(''),
     credit: trimmed(60).default(''),
+    department: z.enum(WALL_DEPARTMENTS).default(''),
     productIds: z
       .array(required(120))
       .max(MAX_WALL_PRODUCTS, `Tag at most ${MAX_WALL_PRODUCTS} pieces in one video`)
       .default([])
       .transform((ids) => [...new Set(ids)]),
-  })
-  .superRefine((v, ctx) => {
-    // Instagram cannot be played inline, so the poster is all that shows.
-    if (detectVideo(v.url)?.kind === 'instagram' && !v.poster) ctx.addIssue({ code: 'custom', path: ['poster'], message: 'Instagram posts need a poster image' })
   })
 export const videoWallSchema = z
   .object({
@@ -398,6 +437,8 @@ export const settingsSchemas = {
       tiktok: httpsUrl,
       twitter: httpsUrl,
     }),
+    // Optional: a save without it keeps every department open (saveSettings fills in defaults).
+    departments: z.object({ men: z.boolean(), women: z.boolean(), kids: z.boolean() }).optional(),
   }),
   commerce: z.object({
     currency: z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO currency code'),
@@ -445,9 +486,8 @@ export const settingsSchemas = {
     c.extraCurrencies.forEach((x, i) => {
       if (seen.has(x.code)) ctx.addIssue({ code: 'custom', path: ['extraCurrencies', i, 'code'], message: `${x.code} is already one of the store's currencies` })
       seen.add(x.code)
-      try {
-        new Intl.NumberFormat('en', { style: 'currency', currency: x.code })
-      } catch {
+      // A real ISO 4217 currency (Intl formats any three letters, so it cannot tell on its own).
+      if (!Intl.supportedValuesOf('currency').includes(x.code)) {
         ctx.addIssue({ code: 'custom', path: ['extraCurrencies', i, 'code'], message: 'Unknown currency code' })
       }
     })
@@ -459,6 +499,20 @@ export const settingsSchemas = {
   }),
   reviews: z.object({ moderation: z.enum(['manual', 'auto']) }),
   homepage: z.object({
+    // Optional (saveSettings fills in defaults): the wide campaign photograph and the campaign band.
+    heroImage: imageUrl.optional(),
+    feature: z
+      .object({ enabled: z.boolean(), collectionHandle: trimmed(120), image: imageUrl, ctaLabel: trimmed(40) })
+      .optional(),
+    // Optional: a save without it shows every section (saveSettings fills in defaults).
+    sections: z
+      .object({ categories: z.boolean(), newIn: z.boolean(), collections: z.boolean(), reviews: z.boolean(), journal: z.boolean(), promises: z.boolean() })
+      .optional(),
+    // Optional: a save without it gets the default Women / Men / Kids panels (saveSettings fills in defaults).
+    heroPanels: z
+      .array(z.object({ label: trimmed(40), href: linkUrl, image: imageUrl }))
+      .max(3)
+      .optional(),
     heroEyebrow: trimmed(80),
     heroTitle: required(160, 'Hero title'),
     heroSubtitle: trimmed(400),

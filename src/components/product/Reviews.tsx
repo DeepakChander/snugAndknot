@@ -80,7 +80,7 @@ export default function Reviews({
           <p className="text-eyebrow text-burgundy">Reviews</p>
           {summary.count ? (
             <>
-              <p className="mt-5 font-display text-[6rem] leading-none tracking-[-0.04em]">{summary.average.toFixed(1)}</p>
+              <p className="mt-5 text-[3rem] font-medium leading-none">{summary.average.toFixed(1)}</p>
               <Stars value={summary.average} size={18} />
               <p className="mt-2 text-sm text-stone">
                 Based on {summary.count} review{summary.count === 1 ? '' : 's'}
@@ -96,11 +96,11 @@ export default function Reviews({
                         onClick={() => setFilter(filter === n ? null : n)}
                         aria-pressed={filter === n}
                         disabled={!c}
-                        className={cn('flex w-full items-center gap-3 rounded-lg px-1 py-1 text-sm transition-colors disabled:opacity-40', filter === n ? 'bg-gold/15' : 'hover:bg-ink/5')}
+                        className={cn('flex w-full items-center gap-3 rounded-lg px-1 py-1 text-sm transition-colors disabled:opacity-40', filter === n ? 'bg-ink/[0.06]' : 'hover:bg-ink/5')}
                       >
                         <span className="w-8 font-mono text-xs">{n}★</span>
                         <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-ink/10">
-                          <motion.span className="absolute inset-y-0 left-0 rounded-full bg-gold" initial={{ width: 0 }} whileInView={{ width: `${pct}%` }} viewport={{ once: true }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} />
+                          <motion.span className="absolute inset-y-0 left-0 rounded-full bg-ink" initial={{ width: 0 }} whileInView={{ width: `${pct}%` }} viewport={{ once: true }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} />
                         </span>
                         <span className="w-6 text-right font-mono text-xs text-stone">{c}</span>
                       </button>
@@ -114,12 +114,12 @@ export default function Reviews({
             </>
           ) : (
             <>
-              <p className="mt-5 font-display text-4xl leading-tight">No reviews yet.</p>
+              <p className="mt-5 text-[1.35rem] font-medium">No reviews yet.</p>
               <p className="mt-3 text-sm text-stone">Own {productTitle}? Tell others how it wears, washes and fits.</p>
             </>
           )}
           {mine ? (
-            <p className="mt-6 rounded-2xl bg-parchment/70 p-4 text-sm">
+            <p className="mt-6 bg-bone p-4 text-sm">
               {mine.status === 'approved' ? 'Thank you — your review is published below.' : mine.status === 'pending' ? 'Thank you — your review is with our team and will appear once approved.' : 'Your review was not published. Contact us if you have questions.'}
             </p>
           ) : (
@@ -143,7 +143,7 @@ export default function Reviews({
                 </p>
                 <label className="flex items-center gap-2 text-sm">
                   <span className="text-stone">Sort</span>
-                  <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="rounded-full border border-ink/15 bg-transparent px-3 py-1.5">
+                  <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="border border-ink/15 bg-transparent px-3 py-1.5">
                     <option value="newest">Newest</option>
                     <option value="helpful">Most helpful</option>
                     <option value="highest">Highest rated</option>
@@ -160,7 +160,7 @@ export default function Reviews({
                           <Stars value={r.rating} size={14} />
                           <span className="text-xs text-stone">{formatDate(r.createdAt)}</span>
                         </div>
-                        <h3 className="mt-4 font-display text-2xl leading-tight">{r.title}</h3>
+                        <h3 className="mt-4 text-[1.05rem] font-medium">{r.title}</h3>
                         <p className="mt-3 max-w-prose leading-relaxed text-stone">{r.body}</p>
                         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                           <span className="font-medium">{r.author}</span>
@@ -168,12 +168,12 @@ export default function Reviews({
                           {r.fit ? <span className="text-xs text-stone">Fit: {r.fit === 'true' ? 'true to size' : r.fit === 'small' ? 'runs small' : 'runs large'}</span> : null}
                         </div>
                         {r.adminReply ? (
-                          <div className="mt-5 rounded-2xl border-l-2 border-gold bg-parchment/50 p-4 text-sm">
-                            <p className="text-eyebrow text-burgundy">Reply from the atelier</p>
+                          <div className="mt-5 border-l-2 border-ink bg-bone p-4 text-sm">
+                            <p className="text-eyebrow text-stone">Reply from Snug&amp;Knot</p>
                             <p className="mt-2">{r.adminReply}</p>
                           </div>
                         ) : null}
-                        <button type="button" onClick={() => markHelpful(r.id)} disabled={helped.has(r.id)} className="mt-5 rounded-full border border-ink/15 px-3 py-1.5 text-xs transition-colors hover:border-ink/40 disabled:opacity-60">
+                        <button type="button" onClick={() => markHelpful(r.id)} disabled={helped.has(r.id)} className="mt-5 border border-ink/15 px-3 py-1.5 text-xs transition-colors hover:border-ink/40 disabled:opacity-60">
                           {helped.has(r.id) ? 'Thanks for the feedback' : 'Helpful'} · {r.helpful}
                         </button>
                       </article>
@@ -188,7 +188,7 @@ export default function Reviews({
               ) : null}
             </>
           ) : (
-            <div className="flex h-full min-h-[220px] items-center justify-center rounded-[1.5rem] border border-dashed border-ink/15 p-10 text-center text-stone">
+            <div className="flex h-full min-h-[220px] items-center justify-center border border-dashed border-ink/15 p-10 text-center text-stone">
               Reviews from customers who own this piece will appear here.
             </div>
           )}
@@ -251,12 +251,12 @@ function ReviewForm({ handle, productTitle, onClose, onCreated }: { handle: stri
   return (
     <div className="flex min-h-full flex-col">
       <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
-        <h2 className="font-display text-3xl">Your review</h2>
+        <h2 className="text-[1.15rem] font-medium">Your review</h2>
         <CloseButton onClick={onClose} />
       </div>
       {done ? (
         <div className="p-6">
-          <p className="font-display text-3xl leading-tight">Thank you.</p>
+          <p className="text-[1.35rem] font-medium">Thank you.</p>
           <p className="mt-3 text-stone">
             {done.status === 'approved' ? 'Your review is now live on the page.' : 'Your review has been sent to our team and will appear once approved.'}
             {done.verified ? ' It carries a verified-buyer badge.' : ''}
@@ -281,14 +281,14 @@ function ReviewForm({ handle, productTitle, onClose, onCreated }: { handle: stri
                   ['large', 'Runs large'],
                 ] as [ReviewFit, string][]
               ).map(([v, label]) => (
-                <button key={v} type="button" aria-pressed={fit === v} onClick={() => setFit(fit === v ? null : v)} className={cn('rounded-2xl border px-3 py-3 text-sm transition-colors', fit === v ? 'border-ink bg-ink text-ivory' : 'border-ink/15 hover:border-ink/40')}>
+                <button key={v} type="button" aria-pressed={fit === v} onClick={() => setFit(fit === v ? null : v)} className={cn('border px-3 py-3 text-sm transition-colors', fit === v ? 'border-ink bg-ink text-ivory' : 'border-ink/15 hover:border-ink/40')}>
                   {label}
                 </button>
               ))}
             </div>
           </fieldset>
           {error ? (
-            <p role="alert" className="rounded-xl bg-error/[0.07] px-4 py-3 text-sm text-error">
+            <p role="alert" className="bg-error/[0.07] px-4 py-3 text-sm text-error">
               {error}
             </p>
           ) : null}

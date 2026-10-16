@@ -7,7 +7,7 @@ type Tone = 'light' | 'dark'
 
 const box = (tone: Tone, error?: string) =>
   cn(
-    'peer block w-full rounded-2xl border bg-transparent px-4 pb-2.5 pt-6 text-[0.95rem] outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-transparent',
+    'peer block w-full border bg-transparent px-4 pb-2.5 pt-6 text-[0.95rem] outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-transparent',
     tone === 'light'
       ? 'border-ink/15 text-ink focus:border-ink/60 focus:shadow-[0_0_0_4px_rgba(22,16,14,0.06)]'
       : 'border-ivory/20 text-ivory focus:border-ivory/70 focus:shadow-[0_0_0_4px_rgba(248,243,234,0.08)]',
@@ -124,7 +124,7 @@ export function Checkbox({ label, className, ...rest }: ComponentPropsWithoutRef
   return (
     <label className={cn('group inline-flex cursor-pointer select-none items-start gap-3 text-sm', className)}>
       <span className="relative mt-0.5 inline-flex h-[18px] w-[18px] shrink-0">
-        <input type="checkbox" className="peer absolute inset-0 appearance-none rounded-[5px] border border-current/30 transition-colors checked:border-burgundy checked:bg-burgundy" {...rest} />
+        <input type="checkbox" className="peer absolute inset-0 appearance-none border border-current/30 transition-colors checked:border-ink checked:bg-ink" {...rest} />
         <svg viewBox="0 0 12 12" className="pointer-events-none relative m-auto h-2.5 w-2.5 text-ivory opacity-0 transition-opacity peer-checked:opacity-100" aria-hidden>
           <path d="M2 6.5 5 9l5-6" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </svg>

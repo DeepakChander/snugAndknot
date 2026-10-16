@@ -11,9 +11,11 @@ export type PublicSettings = Pick<SiteSettings, 'store' | 'commerce' | 'announce
 
 export interface NavData {
   collections: Pick<Collection, 'handle' | 'title' | 'subtitle' | 'image'>[]
-  categories: Pick<Category, 'slug' | 'title' | 'image'>[]
+  /** The categories listed in the menu (empty ones included), in admin order. */
+  categories: Pick<Category, 'slug' | 'title' | 'image' | 'department' | 'group' | 'showInMenu'>[]
   spotlight: Pick<Product, 'handle' | 'title' | 'price' | 'compareAtPrice' | 'prices' | 'images' | 'productType'>[]
-  genders: { men: number; women: number; kids: number }
+  /** Active pieces per department, and a photograph of one of them for the menu. */
+  departments: Record<'men' | 'women' | 'kids', { count: number; image: string }>
 }
 
 interface Ctx {
@@ -23,7 +25,7 @@ interface Ctx {
 
 const SettingsContext = createContext<Ctx>({
   settings: DEFAULT_SETTINGS,
-  nav: { collections: [], categories: [], spotlight: [], genders: { men: 0, women: 0, kids: 0 } },
+  nav: { collections: [], categories: [], spotlight: [], departments: { men: { count: 0, image: '' }, women: { count: 0, image: '' }, kids: { count: 0, image: '' } } },
 })
 
 export function SettingsProvider({ settings, nav, children }: Ctx & { children: React.ReactNode }) {

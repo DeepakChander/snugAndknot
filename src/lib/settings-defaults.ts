@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
       tiktok: 'https://tiktok.com/@snugandknot',
       twitter: 'https://twitter.com/snugandknot',
     },
+    departments: { men: true, women: true, kids: true },
   },
   commerce: {
     currency: 'USD',
@@ -35,7 +36,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   announcement: {
     enabled: true,
     messages: [
-      'Free shipping on orders over $150',
+      'Free shipping on orders over {free-shipping}',
       'Hand-finished in small batches',
       '30-day returns on unworn pieces',
     ],
@@ -45,6 +46,14 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     moderation: 'manual',
   },
   homepage: {
+    sections: { categories: true, newIn: true, collections: true, reviews: true, journal: true, promises: true },
+    heroImage: '/images/hero/campaign.webp',
+    feature: { enabled: true, collectionHandle: 'coastal-escape', image: '', ctaLabel: 'Shop the edit' },
+    heroPanels: [
+      { label: 'Women', href: '/shop/women', image: '/images/hero/women.webp' },
+      { label: 'Men', href: '/shop/men', image: '/images/hero/men.webp' },
+      { label: 'Kids', href: '/shop/kids', image: '/images/hero/kids.webp' },
+    ],
     heroEyebrow: 'Everyday clothing for',
     heroTitle: 'Men, Women & Kids',
     heroSubtitle: 'Trendy · Comfortable · Premium',

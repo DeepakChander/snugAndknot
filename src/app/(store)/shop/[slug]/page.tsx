@@ -1,18 +1,24 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import ShopView from '@/components/shop/ShopView'
 import { DEPARTMENTS, loadShop } from '@/server/shop'
 import { getCategory, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { breadcrumbLd, itemListLd, pageMeta } from '@/lib/seo'
+import { categoryHref, openDepartments } from '@/lib/categories'
+import VideoWall from '@/components/home/VideoWall'
+import { buildWall } from '@/lib/video'
 
-/** "Women's knitwear", "Kids' knitwear". */
-const knitwear = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} knitwear`
+/** "Women's clothing", "Kids' clothing". */
+const clothing = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} clothing`
 
 type Props = {
   params: Promise<{ slug: string }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
+
+/** The two categories the shop opened with, now Men → T-shirts and Women → Knitwear. */
+const MOVED: Record<string, string> = { tops: '/shop/men/t-shirts', cardigans: '/shop/women/knitwear' }
 
 function isDepartment(slug: string): slug is keyof typeof DEPARTMENTS {
   return slug in DEPARTMENTS
@@ -27,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // (the sitemap adds it at the same moment).
     const empty = !(await getProducts({})).some((p) => p.gender === slug || (slug !== 'kids' && p.gender === 'unisex'))
     return pageMeta(settings, {
-      title: knitwear(DEPARTMENTS[slug].title),
+      title: clothing(DEPARTMENTS[slug].title),
       description: DEPARTMENTS[slug].description,
       path: `/shop/${slug}`,
       robots: empty ? { index: false, follow: true } : undefined,
@@ -42,14 +48,19 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
   const sp = await searchParams
 
   if (isDepartment(slug)) {
+    // A department the admin closed has no page.
+    const settings = await getStoreSettings()
+    if (!openDepartments(settings.store).includes(slug)) notFound()
     const dept = DEPARTMENTS[slug]
     const data = await loadShop({ gender: slug, activeHref: `/shop/${slug}` }, sp)
+    // The video wall under the department's pieces: only the clips the admin put in this department.
+    const wall = settings.videos.enabled ? buildWall(settings.videos.items, await getProducts({})).filter((v) => v.department === slug) : []
     return (
       <>
         <JsonLd
           data={[
             breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: dept.title, path: `/shop/${slug}` }]),
-            itemListLd(knitwear(dept.title), data.products),
+            itemListLd(clothing(dept.title), data.products),
           ]}
         />
         <ShopView
@@ -59,16 +70,22 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
           {...data}
           comingSoon={
             slug === 'kids'
-              ? { title: 'The kids’ atelier opens soon.', body: 'Small knits in the same natural fibres are on the needles. Leave your email and we will tell you the day they arrive.' }
+              ? { title: 'Kids is opening soon.', body: 'Leave your email and we will tell you the day the first pieces arrive.' }
               : undefined
           }
         />
+        {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} /> : null}
       </>
     )
   }
 
   const category = await getCategory(slug)
-  if (!category) notFound()
+  if (!category) {
+    if (MOVED[slug]) permanentRedirect(MOVED[slug])
+    notFound()
+  }
+  // A department's category has one address: /shop/men/shirts.
+  if (category.department) permanentRedirect(categoryHref(category))
   const data = await loadShop({ category: slug, activeHref: `/shop/${slug}` }, sp)
   return (
     <>

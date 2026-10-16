@@ -95,6 +95,17 @@ function toDraft(p: Product | null): Draft {
   }
 }
 
+/** Category choices for a product in `gender`: its department's, by menu group, then the department-less ones. */
+function categoryOptions(categories: Category[], gender: Gender) {
+  const own = categories.filter((c) => c.department === gender || (gender === 'unisex' && (c.department === 'men' || c.department === 'women')))
+  const label = (c: Category) => (gender === 'unisex' ? `${c.department === 'men' ? 'Men' : 'Women'} · ` : '') + (c.group || 'Other')
+  const groups = [...new Set(own.map(label))]
+  return [
+    ...groups.map((g) => ({ label: g, items: own.filter((c) => label(c) === g) })),
+    { label: 'No department', items: categories.filter((c) => !c.department) },
+  ].filter((g) => g.items.length)
+}
+
 export default function ProductEditor({ product, categories }: { product: Product | null; categories: Category[] }) {
   const router = useRouter()
   const money = useMoney()
@@ -524,7 +535,16 @@ export default function ProductEditor({ product, categories }: { product: Produc
           </Card>
           <Card title="Organisation">
             <div className="space-y-4">
-              <Select label="Department" value={d.gender} onChange={(e) => set('gender', e.target.value as Gender)}>
+              <Select
+                label="Department"
+                value={d.gender}
+                onChange={(e) => {
+                  const gender = e.target.value as Gender
+                  set('gender', gender)
+                  // A category from the old department no longer fits: clear it rather than keep it silently.
+                  if (d.category && !categoryOptions(categories, gender).some((g) => g.items.some((c) => c.slug === d.category))) set('category', '')
+                }}
+              >
                 <option value="women">Women</option>
                 <option value="men">Men</option>
                 <option value="kids">Kids</option>
@@ -532,10 +552,15 @@ export default function ProductEditor({ product, categories }: { product: Produc
               </Select>
               <Select label="Category" value={d.category} onChange={(e) => set('category', e.target.value)} hint={<Link href="/admin/categories" className="underline">Manage categories</Link>}>
                 <option value="">No category</option>
-                {categories.map((c) => (
-                  <option key={c.slug} value={c.slug}>
-                    {c.title}
-                  </option>
+                {/* The department's own categories under their menu headings, then any with no department. */}
+                {categoryOptions(categories, d.gender).map(({ label, items }) => (
+                  <optgroup key={label} label={label}>
+                    {items.map((c) => (
+                      <option key={c.slug} value={c.slug}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
                 {d.category && !categories.some((c) => c.slug === d.category) ? <option value={d.category}>{d.category} (missing)</option> : null}
               </Select>

@@ -441,6 +441,98 @@ UPDATE orders SET points_granted_at = coalesce(paid_at, placed_at)
    AND (payment_method <> 'razorpay' OR paid_at IS NOT NULL);
 `,
   },
+  {
+    version: 12,
+    name: 'departments',
+    // The catalogue is organised by department (Men, Women, Kids) and, inside each, by category
+    // (Men → Shirts), with an optional group that heads a column in the menu (Topwear, Boys …).
+    // Categories without a department are the older, department-less ones. Adds the standard
+    // categories (off the home grid; they reach the menu once they have active pieces), moves the
+    // pieces from the two original categories into their department's, and drops those two only if
+    // nothing points at them any more.
+    sql: `
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS department TEXT NOT NULL DEFAULT '';
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS menu_group TEXT NOT NULL DEFAULT '';
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS show_in_menu BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE categories DROP CONSTRAINT IF EXISTS categories_department_check;
+ALTER TABLE categories ADD CONSTRAINT categories_department_check CHECK (department IN ('', 'men', 'women', 'kids'));
+INSERT INTO categories (slug, title, department, menu_group, position, show_on_home) SELECT v.slug, v.title, v.department, v.menu_group, v.position, false FROM (VALUES
+  ('men-shirts', 'Shirts', 'men', 'Topwear', 100),
+  ('men-t-shirts', 'T-shirts', 'men', 'Topwear', 101),
+  ('men-polos', 'Polos', 'men', 'Topwear', 102),
+  ('men-knitwear', 'Knitwear', 'men', 'Topwear', 103),
+  ('men-jackets', 'Jackets', 'men', 'Topwear', 104),
+  ('men-trousers', 'Trousers', 'men', 'Bottomwear', 105),
+  ('men-cargos', 'Cargos', 'men', 'Bottomwear', 106),
+  ('men-jeans', 'Jeans', 'men', 'Bottomwear', 107),
+  ('men-shorts', 'Shorts', 'men', 'Bottomwear', 108),
+  ('men-co-ords', 'Co-ords', 'men', 'Sets', 109),
+  ('women-tops', 'Tops', 'women', 'Topwear', 110),
+  ('women-shirts', 'Shirts', 'women', 'Topwear', 111),
+  ('women-t-shirts', 'T-shirts', 'women', 'Topwear', 112),
+  ('women-knitwear', 'Knitwear', 'women', 'Topwear', 113),
+  ('women-jackets', 'Jackets', 'women', 'Topwear', 114),
+  ('women-dresses', 'Dresses', 'women', 'Dresses & bottoms', 115),
+  ('women-trousers', 'Trousers', 'women', 'Dresses & bottoms', 116),
+  ('women-jeans', 'Jeans', 'women', 'Dresses & bottoms', 117),
+  ('women-skirts', 'Skirts', 'women', 'Dresses & bottoms', 118),
+  ('women-co-ords', 'Co-ords', 'women', 'Sets', 119),
+  ('kids-boys-t-shirts', 'T-shirts', 'kids', 'Boys', 120),
+  ('kids-boys-shirts', 'Shirts', 'kids', 'Boys', 121),
+  ('kids-boys-bottoms', 'Bottoms', 'kids', 'Boys', 122),
+  ('kids-boys-sets', 'Sets', 'kids', 'Boys', 123),
+  ('kids-boys-knitwear', 'Knitwear', 'kids', 'Boys', 124),
+  ('kids-girls-t-shirts', 'T-shirts', 'kids', 'Girls', 125),
+  ('kids-girls-shirts', 'Shirts', 'kids', 'Girls', 126),
+  ('kids-girls-bottoms', 'Bottoms', 'kids', 'Girls', 127),
+  ('kids-girls-sets', 'Sets', 'kids', 'Girls', 128),
+  ('kids-girls-knitwear', 'Knitwear', 'kids', 'Girls', 129),
+  ('kids-baby-t-shirts', 'T-shirts', 'kids', 'Baby', 130),
+  ('kids-baby-shirts', 'Shirts', 'kids', 'Baby', 131),
+  ('kids-baby-bottoms', 'Bottoms', 'kids', 'Baby', 132),
+  ('kids-baby-sets', 'Sets', 'kids', 'Baby', 133),
+  ('kids-baby-knitwear', 'Knitwear', 'kids', 'Baby', 134)
+) AS v (slug, title, department, menu_group, position)
+ON CONFLICT (slug) DO NOTHING;
+UPDATE products SET category = gender || '-t-shirts', updated_at = now() WHERE category = 'tops' AND gender IN ('men', 'women');
+UPDATE products SET category = gender || '-knitwear', updated_at = now() WHERE category = 'cardigans' AND gender IN ('men', 'women');
+DELETE FROM categories c WHERE c.slug IN ('tops', 'cardigans') AND NOT EXISTS (SELECT 1 FROM products p WHERE p.category = c.slug);
+`,
+  },
+  {
+    version: 13,
+    name: 'category-images',
+    // Photographs for the Men and Women categories (public/images/categories/<slug>.webp). Only a
+    // category that still has no image gets one, so an image set in the admin stays.
+    sql: `
+UPDATE categories SET image = '/images/categories/' || slug || '.webp'
+ WHERE image = '' AND slug IN ('men-shirts', 'men-t-shirts', 'men-polos', 'men-knitwear', 'men-jackets', 'men-trousers', 'men-cargos', 'men-jeans', 'men-shorts', 'men-co-ords', 'women-tops', 'women-shirts', 'women-t-shirts', 'women-knitwear', 'women-jackets', 'women-dresses', 'women-trousers', 'women-jeans', 'women-skirts', 'women-co-ords');
+`,
+  },
+  {
+    version: 14,
+    name: 'categories-on-home',
+    // The home page's "Shop by category" shows each department's categories with their photographs.
+    // The departments' categories arrived (version 12) switched off for the home page; switch them on.
+    // The admin turns any one off again with "Show on home page".
+    sql: `
+UPDATE categories SET show_on_home = true WHERE department <> '' AND show_on_home = false;
+`,
+  },
+  {
+    version: 15,
+    name: 'announcement-free-shipping',
+    // The announcement's "Free shipping on orders over $150" was typed text, so it kept saying $150
+    // whatever the currency. {free-shipping} shows the amount in each shopper's currency; the default
+    // message moves to it only while it still reads exactly as shipped.
+    sql: `
+UPDATE settings SET value = jsonb_set(value, '{messages}', (
+    SELECT coalesce(jsonb_agg(CASE WHEN m = 'Free shipping on orders over $150' THEN 'Free shipping on orders over {free-shipping}' ELSE m END ORDER BY n), '[]'::jsonb)
+      FROM jsonb_array_elements_text(value->'messages') WITH ORDINALITY AS t (m, n)
+  )), updated_at = now()
+ WHERE key = 'announcement' AND jsonb_typeof(value->'messages') = 'array' AND value->'messages' ? 'Free shipping on orders over $150';
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version

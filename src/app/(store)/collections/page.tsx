@@ -4,7 +4,7 @@ import CollectionsIndex from '@/components/collections/CollectionsIndex'
 import { getCollections, getProducts, getStoreSettings } from '@/server/catalog'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return pageMeta(await getStoreSettings(), { title: 'Collections', description: 'Snug&Knot collections — knitwear gathered around a feeling: winter warmth, the artisan edit, everyday essentials and coastal walks.', path: '/collections' })
+  return pageMeta(await getStoreSettings(), { title: 'Collections', description: 'Snug&Knot collections: pieces gathered to be worn together.', path: '/collections' })
 }
 
 export default async function CollectionsPage() {

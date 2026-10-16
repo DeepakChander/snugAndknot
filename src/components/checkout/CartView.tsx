@@ -9,7 +9,6 @@ import { useUIStore } from '@/stores/ui-store'
 import { useCartQuote } from '@/hooks/use-cart-quote'
 import { useHydrated } from '@/hooks/use-hydrated'
 import { useMoney } from '@/components/providers/SettingsProvider'
-import SplitReveal from '@/components/motion/SplitReveal'
 import { ButtonLink } from '@/components/kit/Button'
 import { QtyStepper } from '@/components/chrome/CartDrawer'
 import ProductCard, { type CardProduct } from '@/components/store/ProductCard'
@@ -30,19 +29,19 @@ export default function CartView({ suggestions }: { suggestions: CardProduct[] }
     <div className="bg-ivory pb-28 pt-nav text-ink">
       <div className="container-wide pt-10 md:pt-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <SplitReveal as="h1" type="chars" intro className="text-display">
+          <h1 className="text-display">
             Your bag
-          </SplitReveal>
+          </h1>
           <p className="font-mono text-sm text-stone">
             {count} piece{count === 1 ? '' : 's'}
           </p>
         </div>
 
         {!hydrated ? (
-          <div className="mt-14 h-64 rounded-[1.75rem] skeleton" />
+          <div className="mt-14 h-64 skeleton" />
         ) : lines.length === 0 ? (
-          <div className="mt-14 rounded-[2rem] bg-bone/70 px-6 py-20 text-center">
-            <p className="font-display text-4xl">Your bag is empty.</p>
+          <div className="mt-14 bg-bone/70 px-6 py-20 text-center">
+            <p className="text-[1.6rem] font-medium">Your bag is empty.</p>
             <p className="mx-auto mt-4 max-w-md text-stone">Begin with a cardigan or a fine-gauge tee — every piece is made in small numbers.</p>
             <ButtonLink href="/shop" className="mt-8" arrow>
               Shop the collection
@@ -53,7 +52,7 @@ export default function CartView({ suggestions }: { suggestions: CardProduct[] }
             <div>
               <AnimatePresence initial={false}>
                 {notices.length ? (
-                  <motion.ul initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mb-6 space-y-1 overflow-hidden rounded-2xl bg-burgundy/[0.06] p-4 text-sm text-burgundy" role="status">
+                  <motion.ul initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mb-6 space-y-1 overflow-hidden bg-burgundy/[0.06] p-4 text-sm text-burgundy" role="status">
                     {notices.map((n) => (
                       <li key={n}>{n}</li>
                     ))}
@@ -64,13 +63,13 @@ export default function CartView({ suggestions }: { suggestions: CardProduct[] }
                 <AnimatePresence initial={false}>
                   {lines.map((l) => (
                     <motion.li key={l.id} layout exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="flex gap-5 py-7 md:gap-8">
-                      <Link href={`/product/${l.handle}`} className="relative aspect-[3/4] w-28 shrink-0 overflow-hidden rounded-2xl bg-parchment md:w-40">
+                      <Link href={`/product/${l.handle}`} className="relative aspect-[3/4] w-28 shrink-0 overflow-hidden bg-parchment md:w-40">
                         {l.image ? <Image src={l.image} alt={l.title} fill sizes="160px" className="object-cover" /> : null}
                       </Link>
                       <div className="flex min-w-0 flex-1 flex-col">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <Link href={`/product/${l.handle}`} className="font-display text-2xl leading-tight hover:text-burgundy md:text-3xl">
+                            <Link href={`/product/${l.handle}`} className="text-[1.05rem] font-medium leading-snug hover:underline md:text-3xl">
                               {l.title}
                             </Link>
                             <p className="mt-1 text-label text-stone">{[l.size, l.color].filter(Boolean).join(' · ')}</p>

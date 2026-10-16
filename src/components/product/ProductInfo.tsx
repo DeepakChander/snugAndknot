@@ -93,14 +93,14 @@ export default function ProductInfo({ product, summary }: { product: Product; su
         <Link href={product.gender === 'unisex' ? '/shop' : `/shop/${product.gender}`} className="link-wipe capitalize">
           {product.gender}
         </Link>{' '}
-        / <span className="text-burgundy">{product.productType}</span>
+        / <span className="text-ink">{product.productType}</span>
       </nav>
 
-      <h1 className="mt-5 text-[clamp(2.6rem,4.6vw,4.4rem)] leading-[0.95] tracking-[-0.025em]">{product.title}</h1>
+      <h1 className="mt-4 text-[clamp(1.5rem,2.2vw,2.05rem)] font-normal leading-tight tracking-[-0.01em]">{product.title}</h1>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
         {priced ? (
-          <Price price={price} compareAt={compareAt} showSaving className="text-xl" />
+          <Price price={price} compareAt={compareAt} showSaving className="text-[1.05rem] font-medium" />
         ) : (
           <span data-money className="font-mono text-sm text-stone">
             Not available in {cur.code} yet
@@ -144,7 +144,7 @@ export default function ProductInfo({ product, summary }: { product: Product; su
                   setColor(c)
                   setVariantId(null)
                 }}
-                className={cn('h-10 w-10 rounded-full ring-1 ring-ink/15 ring-offset-2 ring-offset-ivory transition-all', c === color && 'ring-2 ring-ink')}
+                className={cn('h-9 w-9 ring-1 ring-ink/15 ring-offset-2 ring-offset-ivory transition-all', c === color && 'ring-2 ring-ink')}
                 style={{ background: swatch(c) }}
               />
             ))}
@@ -174,7 +174,7 @@ export default function ProductInfo({ product, summary }: { product: Product; su
                 setQty(1)
               }}
               className={cn(
-                'relative h-12 rounded-2xl border font-mono text-sm transition-all duration-300',
+                'relative h-11 border text-sm transition-colors duration-200',
                 v.id === variantId ? 'border-ink bg-ink text-ivory' : 'border-ink/15 hover:border-ink/50',
                 !v.available && 'text-stone/60'
               )}
@@ -203,26 +203,26 @@ export default function ProductInfo({ product, summary }: { product: Product; su
       ) : (
         <div className="mt-8 flex items-center gap-3">
           {variant ? <QtyStepper value={qty} onChange={(n) => setQty(Math.max(1, Math.min(n, variant.inventory, 10)))} max={Math.min(variant.inventory, 10)} label={product.title} /> : null}
-          <Button size="lg" block onClick={add} arrow magnetic className="flex-1" disabled={!priced}>
+          <Button size="lg" block onClick={add} className="flex-1" disabled={!priced}>
             {!priced ? `Not sold in ${cur.code} yet` : variant ? <span data-money>{`Add to bag — ${money(price * qty)}`}</span> : 'Add to bag'}
           </Button>
-          <WishlistButton handle={product.handle} title={product.title} className="h-14 w-14 shrink-0 border border-ink/15" />
+          <WishlistButton handle={product.handle} title={product.title} className="h-[3.25rem] w-[3.25rem] shrink-0 border border-ink/15" />
         </div>
       )}
 
       {/* Promises */}
-      <ul className="mt-8 grid gap-3 rounded-[1.25rem] bg-parchment/50 p-5 text-sm">
+      <ul className="mt-8 grid gap-3 border-y border-ink/10 py-5 text-sm">
         <li className="flex items-center gap-3">
-          <TruckIcon size={18} className="text-burgundy" />
+          <TruckIcon size={18} className="text-ink" />
           <span data-money>
           {cur.freeShippingThreshold > 0 ? <>Free shipping over {money(cur.freeShippingThreshold)}; otherwise {money(cur.standardShippingRate)}.</> : <>Standard shipping {money(cur.standardShippingRate)}.</>}
           </span>
         </li>
         <li className="flex items-center gap-3">
-          <ReturnIcon size={18} className="text-burgundy" /> {commerce.returnWindowDays}-day returns from your account.
+          <ReturnIcon size={18} className="text-ink" /> {commerce.returnWindowDays}-day returns from your account.
         </li>
         <li className="flex items-center gap-3">
-          <NeedleIcon size={18} className="text-burgundy" /> Finished by hand in small batches.
+          <NeedleIcon size={18} className="text-ink" /> Finished by hand in small batches.
         </li>
       </ul>
 
@@ -280,7 +280,7 @@ export default function ProductInfo({ product, summary }: { product: Product; su
 
       <Overlay open={guide} onClose={() => setGuide(false)} label="Size guide" side="right" className="bg-ivory text-ink">
         <div className="flex items-center justify-between border-b border-ink/10 px-6 py-5">
-          <h2 className="font-display text-3xl">Size guide</h2>
+          <h2 className="text-[1.15rem] font-medium">Size guide</h2>
           <CloseButton onClick={() => setGuide(false)} />
         </div>
         <div className="p-6">
@@ -297,12 +297,12 @@ function StockAlertForm({ productId, variantId, label, onDone }: { productId: st
   const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle')
   const [error, setError] = useState<string | null>(null)
   return state === 'done' ? (
-    <p className="mt-8 rounded-2xl bg-success/10 p-4 text-sm text-success" role="status">
+    <p className="mt-8 bg-success/10 p-4 text-sm text-success" role="status">
       You are on the list — we will let you know when {label} is back in stock.
     </p>
   ) : (
     <form
-      className="mt-8 space-y-3 rounded-[1.25rem] border border-ink/10 p-5"
+      className="mt-8 space-y-3 border border-ink/10 p-5"
       onSubmit={async (e) => {
         e.preventDefault()
         setState('busy')
@@ -317,7 +317,7 @@ function StockAlertForm({ productId, variantId, label, onDone }: { productId: st
         }
       }}
     >
-      <p className="font-display text-2xl leading-tight">Sold out in this size</p>
+      <p className="text-[1.05rem] font-medium">Sold out in this size</p>
       <p className="text-sm text-stone">Leave your email and we will let you know when it is back.</p>
       <Field label="Email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} error={error ?? undefined} />
       <Button type="submit" block loading={state === 'busy'}>
@@ -335,7 +335,7 @@ export function FitMeter({ fit }: { fit: RatingSummary['fit'] }) {
     <div className="mb-8">
       <p className="text-eyebrow text-stone">How it fits — from {total} review{total === 1 ? '' : 's'}</p>
       <div className="relative mt-4 h-1 rounded-full bg-ink/10">
-        <span className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-burgundy ring-4 ring-ivory" style={{ left: `${50 + score * 50}%` }} />
+        <span className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink ring-4 ring-ivory" style={{ left: `${50 + score * 50}%` }} />
       </div>
       <div className="mt-2 flex justify-between text-xs text-stone">
         <span>Runs small</span>

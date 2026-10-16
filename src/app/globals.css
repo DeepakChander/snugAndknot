@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════════════════════════════════
-   SNUG & KNOT — "Index" design system
-   Warm paper and ink, one tomato-red signal, and a yarn palette that gives
-   every section its own colour. Tight grotesk headlines with an italic serif
-   accent word, mono capitals for labels.
+   SNUG & KNOT design system
+   A clothing shop in the high-street premium register (H&M, Zara, COS):
+   white pages, black type, soft off-white bands, photographs doing the work.
+   Calm sans-serif headings with an occasional italic serif accent word;
+   small spaced capitals for labels; red only for sale prices and badges.
    ══════════════════════════════════════════════════════════════════════ */
 
 @theme {
@@ -15,10 +16,10 @@
   --color-smoke: #3a3733;
 
   /* Paper (lights) */
-  --color-ivory: #eeebe4;
-  --color-bone: #f7f5f0;
-  --color-parchment: #e3dfd5;
-  --color-oat: #d4cec1;
+  --color-ivory: #ffffff;
+  --color-bone: #f6f5f2;
+  --color-parchment: #eceae5;
+  --color-oat: #dcd9d2;
 
   /* Neutrals */
   --color-taupe: #a39d92;
@@ -75,10 +76,9 @@
 
 :root {
   --gutter: clamp(1rem, 2.6vw, 3rem);
-  --nav-h: 76px;
+  --nav-h: 60px;
   --announce-h: 0px;
   --nav-offset: var(--nav-h);
-  --grain-opacity: 0.06;
   color-scheme: light;
 }
 
@@ -92,20 +92,6 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
-}
-
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-.lenis.lenis-stopped {
-  overflow: clip;
 }
 
 body {
@@ -125,15 +111,15 @@ body {
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 0.92;
-    letter-spacing: -0.04em;
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
   }
   /* The display face is never set light: without its own weight it takes the heading weight.
      Utilities sit in a later layer, so an explicit weight or tracking class still wins. */
   .font-display {
-    font-weight: 600;
-    letter-spacing: -0.03em;
+    font-weight: 500;
+    letter-spacing: -0.01em;
   }
   /* The accent: one italic serif word or phrase inside grotesk type, kept in its own case. */
   :is(h1, h2, h3, h4, .font-display, .text-mega, .text-display, .text-headline, .text-title, .text-statement) em,
@@ -166,7 +152,7 @@ body {
 
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--color-signal);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
   }
 }
@@ -185,74 +171,70 @@ body {
 
 /* ─────────────────────────── Type scale ─────────────────────────── */
 
-/* Page titles: one or two big words in capitals. Never broken mid-word. */
+/* Display type is the serif (Instrument Serif, one weight): large, close-set and editorial against
+   the plain sans of everything else. Page titles never break mid-word. */
 @utility text-mega {
-  font-family: var(--font-display);
-  font-weight: 650;
-  font-size: clamp(3.1rem, 11vw, 12.5rem);
-  line-height: 0.82;
-  letter-spacing: -0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
   overflow-wrap: normal;
   hyphens: none;
 }
 @utility text-display {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(3.1rem, 9.2vw, 10.5rem);
-  line-height: 0.84;
-  letter-spacing: -0.055em;
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 5.4vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.012em;
 }
 @utility text-headline {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(2.35rem, 5.2vw, 5.75rem);
-  line-height: 0.92;
-  letter-spacing: -0.045em;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.1rem, 3.8vw, 3.5rem);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
 }
 @utility text-statement {
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.7rem, 3.6vw, 3.9rem);
-  line-height: 1.04;
-  letter-spacing: -0.035em;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.4vw, 2.35rem);
+  line-height: 1.25;
+  letter-spacing: -0.012em;
 }
 @utility text-title {
   font-family: var(--font-display);
-  font-weight: 550;
-  font-size: clamp(1.4rem, 2.1vw, 2.15rem);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  font-weight: 500;
+  font-size: clamp(1.1rem, 1.35vw, 1.35rem);
+  line-height: 1.2;
+  letter-spacing: -0.008em;
 }
 @utility text-lead {
-  font-size: clamp(1.02rem, 1.2vw, 1.2rem);
-  line-height: 1.5;
-  letter-spacing: -0.006em;
+  font-size: clamp(1rem, 1.15vw, 1.15rem);
+  line-height: 1.55;
 }
+/* Small spaced capitals for labels. */
 @utility text-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 0.6875rem;
-  line-height: 1.2;
-  letter-spacing: 0.08em;
+  line-height: 1.3;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 @utility text-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: 0.75rem;
   line-height: 1.3;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-/* "/ LABEL" — the slash that opens every small label */
+/* Kept for older markup; labels no longer open with a slash. */
 @utility slash {
   &::before {
-    content: '/';
-    margin-right: 0.45em;
-    font-weight: 300;
-    opacity: 0.55;
+    content: none;
   }
 }
 
@@ -314,24 +296,6 @@ body {
 }
 
 @layer components {
-/* Film grain over the whole site — painted once, composited, never repainted. */
-.grain {
-  position: fixed;
-  inset: -50%;
-  z-index: 90;
-  pointer-events: none;
-  opacity: var(--grain-opacity);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 1.2s steps(6) infinite;
-}
-@keyframes grain {
-  0% { transform: translate(0, 0); }
-  20% { transform: translate(-3%, 2%); }
-  40% { transform: translate(2%, -3%); }
-  60% { transform: translate(-1%, 4%); }
-  80% { transform: translate(3%, 1%); }
-  100% { transform: translate(0, 0); }
-}
 
 /* Knit texture used on panels and placeholders */
 .knit-texture {
@@ -343,116 +307,14 @@ body {
 
 /* ─────────────────────────── Motion helpers ─────────────────────────── */
 
-/* Elements revealed by SplitReveal stay hidden until fonts load and the split runs. */
-.split-pending {
-  visibility: hidden;
-}
-.split-line {
-  padding-bottom: 0.1em;
-  margin-bottom: -0.1em;
-}
-
-/* ─────────────────────────── Home hero: the knitted wordmark ─────────────────────────── */
-
-/* How far the stitch fill has drifted. Registered so it can be animated; it inherits from each word
-   to its letters, so every letter of a word moves as one piece of fabric. */
-@property --kd {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0px;
-}
-@keyframes knit-drift {
-  to {
-    --kd: 0.64em;
-  }
-}
-@keyframes course-run {
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-/* The stitch tile (2 stitches × 16 rows) comes from the component as --knit; 0.1em × 0.64em keeps
-   the stitches in proportion to the letters at every size. */
-.knit-word,
-.knit-word.is-split .knit-char {
-  background-image: var(--knit);
-  background-size: 0.1em 0.64em;
-  background-position: var(--kx, 0px) calc(var(--ky, 0px) + var(--kd));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-.knit-word {
-  animation: knit-drift 18s linear infinite;
-}
-.knit-word[data-word='b'] {
-  animation-direction: reverse;
-}
-/* Once split, each letter carries the fill (a background clipped to text cannot follow letters that
-   move on their own layers). Padding paired with an equal negative margin widens the painted and
-   masked box past the glyph's overhang without changing the layout. */
-.knit-word.is-split {
-  background: none;
-}
-.knit-word .knit-char,
-.knit-word .knit-char-mask {
-  padding: 0.08em 0.06em;
-  margin: -0.08em -0.06em;
-}
-.course-track {
-  animation: course-run var(--dur, 80s) linear infinite;
-}
-.course-track[data-dir='rev'] {
-  animation-direction: reverse;
-}
-/* Nothing drifts while the hero is off screen or has parted. */
-.hero-idle .knit-word,
-.hero-idle .course-track {
-  animation-play-state: paused;
-}
-.hero-word {
-  position: relative;
-}
-.hero-stitch {
-  position: absolute;
-  left: -0.04em;
-  bottom: -0.22em;
-  overflow: visible;
-  pointer-events: none;
-}
-/* Static fallback for the stitched underline when the title is not split (reduced motion). */
-.hero-title:not(.is-split) em {
-  text-decoration-line: underline;
-  text-decoration-style: dashed;
-  text-decoration-color: var(--color-gold);
-  text-decoration-thickness: 0.045em;
-  text-underline-offset: 0.2em;
-}
-
-/* Rolling text: label duplicated in ::after and rolled up on hover. */
+/* Labels once rolled up on hover; now they simply sit still. */
 .roll {
   position: relative;
   display: inline-flex;
-  overflow: hidden;
   line-height: 1.15;
 }
 .roll > span {
   display: block;
-  transition: transform 0.7s var(--ease-out-expo);
-}
-.roll > span::after {
-  content: attr(data-text);
-  /* The rolled copy is decorative: screen readers read the label once. */
-  content: attr(data-text) / '';
-  position: absolute;
-  left: 0;
-  top: 100%;
-}
-.group:hover .roll > span,
-.roll:hover > span,
-.group:focus-visible .roll > span {
-  transform: translateY(-100%);
 }
 
 /* Underline that draws in from the left and leaves to the right */
@@ -470,7 +332,7 @@ body {
   background: currentColor;
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.7s var(--ease-out-expo);
+  transition: transform 0.35s var(--ease-out-quart);
 }
 .link-wipe:hover::after,
 .link-wipe:focus-visible::after,
@@ -479,17 +341,6 @@ body {
   transform-origin: left;
 }
 
-@keyframes marquee-x {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-50%, 0, 0); }
-}
-@keyframes spin-slow {
-  to { transform: rotate(360deg); }
-}
-@keyframes float-y {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
 @keyframes shimmer {
   from { background-position: -200% 0; }
   to { background-position: 200% 0; }
@@ -502,20 +353,6 @@ body {
 
 }
 
-/* Hide the native cursor only when the custom cursor is active (fine pointers). */
-html.has-cursor,
-html.has-cursor a,
-html.has-cursor button,
-html.has-cursor [role='button'],
-html.has-cursor label {
-  cursor: none;
-}
-html.has-cursor input,
-html.has-cursor textarea,
-html.has-cursor select {
-  cursor: text;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -525,14 +362,10 @@ html.has-cursor select {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .grain {
-    display: none;
-  }
 }
 
 /* Print: drop chrome, keep content */
 @media print {
-  .grain,
   [data-chrome] {
     display: none !important;
   }
@@ -540,11 +373,9 @@ html.has-cursor select {
 
 @layer components {
 /* ─────────────────────────── Buttons ───────────────────────────
-   Fill spreads from the exact point the pointer entered (--fx/--fy). */
+   Square, quiet: the fill colour fades in on hover, nothing moves. */
 .btn {
-  --fx: 50%;
-  --fy: 50%;
-  --btn-fill: var(--color-burgundy);
+  --btn-fill: var(--color-ink);
   --btn-ink-hover: var(--color-ivory);
   position: relative;
   isolation: isolate;
@@ -552,43 +383,30 @@ html.has-cursor select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  border-radius: 999px;
+  gap: 0.6rem;
+  border-radius: 0;
   white-space: nowrap;
-  transition: color 0.6s var(--ease-out-expo), background-color 0.4s, border-color 0.4s, opacity 0.3s, transform 0.4s var(--ease-out-expo);
+  transition: color 0.25s, background-color 0.25s, border-color 0.25s, opacity 0.25s;
 }
 .btn-fill {
   position: absolute;
   z-index: -1;
-  left: var(--fx);
-  top: var(--fy);
-  width: 0;
-  aspect-ratio: 1 / 1;
-  border-radius: 999px;
+  inset: 0;
   background: var(--btn-fill);
-  transform: translate(-50%, -50%);
-  transition: width 0.85s var(--ease-out-expo);
+  opacity: 0;
+  transition: opacity 0.25s;
   pointer-events: none;
 }
 .btn:not(:disabled):hover .btn-fill,
 .btn:not(:disabled):focus-visible .btn-fill {
-  width: 280%;
+  opacity: 1;
 }
 .btn:not(:disabled):hover,
 .btn:not(:disabled):focus-visible {
   color: var(--btn-ink-hover);
 }
-.btn:not(:disabled):active {
-  transform: scale(0.97);
-}
 .btn:disabled {
   opacity: 0.45;
-}
-.btn .btn-icon {
-  transition: transform 0.7s var(--ease-out-expo);
-}
-.btn:not(:disabled):hover .btn-icon {
-  transform: rotate(-45deg);
 }
 }
 
@@ -607,9 +425,9 @@ html.has-cursor select {
   }
 }
 
-/* ─────────────────────────── Home hero motion ─────────────────────────── */
+/* ─────────────────────────── Entrance ─────────────────────────── */
 
-/* Calm entrances: copy rises a few pixels, the photograph settles from a slight zoom. */
+/* The one calm entrance: copy rises a few pixels as the page opens. */
 @keyframes sk-rise {
   from {
     opacity: 0;
@@ -620,19 +438,8 @@ html.has-cursor select {
     transform: none;
   }
 }
-@keyframes sk-settle {
-  from {
-    transform: scale(1.06);
-  }
-  to {
-    transform: scale(1);
-  }
-}
 @media (prefers-reduced-motion: no-preference) {
   .sk-rise {
     animation: sk-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .sk-settle {
-    animation: sk-settle 2.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }

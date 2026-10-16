@@ -31,6 +31,10 @@ export function MediaLibrary({ open, onClose, onPick }: { open: boolean; onClose
       .catch(() => setItems([]))
   }, [open])
   const builtIn = [
+    '/images/hero/campaign.webp',
+    '/images/hero/women.webp',
+    '/images/hero/men.webp',
+    '/images/hero/kids.webp',
     '/images/products/women/ivory-cable-cardigan-1.jpg',
     '/images/products/women/terracotta-textured-cardigan-1.jpg',
     '/images/products/men/navy-tan-colorblock-tee-1.jpg',

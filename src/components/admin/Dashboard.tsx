@@ -55,7 +55,7 @@ export default function Dashboard({ stats, recent, userName }: { stats: Stats; r
 
   return (
     <>
-      <PageHeader title={`Hello, ${userName.split(' ')[0]}`} description="Here is how the atelier is doing." />
+      <PageHeader title={`Hello, ${userName.split(' ')[0]}`} description="Here is how the shop is doing." />
 
       {todo.length ? (
         <div className="mb-6 flex flex-wrap gap-2">

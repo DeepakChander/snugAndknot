@@ -20,8 +20,9 @@ const buildCsp = (extra: { script?: string; img?: string; connect?: string; fram
     "media-src 'self' blob: https:",
     "worker-src 'self' blob:",
     // The Meta Pixel sends some events through a hidden facebook.com iframe and form.
-    // The video wall embeds YouTube clips through the privacy-enhanced youtube-nocookie.com player.
-    `frame-src https://www.facebook.com https://www.youtube-nocookie.com${extra.frame ?? ''}`,
+    // The video wall embeds YouTube clips through the privacy-enhanced youtube-nocookie.com player,
+    // and Instagram posts and reels through Instagram's own embed.
+    `frame-src https://www.facebook.com https://www.youtube-nocookie.com https://www.instagram.com${extra.frame ?? ''}`,
     "object-src 'none'",
     "base-uri 'self'",
     `form-action 'self' https://www.facebook.com${extra.form ?? ''}`,

@@ -5,6 +5,7 @@ import { requireAdminPage } from '@/server/guards'
 import { razorpayStatus } from '@/server/razorpay'
 import { absoluteUrl } from '@/lib/site'
 import { listProducts } from '@/server/repo/products'
+import { listCollections } from '@/server/repo/collections'
 import { currencies, productPriceIn } from '@/lib/currency'
 
 export const metadata = { title: 'Settings' }
@@ -15,12 +16,13 @@ export default async function AdminSettings({ searchParams }: { searchParams: Pr
   await requireAdminPage()
   const [{ tab }, settings] = await Promise.all([searchParams, getSettings()])
   const active = KEYS.includes(tab as SettingsKey) ? (tab as SettingsKey) : 'store'
-  const activeProducts = await listProducts({ status: 'active' })
+  const [activeProducts, allCollections] = await Promise.all([listProducts({ status: 'active' }), listCollections()])
+  const collections = allCollections.map((c) => ({ handle: c.handle, title: c.title }))
   const missingPrices = Object.fromEntries(
     currencies(settings.commerce)
       .slice(1)
       .map((c) => [c.code, activeProducts.filter((p) => !productPriceIn(p, c)).length])
   )
   const payments = { ...razorpayStatus(), webhookUrl: absoluteUrl('/api/webhooks/razorpay'), missingPrices }
-  return <SettingsAdmin key={active} settings={settings} tab={active} payments={payments} />
+  return <SettingsAdmin key={active} settings={settings} tab={active} payments={payments} collections={collections} />
 }

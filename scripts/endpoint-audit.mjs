@@ -281,6 +281,7 @@ const ADMIN_ENDPOINTS = [
   ['GET', '/api/admin/products/[id]', `/api/admin/products/${MISSING}`],
   ['PUT', '/api/admin/products/[id]', `/api/admin/products/${MISSING}`],
   ['DELETE', '/api/admin/products/[id]', `/api/admin/products/${MISSING}`],
+  ['POST', '/api/admin/products/actions', '/api/admin/products/actions'],
   ['GET', '/api/admin/returns', '/api/admin/returns'],
   ['PATCH', '/api/admin/returns/[id]', `/api/admin/returns/${MISSING}`],
   ['GET', '/api/admin/reviews', '/api/admin/reviews'],
@@ -288,6 +289,7 @@ const ADMIN_ENDPOINTS = [
   ['DELETE', '/api/admin/reviews/[id]', `/api/admin/reviews/${MISSING}`],
   ['GET', '/api/admin/settings', '/api/admin/settings'],
   ['PUT', '/api/admin/settings', '/api/admin/settings'],
+  ['POST', '/api/admin/settings/currency', '/api/admin/settings/currency'],
   ['GET', '/api/admin/stats', '/api/admin/stats'],
   ['GET', '/api/admin/stock-alerts', '/api/admin/stock-alerts'],
   ['GET', '/api/admin/subscribers', '/api/admin/subscribers'],
@@ -737,6 +739,34 @@ async function adminCatalogue() {
   expect(PU, 'admin', 'invalid input (compare-at below price)', await admin.put(`/api/admin/products/${pid}`, { ...freshWithIds, compareAtPrice: 1 }), 422)
   expect(PU, 'admin', 'handle taken by another product', await admin.put(`/api/admin/products/${pid}`, { ...freshWithIds, handle: p.handle }), 409)
   expect(PU, 'admin', 'text/plain body', await admin.put(`/api/admin/products/${pid}`, JSON.stringify(fresh)), 415)
+  // Quick actions from the product list, on the audit's own draft piece (one size, 2 in stock, 50).
+  const PA = 'POST /api/admin/products/actions'
+  const act = (body) => admin.post('/api/admin/products/actions', body)
+  const after = async () => (await admin.get(`/api/admin/products/${pid}`)).data?.product
+  const vid = created.data?.product?.variants?.[0]?.id
+  expect(PA, 'admin', 'status → archived', await act({ action: 'status', ids: [pid], status: 'archived' }), 200, (await after())?.status === 'archived')
+  expect(PA, 'admin', 'sold out sets every size to 0', await act({ action: 'sold-out', ids: [pid] }), 200, (await after())?.variants.every((v) => v.inventory === 0))
+  expect(PA, 'admin', 'restock refills the sold-out sizes', await act({ action: 'restock', ids: [pid], quantity: 7 }), 200, (await after())?.variants.every((v) => v.inventory === 7))
+  expect(PA, 'admin', 'stock per size', await act({ action: 'inventory', id: pid, variants: [{ id: vid, inventory: 3 }] }), 200, (await after())?.variants[0]?.inventory === 3)
+  // Read the other product's stock now (orders earlier in the audit have moved it since ctx was taken).
+  const stockOf = async (id, vid) => (await admin.get(`/api/admin/products/${id}`)).data?.product?.variants?.find((v) => v.id === vid)?.inventory
+  const foreign = ctx.product.variants[0]
+  const foreignBefore = await stockOf(ctx.product.id, foreign.id)
+  await act({ action: 'inventory', id: pid, variants: [{ id: foreign.id, inventory: 0 }] })
+  const foreignAfter = await stockOf(ctx.product.id, foreign.id)
+  check(PA, 'admin', "another product's size is not touched", foreignBefore > 0 && foreignAfter === foreignBefore, { foreignBefore, foreignAfter })
+  const priced = await act({ action: 'price', id: pid, price: 60, compareAtPrice: 80, prices: {} })
+  expect(PA, 'admin', 'one price for every size', priced, 200, (await after())?.variants.every((v) => v.price === 60 && v.compareAtPrice === 80))
+  expect(PA, 'admin', 'compare-at below the price', await act({ action: 'price', id: pid, price: 60, compareAtPrice: 50, prices: {} }), 422)
+  expect(PA, 'admin', 'unknown action', await act({ action: 'explode', ids: [pid] }), 422)
+  expect(PA, 'admin', 'no products chosen', await act({ action: 'sold-out', ids: [] }), 422)
+  expect(PA, 'admin', 'restock with 0', await act({ action: 'restock', ids: [pid], quantity: 0 }), 422)
+  expect(PA, 'admin', 'unknown product', await act({ action: 'sold-out', ids: [MISSING] }), 404)
+  expect(PA, 'admin', 'text/plain body', await admin.post('/api/admin/products/actions', JSON.stringify({ action: 'sold-out', ids: [pid] })), 415)
+  const spare = await admin.post('/api/admin/products', { ...fresh, handle: `audit-spare-${stamp}`, variants: [{ ...fresh.variants[0], sku: `AUDIT-SPARE-${stamp}` }] })
+  const spareId = spare.data?.product?.id
+  expect(PA, 'admin', 'delete', await act({ action: 'delete', ids: [spareId] }), 200, (await admin.get(`/api/admin/products/${spareId}`)).status === 404)
+
   const PD = 'DELETE /api/admin/products/[id]'
   expect(PD, 'admin', 'delete', await admin.del(`/api/admin/products/${pid}`), 200)
   expect(PD, 'admin', 'delete again / unknown id', await admin.del(`/api/admin/products/${pid}`), 404)
@@ -971,6 +1001,16 @@ async function adminSettingsAndMisc() {
   // A deliberately malicious value: the server must refuse it.
   // eslint-disable-next-line no-script-url
   expect(SP, 'admin', 'javascript: link', await admin.put('/api/admin/settings', { section: 'homepage', value: { ...settings.homepage, primaryCtaHref: 'javascript:alert(1)' } }), 422)
+  const otherCode = settings.commerce.currency === 'INR' ? 'USD' : 'INR'
+  expect(SP, 'admin', 'relabelling the main currency (only the conversion tool may change it)', await admin.put('/api/admin/settings', { section: 'commerce', value: { ...settings.commerce, currency: otherCode } }), 400)
+  // Refusals only: a real switch would change the currency under the rest of the audit
+  // (scripts/currency-switch-smoke.mjs runs one on its own database).
+  const SC = 'POST /api/admin/settings/currency'
+  expect(SC, 'admin', 'to the current currency', await admin.post('/api/admin/settings/currency', { code: settings.commerce.currency, rate: 1 }), 400)
+  expect(SC, 'admin', 'no rate', await admin.post('/api/admin/settings/currency', { code: otherCode }), 422)
+  expect(SC, 'admin', 'negative rate', await admin.post('/api/admin/settings/currency', { code: otherCode, rate: -3 }), 422)
+  expect(SC, 'admin', 'unknown currency', await admin.post('/api/admin/settings/currency', { code: 'ZZZ', rate: 2 }), 422)
+  expect(SC, 'admin', 'text/plain body', await admin.post('/api/admin/settings/currency', JSON.stringify({ code: otherCode, rate: 2 })), 415)
   expect(SP, 'admin', 'text/plain body', await admin.put('/api/admin/settings', JSON.stringify({ section: 'announcement', value: settings.announcement })), 415)
   const after = (await admin.get('/api/admin/settings')).data?.settings
   check(SP, 'admin', 'settings unchanged after the refused writes', JSON.stringify(after) === JSON.stringify(settings), 'settings differ')

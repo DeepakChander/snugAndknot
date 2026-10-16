@@ -14,7 +14,8 @@ export const PUT = route<Ctx>(async (req, { params }) => {
   if (!before) throw new HttpError(404, 'Category not found.')
   // The slug is the key products point at, so it cannot be renamed in place.
   if (input.slug !== slug) throw new HttpError(400, 'The slug of an existing category cannot be changed.')
-  const category = await upsertCategory(input)
+  // The department is part of the address (/shop/men/shirts), so it stays what it was created with.
+  const category = await upsertCategory({ ...input, department: before.department })
   invalidate('categories')
   await catalogUpdated('Category', before, category, category.title, admin.email, '/admin/categories')
   return ok({ category })
