@@ -11,13 +11,13 @@ import VideoWall from '@/components/home/VideoWall'
 import JournalCards from '@/components/home/JournalCards'
 import Promises from '@/components/home/Promises'
 import type { Metadata } from 'next'
-import { getCategories, getCollections, getLatestReviews, getProducts, getStoreSettings } from '@/server/catalog'
+import { getAllCategories, getCategories, getCollections, getLatestReviews, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { organizationLd, websiteLd } from '@/lib/seo'
 import { JOURNAL } from '@/lib/journal'
 import { buildWall } from '@/lib/video'
 import type { Product } from '@/types/commerce'
-import { categoryFullTitle, categoryHref } from '@/lib/categories'
+import { categoryFullTitle, categoryHref, type Department } from '@/lib/categories'
 
 /** Knitwear-only editorial frames, the fallback images for the "Shop by" index. */
 const LOOKS = [
@@ -31,10 +31,11 @@ export const metadata: Metadata = { alternates: { canonical: '/', types: { 'appl
 const pieces = (n: number) => `${n} piece${n === 1 ? '' : 's'}`
 
 export default async function HomePage() {
-  const [products, collections, categories, latest, settings] = await Promise.all([
+  const [products, collections, categories, allCategories, latest, settings] = await Promise.all([
     getProducts({ sort: 'featured' }),
     getCollections(),
     getCategories(),
+    getAllCategories(),
     getLatestReviews(6),
     getStoreSettings(),
   ])
@@ -54,18 +55,11 @@ export default async function HomePage() {
   }
   rows.push({ label: 'All pieces', href: '/shop', meta: pieces(products.length), image: LOOKS[2] })
 
-  // "Shop by category" tiles: categories with active pieces (getCategories) that the admin left on
-  // the home page, in their admin order. A category without its own image shows one of its pieces.
-  // A cached read from before the badge/showOnHome columns lacks both, so missing means "shown, no badge".
-  const tiles: CategoryTile[] = categories
-    .filter((c) => c.showOnHome !== false)
-    .map((c) => ({
-      slug: c.slug,
-      href: categoryHref(c),
-      title: categoryFullTitle(c),
-      badge: c.badge ?? '',
-      image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
-    }))
+  // "Shop by category": each department's categories that the admin left on the home page and that
+  // have an image, in admin order (empty ones included: their page says what is coming).
+  const tiles: CategoryTile[] = allCategories
+    .filter((c) => c.department && c.showOnHome && c.image)
+    .map((c) => ({ slug: c.slug, href: categoryHref(c), title: c.title, badge: c.badge, image: c.image, department: c.department as Department }))
 
   // Hero panels from the admin, in order. A panel with no photograph of its own that links to a
   // department shows one of that department's pieces; a panel with no photograph at all is left out

@@ -509,6 +509,16 @@ UPDATE categories SET image = '/images/categories/' || slug || '.webp'
  WHERE image = '' AND slug IN ('men-shirts', 'men-t-shirts', 'men-polos', 'men-knitwear', 'men-jackets', 'men-trousers', 'men-cargos', 'men-jeans', 'men-shorts', 'men-co-ords', 'women-tops', 'women-shirts', 'women-t-shirts', 'women-knitwear', 'women-jackets', 'women-dresses', 'women-trousers', 'women-jeans', 'women-skirts', 'women-co-ords');
 `,
   },
+  {
+    version: 14,
+    name: 'categories-on-home',
+    // The home page's "Shop by category" shows each department's categories with their photographs.
+    // The departments' categories arrived (version 12) switched off for the home page; switch them on.
+    // The admin turns any one off again with "Show on home page".
+    sql: `
+UPDATE categories SET show_on_home = true WHERE department <> '' AND show_on_home = false;
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version
