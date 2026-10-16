@@ -7,8 +7,8 @@ import JsonLd from '@/components/seo/JsonLd'
 import { breadcrumbLd, itemListLd, pageMeta } from '@/lib/seo'
 import { categoryHref, openDepartments } from '@/lib/categories'
 
-/** "Women's knitwear", "Kids' knitwear". */
-const knitwear = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} knitwear`
+/** "Women's clothing", "Kids' clothing". */
+const clothing = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} clothing`
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // (the sitemap adds it at the same moment).
     const empty = !(await getProducts({})).some((p) => p.gender === slug || (slug !== 'kids' && p.gender === 'unisex'))
     return pageMeta(settings, {
-      title: knitwear(DEPARTMENTS[slug].title),
+      title: clothing(DEPARTMENTS[slug].title),
       description: DEPARTMENTS[slug].description,
       path: `/shop/${slug}`,
       robots: empty ? { index: false, follow: true } : undefined,
@@ -55,7 +55,7 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
         <JsonLd
           data={[
             breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: dept.title, path: `/shop/${slug}` }]),
-            itemListLd(knitwear(dept.title), data.products),
+            itemListLd(clothing(dept.title), data.products),
           ]}
         />
         <ShopView
@@ -65,7 +65,7 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
           {...data}
           comingSoon={
             slug === 'kids'
-              ? { title: 'The kids’ atelier opens soon.', body: 'Small knits in the same natural fibres are on the needles. Leave your email and we will tell you the day they arrive.' }
+              ? { title: 'Kids is opening soon.', body: 'Leave your email and we will tell you the day the first pieces arrive.' }
               : undefined
           }
         />

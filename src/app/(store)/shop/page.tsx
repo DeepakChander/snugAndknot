@@ -5,7 +5,7 @@ import ShopView from '@/components/shop/ShopView'
 import { loadShop } from '@/server/shop'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return pageMeta(await getStoreSettings(), { title: 'Shop all knitwear', description: 'Every Snug&Knot piece — cardigans and fine-gauge knit tees in merino, cashmere blends and long-staple cotton.', path: '/shop' })
+  return pageMeta(await getStoreSettings(), { title: 'Shop all', description: 'Everyday clothing for men, women and kids at Snug&Knot.', path: '/shop' })
 }
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -13,8 +13,8 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   return (
     <ShopView
       eyebrow="Shop"
-      title="All pieces"
-      description="A short list of knits, made slowly in small runs — natural fibres, honest construction, finished by hand."
+      title="Shop all"
+      description="Everything in the shop, for men, women and kids."
       {...data}
     />
   )
