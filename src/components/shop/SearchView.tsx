@@ -7,7 +7,7 @@ import { ButtonLink } from '@/components/kit/Button'
 import { SearchIcon } from '@/components/kit/icons'
 import { cn } from '@/lib/format'
 
-const SUGGESTIONS = ['Cardigan', 'Knit tee', 'Merino', 'Cashmere', 'Cable knit', 'Terracotta']
+const SUGGESTIONS = ['T-shirts', 'Shirts', 'Knitwear', 'Cardigan', 'Jeans', 'Women', 'Men', 'Kids']
 
 export default function SearchView({ query, results, popular }: { query: string; results: CardProduct[]; popular: CardProduct[] }) {
   const router = useRouter()
@@ -18,7 +18,7 @@ export default function SearchView({ query, results, popular }: { query: string;
   return (
     <div className="bg-ivory pb-28 pt-nav text-ink">
       <div className="container-wide pt-12 md:pt-20">
-        <p className="text-eyebrow text-burgundy">Search</p>
+        <p className="text-eyebrow text-stone">Search</p>
         <form
           role="search"
           onSubmit={(e) => {
@@ -27,7 +27,7 @@ export default function SearchView({ query, results, popular }: { query: string;
           }}
           className="mt-6 flex items-center gap-4 border-b border-ink/20 pb-4 focus-within:border-ink"
         >
-          <SearchIcon size={34} className="hidden shrink-0 text-stone sm:block" />
+          <SearchIcon size={24} className="shrink-0 text-stone" />
           <label htmlFor="search-page" className="sr-only">
             Search products
           </label>
@@ -36,9 +36,9 @@ export default function SearchView({ query, results, popular }: { query: string;
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="What are you looking for?"
-            className="min-w-0 flex-1 bg-transparent font-display text-[clamp(2.25rem,6vw,5.5rem)] leading-none tracking-[-0.03em] outline-none placeholder:text-ink/20"
+            className="min-w-0 flex-1 bg-transparent text-[clamp(1.4rem,3vw,2.25rem)] leading-tight outline-none placeholder:text-ink/30"
           />
-          <button type="submit" className="shrink-0 rounded-full bg-ink px-5 py-3 text-sm text-ivory hover:bg-burgundy">
+          <button type="submit" className="shrink-0 bg-ink px-5 py-3 text-[0.72rem] font-medium uppercase tracking-[0.12em] text-ivory hover:bg-smoke">
             Search
           </button>
         </form>
@@ -51,7 +51,7 @@ export default function SearchView({ query, results, popular }: { query: string;
                 setQ(s)
                 go(s)
               }}
-              className="rounded-full border border-ink/15 px-4 py-1.5 text-sm hover:border-ink/50"
+              className="border border-ink/15 px-4 py-1.5 text-sm hover:border-ink"
             >
               {s}
             </button>

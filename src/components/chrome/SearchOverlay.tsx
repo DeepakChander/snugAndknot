@@ -12,8 +12,7 @@ import { api } from '@/lib/api'
 import { ArrowRight, SearchIcon, XIcon } from '@/components/kit/icons'
 import type { Product } from '@/types/commerce'
 
-const EASE = [0.16, 1, 0.3, 1] as const
-const SUGGESTIONS = ['Cardigan', 'Knit tee', 'Merino', 'Cashmere', 'Cable knit', 'Women', 'Men']
+const SUGGESTIONS = ['T-shirts', 'Shirts', 'Knitwear', 'Cardigan', 'Jeans', 'Women', 'Men', 'Kids']
 const RECENT_KEY = 'sk-recent-searches'
 
 function readRecent(): string[] {
@@ -92,16 +91,16 @@ export default function SearchOverlay() {
           aria-label="Search"
           data-chrome
           data-lenis-prevent
-          initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
-          animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
-          exit={{ clipPath: 'inset(0% 0% 100% 0%)' }}
-          transition={{ duration: 0.8, ease: [0.87, 0, 0.13, 1] }}
-          className="fixed inset-0 z-[130] overflow-y-auto bg-noir text-bone"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[130] overflow-y-auto bg-ivory text-ink"
         >
           <div className="container-wide pb-16 pt-6">
             <div className="flex items-center justify-between">
-              <span className="text-eyebrow text-taupe">Search the atelier</span>
-              <button type="button" onClick={closeSearch} data-cursor="hover" className="flex h-11 items-center gap-2 rounded-full border border-bone/15 px-4 text-label hover:bg-bone/5">
+              <span className="text-eyebrow text-stone">Search</span>
+              <button type="button" onClick={closeSearch} className="flex h-10 items-center gap-2 px-2 text-[0.72rem] font-medium uppercase tracking-[0.12em] hover:underline">
                 Close <XIcon size={14} />
               </button>
             </div>
@@ -112,9 +111,9 @@ export default function SearchOverlay() {
                 e.preventDefault()
                 submit(q)
               }}
-              className="mt-[8vh] flex items-center gap-4 border-b border-bone/20 pb-4 focus-within:border-bone/60"
+              className="mt-[6vh] flex items-center gap-4 border-b border-ink/20 pb-3 focus-within:border-ink"
             >
-              <SearchIcon size={32} className="hidden shrink-0 text-bone/40 sm:block" />
+              <SearchIcon size={24} className="shrink-0 text-ink/50" />
               <label htmlFor="site-search" className="sr-only">
                 Search products
               </label>
@@ -123,20 +122,20 @@ export default function SearchOverlay() {
                 data-autofocus
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Cardigans, merino, gifts…"
+                placeholder="Search shirts, jeans, knitwear…"
                 autoComplete="off"
-                className="min-w-0 flex-1 bg-transparent font-display text-[clamp(2.25rem,7vw,6.5rem)] leading-none tracking-[-0.03em] outline-none placeholder:text-bone/20"
+                className="min-w-0 flex-1 bg-transparent text-[clamp(1.4rem,3vw,2.25rem)] leading-tight outline-none placeholder:text-ink/30"
               />
-              {loading ? <span className="h-5 w-5 shrink-0 animate-spin rounded-full border border-bone/20 border-t-gold" aria-label="Searching" /> : null}
+              {loading ? <span className="h-5 w-5 shrink-0 animate-spin rounded-full border border-ink/15 border-t-ink" aria-label="Searching" /> : null}
             </form>
 
             {results === null ? (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE, delay: 0.3 }} className="mt-10 grid gap-10 md:grid-cols-2">
+              <div className="mt-10 grid gap-10 md:grid-cols-2">
                 <div>
-                  <p className="text-eyebrow text-taupe">Popular</p>
+                  <p className="text-eyebrow text-stone">Popular</p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {SUGGESTIONS.map((s) => (
-                      <button key={s} type="button" onClick={() => setQ(s)} data-cursor="hover" className="rounded-full border border-bone/15 px-4 py-2 text-sm transition-colors hover:border-gold hover:text-gold-light">
+                      <button key={s} type="button" onClick={() => setQ(s)} data-cursor="hover" className="border border-ink/15 px-4 py-2 text-sm transition-colors hover:border-ink">
                         {s}
                       </button>
                     ))}
@@ -144,11 +143,11 @@ export default function SearchOverlay() {
                 </div>
                 {recent.length ? (
                   <div>
-                    <p className="text-eyebrow text-taupe">Recent</p>
+                    <p className="text-eyebrow text-stone">Recent</p>
                     <ul className="mt-4 space-y-2">
                       {recent.map((r) => (
                         <li key={r}>
-                          <button type="button" onClick={() => setQ(r)} className="link-wipe text-lg text-bone/80">
+                          <button type="button" onClick={() => setQ(r)} className="text-[1rem] text-ink/75 hover:text-ink hover:underline">
                             {r}
                           </button>
                         </li>
@@ -156,11 +155,11 @@ export default function SearchOverlay() {
                     </ul>
                   </div>
                 ) : null}
-              </motion.div>
+              </div>
             ) : results.length === 0 && !loading ? (
-              <p className="mt-10 text-lead text-bone/60">
+              <p className="mt-10 text-lead text-stone">
                 Nothing matches “{q.trim()}”. Try a fabric, a colour or a piece — or{' '}
-                <Link href="/shop" onClick={closeSearch} className="link-wipe text-bone">
+                <Link href="/shop" onClick={closeSearch} className="text-ink underline">
                   browse everything
                 </Link>
                 .
@@ -168,16 +167,16 @@ export default function SearchOverlay() {
             ) : (
               <div className="mt-10">
                 <div className="flex items-baseline justify-between">
-                  <p className="text-eyebrow text-taupe" aria-live="polite">
+                  <p className="text-eyebrow text-stone" aria-live="polite">
                     {results.length} result{results.length === 1 ? '' : 's'}
                   </p>
-                  <button type="button" onClick={() => submit(q)} className="group flex items-center gap-2 text-label text-gold-light">
-                    <span className="link-wipe">See all results</span> <ArrowRight size={14} />
+                  <button type="button" onClick={() => submit(q)} className="group flex items-center gap-2 text-[0.72rem] font-medium uppercase tracking-[0.12em]">
+                    <span className="border-b border-ink pb-0.5">See all results</span> <ArrowRight size={14} />
                   </button>
                 </div>
                 <ul className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-                  {results.map((p, i) => (
-                    <motion.li key={p.id} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE, delay: i * 0.05 }}>
+                  {results.map((p) => (
+                    <li key={p.id}>
                       <Link
                         href={`/product/${p.handle}`}
                         onClick={() => {
@@ -185,16 +184,14 @@ export default function SearchOverlay() {
                           closeSearch()
                         }}
                         className="group block"
-                        data-cursor="view"
-                        data-cursor-label="View"
                       >
-                        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-umber">
-                          {p.images[0] ? <Image src={p.images[0].src} alt={p.images[0].alt} fill sizes="(min-width:768px) 25vw, 50vw" className="object-cover transition-transform duration-1000 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105" /> : null}
+                        <div className="relative aspect-[3/4] overflow-hidden bg-bone">
+                          {p.images[0] ? <Image src={p.images[0].src} alt={p.images[0].alt} fill sizes="(min-width:768px) 25vw, 50vw" className="object-cover" /> : null}
                         </div>
-                        <p className="mt-3 font-display text-xl leading-tight">{p.title}</p>
-                        <p><ProductPrice product={p} showCompareAt={false} className="text-sm text-taupe" /></p>
+                        <p className="mt-2.5 text-[0.86rem] leading-snug group-hover:underline">{p.title}</p>
+                        <p><ProductPrice product={p} showCompareAt={false} className="text-[0.86rem] font-medium" /></p>
                       </Link>
-                    </motion.li>
+                    </li>
                   ))}
                 </ul>
               </div>
