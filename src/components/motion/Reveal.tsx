@@ -17,14 +17,14 @@ type Props = HTMLMotionProps<'div'> & {
 }
 
 /** Fades and rises into place the first time it scrolls into view. */
-export default function Reveal({ delay = 0, y = 48, x = 0, scale = 1, blur = false, once = true, amount = 0.2, children, ...rest }: Props) {
+export default function Reveal({ delay = 0, y = 16, x = 0, scale = 1, blur = false, once = true, amount = 0.2, children, ...rest }: Props) {
   const reduce = useReducedMotion()
   return (
     <motion.div
       initial={reduce ? { opacity: 0 } : { opacity: 0, y, x, scale, filter: blur ? 'blur(12px)' : 'blur(0px)' }}
       whileInView={{ opacity: 1, y: 0, x: 0, scale: 1, filter: 'blur(0px)' }}
       viewport={{ once, amount }}
-      transition={{ duration: reduce ? 0.3 : 1.2, ease: EASE_EXPO, delay }}
+      transition={{ duration: reduce ? 0.3 : 0.6, ease: EASE_EXPO, delay }}
       {...rest}
     >
       {children}
@@ -47,12 +47,12 @@ export function RevealGroup({ stagger = 0.08, delay = 0, children, ...rest }: HT
   )
 }
 
-export function RevealItem({ y = 40, children, ...rest }: HTMLMotionProps<'div'> & { y?: number }) {
+export function RevealItem({ y = 16, children, ...rest }: HTMLMotionProps<'div'> & { y?: number }) {
   return (
     <motion.div
       variants={{
         hidden: { opacity: 0, y },
-        show: { opacity: 1, y: 0, transition: { duration: 1.1, ease: EASE_EXPO } },
+        show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_EXPO } },
       }}
       {...rest}
     >
