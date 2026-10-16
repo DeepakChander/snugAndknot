@@ -28,8 +28,8 @@ function Step({ n, title, children, aside }: { n: number; title: string; childre
   return (
     <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: n * 0.06 }} className="border-t border-ink/10 py-9">
       <div className="mb-6 flex items-baseline justify-between gap-4">
-        <h2 className="flex items-baseline gap-4 font-display text-3xl">
-          <span className="font-mono text-sm text-gold">{String(n).padStart(2, '0')}</span>
+        <h2 className="flex items-baseline gap-4 text-[1.25rem] font-medium">
+          <span className="font-mono text-sm text-stone">{String(n).padStart(2, '0')}</span>
           {title}
         </h2>
         {aside}
@@ -295,9 +295,9 @@ export default function CheckoutView() {
                     { id: 'express', title: 'Express delivery', price: cur.expressShippingRate, note: 'Priority dispatch' },
                   ] as const
                 ).map((m) => (
-                  <label key={m.id} className={cn('flex cursor-pointer items-center gap-4 rounded-2xl border p-5 transition-colors', form.shippingMethod === m.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15 hover:border-ink/40')}>
+                  <label key={m.id} className={cn('flex cursor-pointer items-center gap-4 border p-5 transition-colors', form.shippingMethod === m.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15 hover:border-ink/40')}>
                     <input type="radio" name="shipping" value={m.id} checked={form.shippingMethod === m.id} onChange={() => setForm((f) => ({ ...f, shippingMethod: m.id }))} className="h-4 w-4 accent-[#5b0e14]" />
-                    <TruckIcon size={20} className="text-burgundy" />
+                    <TruckIcon size={20} className="text-ink" />
                     <span className="flex-1">
                       <span className="block">{m.title}</span>
                       {m.note ? <span className="text-xs text-stone">{m.note}</span> : null}
@@ -319,26 +319,26 @@ export default function CheckoutView() {
                   )
                     .filter((m) => m.show)
                     .map((m) => (
-                      <label key={m.id} className={cn('flex cursor-pointer items-center gap-4 rounded-2xl border p-5 transition-colors', method === m.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15 hover:border-ink/40')}>
+                      <label key={m.id} className={cn('flex cursor-pointer items-center gap-4 border p-5 transition-colors', method === m.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15 hover:border-ink/40')}>
                         <input type="radio" name="payment" value={m.id} checked={method === m.id} onChange={() => setPaymentMethod(m.id)} className="h-4 w-4 accent-[#5b0e14]" />
                         <span className="flex-1">
                           <span className="block">{m.title}</span>
                           <span className="text-xs text-stone">{m.note}</span>
                         </span>
-                        {m.id === 'razorpay' ? <ShieldIcon size={20} className="text-burgundy" /> : null}
+                        {m.id === 'razorpay' ? <ShieldIcon size={20} className="text-ink" /> : null}
                       </label>
                     ))}
                 </div>
               ) : commerce.codEnabled ? (
                 <div className="grid gap-3">
-                  <label className="flex items-center gap-4 rounded-2xl border border-ink bg-ink/[0.03] p-5">
+                  <label className="flex items-center gap-4 border border-ink bg-ink/[0.03] p-5">
                     <input type="radio" name="payment" checked readOnly className="h-4 w-4 accent-[#5b0e14]" />
                     <span className="flex-1">
                       <span className="block">Pay on delivery</span>
                       <span className="text-xs text-stone">Pay the courier when your parcel arrives. No card details needed online.</span>
                     </span>
                   </label>
-                  <div className="flex items-center gap-4 rounded-2xl border border-dashed border-ink/15 p-5 text-stone">
+                  <div className="flex items-center gap-4 border border-dashed border-ink/15 p-5 text-stone">
                     <input type="radio" disabled className="h-4 w-4" aria-label="Card payment (not yet available)" />
                     <span className="flex-1">
                       <span className="block">Card payment</span>
@@ -347,7 +347,7 @@ export default function CheckoutView() {
                   </div>
                 </div>
               ) : (
-                <p className="rounded-2xl bg-error/[0.07] p-5 text-sm text-error">Checkout is paused right now. Please contact us at {store.email} to place an order.</p>
+                <p className="bg-error/[0.07] p-5 text-sm text-error">Checkout is paused right now. Please contact us at {store.email} to place an order.</p>
               )}
             </Step>
 
@@ -360,14 +360,14 @@ export default function CheckoutView() {
         <div className="lg:sticky lg:top-[calc(var(--nav-offset)+1.5rem)] lg:self-start">
           <OrderSummary quote={quote} loading={loading}>
             {notices.length ? (
-              <ul className="mb-4 space-y-1 rounded-2xl bg-burgundy/[0.06] p-4 text-sm text-burgundy" role="status">
+              <ul className="mb-4 space-y-1 bg-burgundy/[0.06] p-4 text-sm text-burgundy" role="status">
                 {notices.map((n) => (
                   <li key={n}>{n}</li>
                 ))}
               </ul>
             ) : null}
             {formError ? (
-              <p role="alert" className="mb-4 rounded-2xl bg-error/[0.07] p-4 text-sm text-error">
+              <p role="alert" className="mb-4 bg-error/[0.07] p-4 text-sm text-error">
                 {formError}
               </p>
             ) : null}
