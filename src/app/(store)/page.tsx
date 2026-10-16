@@ -2,7 +2,7 @@ import HomeHero, { type HeroPanelView } from '@/components/home/HomeHero'
 import CategoryGrid, { type CategoryTile } from '@/components/home/CategoryGrid'
 import MaterialRows from '@/components/home/MaterialRows'
 import NewIn from '@/components/home/NewIn'
-import CollectionSheets from '@/components/home/CollectionSheets'
+import Collections from '@/components/home/Collections'
 import ShopIndex, { type IndexRow } from '@/components/home/ShopIndex'
 import Statement from '@/components/home/Statement'
 import CraftCards from '@/components/home/CraftCards'
@@ -83,7 +83,7 @@ export default async function HomePage() {
       <CategoryGrid tiles={tiles} />
       <MaterialRows />
       <NewIn products={[...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 8)} />
-      <CollectionSheets collections={collections} products={products} />
+      <Collections collections={collections} products={products} />
       <ShopIndex rows={rows} />
       <Statement />
       <CraftCards />
