@@ -11,7 +11,7 @@ export type PublicSettings = Pick<SiteSettings, 'store' | 'commerce' | 'announce
 
 export interface NavData {
   collections: Pick<Collection, 'handle' | 'title' | 'subtitle' | 'image'>[]
-  /** Categories with active pieces, in admin order. */
+  /** The categories listed in the menu (empty ones included), in admin order. */
   categories: Pick<Category, 'slug' | 'title' | 'image' | 'department' | 'group' | 'showInMenu'>[]
   spotlight: Pick<Product, 'handle' | 'title' | 'price' | 'compareAtPrice' | 'prices' | 'images' | 'productType'>[]
   /** Active pieces per department, and a photograph of one of them for the menu. */

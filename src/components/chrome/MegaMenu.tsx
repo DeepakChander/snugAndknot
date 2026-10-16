@@ -13,8 +13,8 @@ export interface MenuGroup {
 
 /**
  * One department's menu: the shortcuts first, then its categories under their menu headings, in
- * admin order. Only categories with active pieces reach here (NavData), so nothing leads to an
- * empty page.
+ * admin order. Every category the admin left in the menu is listed; one without pieces yet opens a
+ * "coming soon" page with a notify-me form.
  */
 export function departmentMenu(nav: NavData, dept: Department): MenuGroup[] {
   const title = DEPARTMENT_TITLES[dept]

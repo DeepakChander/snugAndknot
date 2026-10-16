@@ -89,6 +89,12 @@ export const getCategories = unstable_cache(() => collections.listActiveCategori
   revalidate: REVALIDATE,
 })
 
+/** Every category, with or without pieces: the menu lists a department's whole range. */
+export const getAllCategories = unstable_cache(() => collections.listCategories(), ['all-categories-v2'], {
+  tags: [TAGS.categories],
+  revalidate: REVALIDATE,
+})
+
 export const getCategory = unstable_cache((slug: string) => collections.getCategory(slug), ['category-v2'], {
   tags: [TAGS.categories],
   revalidate: REVALIDATE,

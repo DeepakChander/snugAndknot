@@ -1,5 +1,5 @@
 import 'server-only'
-import { getCategories, getFacets, getProducts } from './catalog'
+import { getAllCategories, getCategories, getFacets, getProducts } from './catalog'
 import { readFilters } from '@/lib/shop-filters'
 import { categoryHref, type Department } from '@/lib/categories'
 import type { Gender, SortOption } from '@/types/commerce'
@@ -15,7 +15,7 @@ type SP = Record<string, string | string[] | undefined>
 /** Everything ShopView needs for a department, category or the full catalogue. */
 export async function loadShop(scope: { gender?: Gender; category?: string; department?: Department; activeHref: string }, sp: SP) {
   const filters = readFilters(sp)
-  const [products, all, facets, categories] = await Promise.all([
+  const [products, all, facets, categories, everyCategory] = await Promise.all([
     getProducts({
       gender: scope.gender,
       category: scope.category,
@@ -28,6 +28,7 @@ export async function loadShop(scope: { gender?: Gender; category?: string; depa
     getProducts({}),
     getFacets(),
     getCategories(),
+    getAllCategories(),
   ])
   const count = (g: 'men' | 'women' | 'kids') => all.filter((p) => p.gender === g || (g !== 'kids' && p.gender === 'unisex')).length
   const segments = [
@@ -36,10 +37,9 @@ export async function loadShop(scope: { gender?: Gender; category?: string; depa
     { label: 'Men', href: '/shop/men', active: scope.activeHref === '/shop/men', count: count('men') },
     { label: 'Kids', href: '/shop/kids', active: scope.activeHref === '/shop/kids', count: count('kids') },
   ]
-  // Inside a department, its own categories; elsewhere, every category with pieces.
+  // Inside a department, its whole menu range (as the header lists it); elsewhere, every category with pieces.
   const department = scope.department ?? (scope.gender && scope.gender !== 'unisex' ? scope.gender : undefined)
-  const categoryLinks = categories
-    .filter((c) => !department || c.department === department)
+  const categoryLinks = (department ? everyCategory.filter((c) => c.department === department && c.showInMenu) : categories)
     .map((c) => ({ label: c.title, href: categoryHref(c), active: scope.activeHref === categoryHref(c) }))
   const deckSource = products.length ? products : all
   const deck = deckSource
