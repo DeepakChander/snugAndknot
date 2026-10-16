@@ -50,7 +50,7 @@ const PRODUCTS: SeedProduct[] = [
     },
     productType: 'Knit Tee',
     gender: 'men',
-    category: 'tops',
+    category: 'men-t-shirts',
     tags: ['men', 'knitwear', 'tee', 'premium', 'contrast', 'black', 'red', 'athletic'],
     price: 129,
     compareAtPrice: 179,
@@ -85,7 +85,7 @@ const PRODUCTS: SeedProduct[] = [
     },
     productType: 'Knit Tee',
     gender: 'men',
-    category: 'tops',
+    category: 'men-t-shirts',
     tags: ['men', 'knitwear', 'tee', 'premium', 'colorblock', 'navy', 'tan', 'minimal'],
     price: 139,
     compareAtPrice: 189,
@@ -126,7 +126,7 @@ const PRODUCTS: SeedProduct[] = [
     },
     productType: 'Cardigan',
     gender: 'women',
-    category: 'cardigans',
+    category: 'women-knitwear',
     tags: ['women', 'knitwear', 'cardigan', 'premium', 'cable-knit', 'autumn', 'winter', 'sustainable'],
     price: 189,
     compareAtPrice: 249,
@@ -168,7 +168,7 @@ const PRODUCTS: SeedProduct[] = [
     },
     productType: 'Cardigan',
     gender: 'women',
-    category: 'cardigans',
+    category: 'women-knitwear',
     tags: ['women', 'knitwear', 'cardigan', 'premium', 'terracotta', 'autumn', 'textured', 'sustainable'],
     price: 169,
     compareAtPrice: 229,
@@ -188,21 +188,6 @@ const PRODUCTS: SeedProduct[] = [
     isNew: true,
     bestseller: true,
     createdAt: '2024-11-10T10:00:00Z',
-  },
-]
-
-const CATEGORIES = [
-  {
-    slug: 'tops',
-    title: 'Knit Tops',
-    description: 'Fine-gauge knit tees and tops — merino, cotton and silk blends with a refined drape.',
-    image: '/images/products/men/navy-tan-colorblock-tee-1.jpg',
-  },
-  {
-    slug: 'cardigans',
-    title: 'Cardigans',
-    description: 'Cable, diamond and heritage stitches, buttoned down the front.',
-    image: '/images/products/women/ivory-cable-cardigan-1.jpg',
   },
 ]
 
@@ -261,13 +246,7 @@ export async function seedDatabase(q: Queryable) {
     )
   }
 
-  for (const [i, c] of CATEGORIES.entries()) {
-    await q.query(
-      `INSERT INTO categories (slug, title, description, image, position)
-       VALUES ($1, $2, $3, $4, $5) ON CONFLICT (slug) DO NOTHING`,
-      [c.slug, c.title, c.description, c.image, i]
-    )
-  }
+  // Categories come from the migrations (version 12 adds the departments' categories).
 
   for (const p of PRODUCTS) {
     await q.query(

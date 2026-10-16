@@ -49,7 +49,7 @@ const GROUPS = [
   { label: 'Store', items: [{ href: '/admin/settings', label: 'Settings' }, { href: '/admin/emails', label: 'Emails' }] },
 ]
 
-const EMPTY_NAV: NavData = { collections: [], categories: [], spotlight: [], genders: { men: 0, women: 0, kids: 0 } }
+const EMPTY_NAV: NavData = { collections: [], categories: [], spotlight: [], departments: { men: { count: 0, image: '' }, women: { count: 0, image: '' }, kids: { count: 0, image: '' } } }
 
 export default function AdminShell({
   user,

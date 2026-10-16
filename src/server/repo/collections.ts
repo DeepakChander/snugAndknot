@@ -27,6 +27,9 @@ function mapCategory(r: Row): Category {
     position: Math.trunc(num(r.position)),
     badge: r.badge ?? '',
     showOnHome: r.show_on_home ?? true,
+    department: r.department ?? '',
+    group: r.menu_group ?? '',
+    showInMenu: r.show_in_menu ?? true,
   }
 }
 
@@ -105,11 +108,13 @@ export async function getCategory(slug: string): Promise<Category | null> {
 
 export async function upsertCategory(input: Category): Promise<Category> {
   const rows = await query(
-    `INSERT INTO categories (slug, title, description, image, position, badge, show_on_home) VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO categories (slug, title, description, image, position, badge, show_on_home, department, menu_group, show_in_menu)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description,
-       image = EXCLUDED.image, position = EXCLUDED.position, badge = EXCLUDED.badge, show_on_home = EXCLUDED.show_on_home
+       image = EXCLUDED.image, position = EXCLUDED.position, badge = EXCLUDED.badge, show_on_home = EXCLUDED.show_on_home,
+       department = EXCLUDED.department, menu_group = EXCLUDED.menu_group, show_in_menu = EXCLUDED.show_in_menu
      RETURNING *`,
-    [input.slug, input.title, input.description, input.image, input.position, input.badge, input.showOnHome]
+    [input.slug, input.title, input.description, input.image, input.position, input.badge, input.showOnHome, input.department, input.group, input.showInMenu]
   )
   return mapCategory(rows[0])
 }

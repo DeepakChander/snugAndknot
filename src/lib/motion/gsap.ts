@@ -34,10 +34,10 @@ export const isTouch = () =>
   typeof window !== 'undefined' && window.matchMedia('(hover: none), (pointer: coarse)').matches
 
 /* ─────────────── Page-ready signal ───────────────
-   Intro animations wait until the preloader or page transition has cleared,
-   so nothing animates behind a curtain. */
+   Intro animations could wait for a curtain (preloader, page transition) to clear. The shop has
+   neither any more, so a page is ready from the start; the hooks stay for any future curtain. */
 
-let ready = false
+let ready = true
 const subscribers = new Set<() => void>()
 
 export function whenPageReady(cb: () => void): () => void {

@@ -83,12 +83,13 @@ export const getCollection = unstable_cache((handle: string) => collections.getC
   revalidate: REVALIDATE,
 })
 
-export const getCategories = unstable_cache(() => collections.listActiveCategories(), ['categories'], {
+// The keys carry a version: entries cached before categories had departments must not be read back.
+export const getCategories = unstable_cache(() => collections.listActiveCategories(), ['categories-v2'], {
   tags: [TAGS.categories, TAGS.products],
   revalidate: REVALIDATE,
 })
 
-export const getCategory = unstable_cache((slug: string) => collections.getCategory(slug), ['category'], {
+export const getCategory = unstable_cache((slug: string) => collections.getCategory(slug), ['category-v2'], {
   tags: [TAGS.categories],
   revalidate: REVALIDATE,
 })

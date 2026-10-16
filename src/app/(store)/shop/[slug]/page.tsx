@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import ShopView from '@/components/shop/ShopView'
 import { DEPARTMENTS, loadShop } from '@/server/shop'
 import { getCategory, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { breadcrumbLd, itemListLd, pageMeta } from '@/lib/seo'
+import { categoryHref } from '@/lib/categories'
 
 /** "Women's knitwear", "Kids' knitwear". */
 const knitwear = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} knitwear`
@@ -13,6 +14,9 @@ type Props = {
   params: Promise<{ slug: string }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
+
+/** The two categories the shop opened with, now Men → T-shirts and Women → Knitwear. */
+const MOVED: Record<string, string> = { tops: '/shop/men/t-shirts', cardigans: '/shop/women/knitwear' }
 
 function isDepartment(slug: string): slug is keyof typeof DEPARTMENTS {
   return slug in DEPARTMENTS
@@ -68,7 +72,12 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
   }
 
   const category = await getCategory(slug)
-  if (!category) notFound()
+  if (!category) {
+    if (MOVED[slug]) permanentRedirect(MOVED[slug])
+    notFound()
+  }
+  // A department's category has one address: /shop/men/shirts.
+  if (category.department) permanentRedirect(categoryHref(category))
   const data = await loadShop({ category: slug, activeHref: `/shop/${slug}` }, sp)
   return (
     <>

@@ -1,146 +1,132 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useUIStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { useSettings } from '@/components/providers/SettingsProvider'
+import { useNavData } from '@/components/providers/SettingsProvider'
 import { useDialogBehaviour } from '@/components/kit/Overlay'
+import { cn } from '@/lib/format'
+import { DEPARTMENT_ORDER, DEPARTMENT_TITLES, type Department } from '@/lib/categories'
 import CurrencySwitcher from './CurrencySwitcher'
-import { InstagramIcon, PinterestIcon, TiktokIcon } from '@/components/kit/icons'
+import { departmentMenu } from './MegaMenu'
+import { ChevronDown, XIcon } from '@/components/kit/icons'
 
-const EASE = [0.16, 1, 0.3, 1] as const
-
-const LINKS = [
-  { label: 'Shop all', href: '/shop' },
-  { label: 'Women', href: '/shop/women' },
-  { label: 'Men', href: '/shop/men' },
+const MORE = [
   { label: 'Collections', href: '/collections' },
   { label: 'Lookbook', href: '/lookbook' },
   { label: 'Journal', href: '/journal' },
-  { label: 'The Atelier', href: '/about' },
+  { label: 'Our story', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ]
 
+/** The phone menu: a panel from the left with a tab per department, its categories, then the rest. */
 export default function MobileMenu() {
-  const { isMenuOpen, closeMenu, openSearch } = useUIStore()
+  const { isMenuOpen, closeMenu } = useUIStore()
   const user = useAuthStore((s) => s.user)
   const openAuthModal = useAuthStore((s) => s.openAuthModal)
-  const { store } = useSettings()
+  const nav = useNavData()
+  const [dept, setDept] = useState<Department>('men')
   const ref = useRef<HTMLDivElement>(null)
   useDialogBehaviour(isMenuOpen, ref, closeMenu)
 
   return (
     <AnimatePresence>
       {isMenuOpen ? (
-        <motion.div
-          ref={ref}
-          id="mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu"
-          data-chrome
-          data-lenis-prevent
-          initial={{ clipPath: 'inset(0% 0% 100% 0%)' }}
-          animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
-          exit={{ clipPath: 'inset(0% 0% 100% 0%)' }}
-          transition={{ duration: 0.85, ease: [0.87, 0, 0.13, 1] }}
-          className="fixed inset-0 z-[95] flex flex-col overflow-y-auto bg-ink pt-[calc(var(--nav-h)+var(--announce-h))] text-bone lg:hidden"
-        >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_80%_10%,rgba(217,68,43,0.18),transparent_70%)]" aria-hidden />
-          {/* Keyboard users stay trapped in the dialog, so give them a close control inside it. */}
-          <button type="button" onClick={closeMenu} className="sr-only focus:not-sr-only focus:absolute focus:right-4 focus:top-[calc(var(--nav-h)+0.5rem)] focus:rounded-full focus:bg-bone focus:px-4 focus:py-2 focus:text-ink">
-            Close menu
-          </button>
-          <nav aria-label="Mobile" className="relative flex-1 px-gutter pt-6">
-            <ul>
-              {LINKS.map((l, i) => (
-                <li key={l.href} className="overflow-hidden border-b border-bone/10">
-                  <motion.div
-                    initial={{ y: '105%' }}
-                    animate={{ y: '0%' }}
-                    exit={{ y: '105%' }}
-                    transition={{ duration: 0.9, ease: EASE, delay: 0.25 + i * 0.05 }}
-                  >
-                    <Link href={l.href} onClick={closeMenu} className="flex items-baseline gap-4 py-3">
-                      <span className="w-6 font-mono text-[0.65rem] text-butter">{String(i + 1).padStart(2, '0')}</span>
-                      <span className="font-display text-[clamp(2.3rem,11.5vw,4.2rem)] font-semibold uppercase leading-[0.9] tracking-[-0.055em]">{l.label}</span>
-                    </Link>
-                  </motion.div>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
+        <>
+          <motion.div key="menu-dim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 z-[114] bg-ink/30 lg:hidden" onClick={closeMenu} aria-hidden />
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.6 }}
-            className="relative grid grid-cols-2 gap-6 px-gutter pb-10 pt-10 text-sm"
+            key="menu"
+            ref={ref}
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            data-chrome
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
+            className="fixed inset-y-0 left-0 z-[115] flex w-full max-w-[420px] flex-col bg-white text-ink lg:hidden"
           >
-            <div className="space-y-2">
-              <p className="text-eyebrow slash text-bone/60">Account</p>
-              {user ? (
-                <>
-                  <Link href="/account" onClick={closeMenu} className="block">
-                    {user.name}
-                  </Link>
-                  <Link href="/account/orders" onClick={closeMenu} className="block text-bone/70">
-                    Orders
-                  </Link>
-                </>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMenu()
-                    openAuthModal('login')
-                  }}
-                  className="block"
-                >
-                  Sign in / Join
-                </button>
-              )}
-              <Link href="/account/wishlist" onClick={closeMenu} className="block text-bone/70">
-                Wishlist
-              </Link>
-              <button type="button" onClick={openSearch} className="block text-bone/70">
-                Search
-              </button>
-              <CurrencySwitcher className="pt-2 text-bone/70" />
-            </div>
-            <div className="space-y-2">
-              <p className="text-eyebrow slash text-bone/60">Say hello</p>
-              <a href={`mailto:${store.email}`} className="block text-[0.8rem] [overflow-wrap:anywhere]">
-                {store.email}
-              </a>
-              {store.phone ? (
-                <a href={`tel:${store.phone.replace(/[^+\d]/g, '')}`} className="block text-bone/70">
-                  {store.phone}
-                </a>
-              ) : null}
-              <div className="flex gap-3 pt-2 text-bone/70">
-                {store.social.instagram ? (
-                  <a href={store.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                    <InstagramIcon size={18} />
-                  </a>
-                ) : null}
-                {store.social.pinterest ? (
-                  <a href={store.social.pinterest} target="_blank" rel="noopener noreferrer" aria-label="Pinterest">
-                    <PinterestIcon size={18} />
-                  </a>
-                ) : null}
-                {store.social.tiktok ? (
-                  <a href={store.social.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-                    <TiktokIcon size={18} />
-                  </a>
-                ) : null}
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-ink/10 pl-1 pr-2">
+              <div role="tablist" aria-label="Department" className="flex h-full">
+                {DEPARTMENT_ORDER.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    role="tab"
+                    aria-selected={dept === d}
+                    onClick={() => setDept(d)}
+                    className={cn('relative px-4 text-[0.82rem] font-medium uppercase tracking-[0.08em]', dept === d ? 'text-ink after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:bg-ink' : 'text-ink/55')}
+                  >
+                    {DEPARTMENT_TITLES[d]}
+                  </button>
+                ))}
               </div>
+              <button type="button" onClick={closeMenu} aria-label="Close menu" className="flex h-10 w-10 items-center justify-center">
+                <XIcon size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <nav aria-label={`${DEPARTMENT_TITLES[dept]} categories`} className="px-5 pb-4 pt-2">
+                {departmentMenu(nav, dept).map((g, i) => (
+                  <details key={`${dept}-${g.heading}`} open={i === 0} className="group border-b border-ink/10">
+                    <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-[0.95rem] font-medium [&::-webkit-details-marker]:hidden">
+                      {g.heading}
+                      <ChevronDown size={16} className="text-ink/50 transition-transform group-open:rotate-180" />
+                    </summary>
+                    <ul className="pb-3">
+                      {g.links.map((l) => (
+                        <li key={l.href}>
+                          <Link href={l.href} onClick={closeMenu} className="block py-2 pl-1 text-[0.95rem] text-ink/75">
+                            {l.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ))}
+              </nav>
+
+              <ul className="border-t border-ink/10 px-5 py-4">
+                {MORE.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} onClick={closeMenu} className="block py-2 text-[0.9rem] text-ink/75">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex shrink-0 items-center justify-between gap-4 border-t border-ink/10 px-5 py-4 text-[0.9rem]">
+              <div className="flex gap-5">
+                {user ? (
+                  <Link href="/account" onClick={closeMenu}>
+                    My account
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeMenu()
+                      openAuthModal('login')
+                    }}
+                  >
+                    Sign in
+                  </button>
+                )}
+                <Link href="/account/wishlist" onClick={closeMenu} className="text-ink/75">
+                  Wishlist
+                </Link>
+              </div>
+              <CurrencySwitcher className="text-ink/75" />
             </div>
           </motion.div>
-        </motion.div>
+        </>
       ) : null}
     </AnimatePresence>
   )

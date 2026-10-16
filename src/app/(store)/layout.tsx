@@ -37,14 +37,16 @@ export default async function StoreLayout({ children }: { children: React.ReactN
     reviews: settings.reviews,
   }
 
-  const count = (g: 'men' | 'women' | 'kids') =>
-    products.filter((p) => p.gender === g || (g !== 'kids' && p.gender === 'unisex')).length
+  const department = (g: 'men' | 'women' | 'kids') => {
+    const list = products.filter((p) => p.gender === g || (g !== 'kids' && p.gender === 'unisex'))
+    return { count: list.length, image: list.find((p) => p.images[0])?.images[0].src ?? '' }
+  }
 
   const nav: NavData = {
     collections: collections.map(({ handle, title, subtitle, image }) => ({ handle, title, subtitle, image })),
-    categories: categories.map(({ slug, title, image }) => ({ slug, title, image })),
+    categories: categories.map(({ slug, title, image, department, group, showInMenu }) => ({ slug, title, image, department, group, showInMenu })),
     spotlight: products.slice(0, 4).map(({ handle, title, price, compareAtPrice, prices, images, productType }) => ({ handle, title, price, compareAtPrice, prices, images: images.slice(0, 1), productType })),
-    genders: { men: count('men'), women: count('women'), kids: count('kids') },
+    departments: { men: department('men'), women: department('women'), kids: department('kids') },
   }
 
   return (

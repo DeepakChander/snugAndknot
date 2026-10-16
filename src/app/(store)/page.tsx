@@ -18,6 +18,7 @@ import { organizationLd, websiteLd } from '@/lib/seo'
 import { JOURNAL } from '@/lib/journal'
 import { buildWall } from '@/lib/video'
 import type { Product } from '@/types/commerce'
+import { categoryFullTitle, categoryHref } from '@/lib/categories'
 
 /** Knitwear-only editorial frames, the fallback images for the "Shop by" index. */
 const LOOKS = [
@@ -50,7 +51,7 @@ export default async function HomePage() {
   }
   for (const c of categories) {
     const list = products.filter((p) => p.category === c.slug)
-    rows.push({ label: c.title, href: `/shop/${c.slug}`, meta: pieces(c.productCount), image: c.image || firstImage(list, LOOKS[1]) })
+    rows.push({ label: categoryFullTitle(c), href: categoryHref(c), meta: pieces(c.productCount), image: c.image || firstImage(list, LOOKS[1]) })
   }
   rows.push({ label: 'All pieces', href: '/shop', meta: pieces(products.length), image: LOOKS[2] })
 
@@ -61,7 +62,8 @@ export default async function HomePage() {
     .filter((c) => c.showOnHome !== false)
     .map((c) => ({
       slug: c.slug,
-      title: c.title,
+      href: categoryHref(c),
+      title: categoryFullTitle(c),
       badge: c.badge ?? '',
       image: c.image || firstImage(products.filter((p) => p.category === c.slug), ''),
     }))

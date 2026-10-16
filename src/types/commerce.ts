@@ -95,7 +95,15 @@ export interface Category {
   badge: string
   /** Whether the category gets a tile in the home page's "Shop by category" grid. */
   showOnHome: boolean
+  /** Men, Women or Kids; '' for an older category that belongs to no department. */
+  department: CategoryDepartment
+  /** Optional heading the category sits under in the menu, e.g. "Topwear" or "Boys". */
+  group: string
+  /** Listed in the navigation menu (once it has active pieces). */
+  showInMenu: boolean
 }
+
+export type CategoryDepartment = '' | 'men' | 'women' | 'kids'
 
 export interface Collection {
   id: string

@@ -10,7 +10,8 @@ import { Badge, Btn, Card, Empty, Input, PageHeader, Select, Textarea, Toggle, c
 import { ImageField, uploadImage } from './ImagePicker'
 import { ApiError } from '@/lib/api'
 import { cn, formatDate } from '@/lib/format'
-import type { Category, Collection, Coupon } from '@/types/commerce'
+import type { Category, CategoryDepartment, Collection, Coupon } from '@/types/commerce'
+import { categoryHref } from '@/lib/categories'
 
 const slug = (s: string) =>
   s
@@ -173,29 +174,62 @@ export function CollectionsAdmin({ collections, products }: { collections: Colle
 
 /* ─────────────────────────── Categories ─────────────────────────── */
 
-function CategoryRow({ category, isNew, onDone }: { category: Category; isNew?: boolean; onDone?: () => void }) {
+const DEPT_TABS: { key: CategoryDepartment; label: string }[] = [
+  { key: 'men', label: 'Men' },
+  { key: 'women', label: 'Women' },
+  { key: 'kids', label: 'Kids' },
+  { key: '', label: 'No department' },
+]
+
+/** men + "Boys" + "T-shirts" → "kids-boys-t-shirts"; a category with no department keeps the plain slug. */
+const categorySlug = (department: CategoryDepartment, group: string, title: string) =>
+  [department, department === 'kids' ? slug(group) : '', slug(title)].filter(Boolean).join('-')
+
+function CategoryRow({ category, isNew, groups, onDone }: { category: Category; isNew?: boolean; groups: string[]; onDone?: () => void }) {
   const { run, busy, fieldErrors } = useMutate()
   const [c, setC] = useState(category)
   const [touched, setTouched] = useState(!isNew)
+  const listId = `groups-${category.slug || 'new'}`
+  // Until the slug is typed by hand, a new category's slug follows its department, group and title.
+  const update = (patch: Partial<Category>) => setC((x) => {
+    const next = { ...x, ...patch }
+    return touched ? next : { ...next, slug: categorySlug(next.department, next.group, next.title) }
+  })
   return (
     <Card>
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr_auto]">
         <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
+            <Select label="Department" value={c.department} disabled={!isNew} hint={isNew ? undefined : 'Fixed once created.'} onChange={(e) => update({ department: e.target.value as CategoryDepartment })}>
+              {DEPT_TABS.map((d) => (
+                <option key={d.key} value={d.key}>
+                  {d.label}
+                </option>
+              ))}
+            </Select>
+            <Input label="Menu group" list={listId} maxLength={40} value={c.group} error={fieldErrors.group} placeholder="Topwear" hint="The column heading in the menu, e.g. Topwear or Boys." onChange={(e) => update({ group: e.target.value })} />
+            <datalist id={listId}>
+              {groups.map((g) => (
+                <option key={g} value={g} />
+              ))}
+            </datalist>
+          </div>
+          <Input label="Title" value={c.title} error={fieldErrors.title} placeholder="Shirts" onChange={(e) => update({ title: e.target.value })} />
           <Input
-            label="Title"
-            value={c.title}
-            error={fieldErrors.title}
-            onChange={(e) => {
-              const title = e.target.value
-              setC((x) => ({ ...x, title, slug: touched ? x.slug : slug(title) }))
-            }}
+            label="Slug"
+            prefix="/"
+            value={c.slug}
+            disabled={!isNew}
+            error={fieldErrors.slug}
+            hint={isNew ? `Page: ${categoryHref(c)}` : `Page: ${categoryHref(c)}. Products point at the slug, so it cannot change.`}
+            onChange={(e) => (setTouched(true), setC({ ...c, slug: e.target.value.toLowerCase() }))}
           />
-          <Input label="Slug" prefix="/" value={c.slug} disabled={!isNew} error={fieldErrors.slug} hint={isNew ? `/shop/${c.slug || '…'}` : 'Products point at the slug, so it cannot change.'} onChange={(e) => (setTouched(true), setC({ ...c, slug: e.target.value.toLowerCase() }))} />
           <Textarea label="Description" rows={2} value={c.description} onChange={(e) => setC({ ...c, description: e.target.value })} />
           <div className="grid grid-cols-2 gap-4">
             <Input label="Badge" maxLength={24} value={c.badge} error={fieldErrors.badge} placeholder="3XL TO 6XL" hint="Optional, e.g. 3XL TO 6XL. Shown beside the name on the home page." onChange={(e) => setC({ ...c, badge: e.target.value })} />
             <Input label="Order" type="number" min={0} value={c.position} onChange={(e) => setC({ ...c, position: Number(e.target.value) || 0 })} hint="Lower shows first." />
           </div>
+          <Toggle checked={c.showInMenu} onChange={(v) => setC({ ...c, showInMenu: v })} label="Show in the menu" description="Lists this category under its department in the navigation, once it has active pieces." />
           <Toggle checked={c.showOnHome} onChange={(v) => setC({ ...c, showOnHome: v })} label="Show on home page" description="Gives this category a tile in the home page's category grid, once it has active pieces." />
         </div>
         <ImageField label="Image" value={c.image} onChange={(v) => setC({ ...c, image: v })} />
@@ -203,11 +237,10 @@ function CategoryRow({ category, isNew, onDone }: { category: Category; isNew?: 
           <Btn size="sm" loading={busy} onClick={async () => (await run(isNew ? 'POST' : 'PUT', isNew ? '/api/admin/categories' : `/api/admin/categories/${category.slug}`, c, isNew ? 'Category created.' : 'Category saved.')) && onDone?.()}>
             {isNew ? 'Create' : 'Save'}
           </Btn>
-          {isNew ? (
-            <Btn size="sm" variant="ghost" onClick={onDone}>
-              Cancel
-            </Btn>
-          ) : (
+          <Btn size="sm" variant="ghost" onClick={onDone}>
+            {isNew ? 'Cancel' : 'Close'}
+          </Btn>
+          {isNew ? null : (
             <Btn size="sm" variant="danger" loading={busy} onClick={() => confirmAction(`Delete the category “${category.title}”?`) && run('DELETE', `/api/admin/categories/${category.slug}`, undefined, 'Category deleted.')}>
               Delete
             </Btn>
@@ -219,19 +252,76 @@ function CategoryRow({ category, isNew, onDone }: { category: Category; isNew?: 
 }
 
 export function CategoriesAdmin({ categories, counts }: { categories: Category[]; counts: Record<string, number> }) {
+  const [tab, setTab] = useState<CategoryDepartment>('men')
   const [adding, setAdding] = useState(false)
+  const [open, setOpen] = useState<string | null>(null)
+  const inTab = categories.filter((c) => c.department === tab)
+  const groups = [...new Set(inTab.map((c) => c.group).filter(Boolean))]
+  // Rows grouped under their menu heading, in the order the headings first appear.
+  const sections = [...groups, ''].map((g) => ({ group: g, rows: inTab.filter((c) => c.group === g) })).filter((x) => x.rows.length)
+
   return (
     <>
-      <PageHeader title="Categories" description="Categories group pieces by type (e.g. cardigans) and get their own page at /shop/slug. Only categories with active pieces are shown to customers. The home page grid shows them in order, using each image: a cut-out garment on a transparent background looks best." actions={!adding ? <Btn onClick={() => setAdding(true)}>New category</Btn> : undefined} />
-      <div className="space-y-3">
-        {adding ? <CategoryRow isNew category={{ slug: '', title: '', description: '', image: '', position: categories.length, badge: '', showOnHome: true }} onDone={() => setAdding(false)} /> : null}
-        {categories.map((c) => (
-          <div key={c.slug}>
-            <p className="mb-1 px-1 text-xs text-stone">{counts[c.slug] ?? 0} product(s)</p>
-            <CategoryRow category={c} />
-          </div>
+      <PageHeader
+        title="Categories"
+        description="The catalogue is organised by department (Men, Women, Kids) and, inside each, by category, grouped under menu headings. Each category has its own page (e.g. /shop/men/shirts). Customers only see categories that have active pieces; a product's department and category are set in the product editor."
+        actions={!adding ? <Btn onClick={() => (setAdding(true), setOpen(null))}>New category</Btn> : undefined}
+      />
+      <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Department">
+        {DEPT_TABS.map((d) => {
+          const n = categories.filter((c) => c.department === d.key).length
+          if (!d.key && !n) return null
+          return (
+            <button
+              key={d.key || 'none'}
+              type="button"
+              role="tab"
+              aria-selected={tab === d.key}
+              onClick={() => (setTab(d.key), setAdding(false), setOpen(null))}
+              className={cn('rounded-full border px-4 py-1.5 text-sm transition-colors', tab === d.key ? 'border-ink bg-ink text-ivory' : 'border-ink/15 hover:border-ink/40')}
+            >
+              {d.label} <span className="opacity-60">{n}</span>
+            </button>
+          )
+        })}
+      </div>
+      <div className="space-y-6">
+        {adding ? (
+          <CategoryRow
+            isNew
+            groups={groups}
+            category={{ slug: '', title: '', description: '', image: '', position: categories.length ? Math.max(...categories.map((c) => c.position)) + 1 : 0, badge: '', showOnHome: false, department: tab, group: '', showInMenu: true }}
+            onDone={() => setAdding(false)}
+          />
+        ) : null}
+        {sections.map(({ group, rows }) => (
+          <section key={group || 'ungrouped'}>
+            <h2 className="mb-2 px-1 text-xs font-medium uppercase tracking-[0.14em] text-stone">{group || (tab ? 'No menu group' : 'Categories')}</h2>
+            <div className="divide-y divide-ink/10 overflow-hidden rounded-2xl border border-ink/10 bg-white/70">
+              {rows.map((c) =>
+                open === c.slug ? (
+                  <div key={c.slug} className="p-2">
+                    <CategoryRow category={c} groups={groups} onDone={() => setOpen(null)} />
+                  </div>
+                ) : (
+                  <div key={c.slug} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
+                    <span className="min-w-[8rem] flex-1 text-sm font-medium">{c.title}</span>
+                    <span className="font-mono text-xs text-stone">{categoryHref(c)}</span>
+                    <span className="w-24 text-xs text-stone">{counts[c.slug] ?? 0} product(s)</span>
+                    <span className="flex w-40 gap-1.5">
+                      {c.showInMenu ? <Badge tone="good">menu</Badge> : <Badge>not in menu</Badge>}
+                      {c.showOnHome ? <Badge tone="info">home</Badge> : null}
+                    </span>
+                    <Btn size="sm" variant="outline" onClick={() => (setOpen(c.slug), setAdding(false))}>
+                      Edit
+                    </Btn>
+                  </div>
+                )
+              )}
+            </div>
+          </section>
         ))}
-        {!categories.length && !adding ? <Empty title="No categories" /> : null}
+        {!inTab.length && !adding ? <Empty title="No categories in this department yet" /> : null}
       </div>
     </>
   )

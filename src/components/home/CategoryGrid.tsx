@@ -4,6 +4,7 @@ import { ButtonLink } from '@/components/kit/Button'
 
 export interface CategoryTile {
   slug: string
+  href: string
   title: string
   badge: string
   image: string
@@ -29,7 +30,7 @@ export default function CategoryGrid({ tiles }: { tiles: CategoryTile[] }) {
         <ul className="flex flex-wrap justify-center pl-px pt-px">
           {tiles.map((t) => (
             <li key={t.slug} className="-ml-px -mt-px basis-1/2 border border-ink/15 md:basis-1/3 lg:basis-1/4">
-              <Link href={`/shop/${t.slug}`} data-cursor="hover" className="group flex h-full flex-col gap-3 p-3 transition-colors duration-500 hover:bg-ivory focus-visible:bg-ivory sm:p-4 lg:p-5">
+              <Link href={t.href} data-cursor="hover" className="group flex h-full flex-col gap-3 p-3 transition-colors duration-500 hover:bg-ivory focus-visible:bg-ivory sm:p-4 lg:p-5">
                 <span className="flex min-h-6 flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="font-display text-[clamp(0.8rem,1.05vw,1rem)] font-semibold uppercase leading-tight tracking-[0.01em]">{t.title}</span>
                   {t.badge ? (

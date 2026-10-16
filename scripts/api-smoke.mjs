@@ -306,9 +306,10 @@ async function main() {
   const colEdit = await admin.put(`/api/admin/collections/${col.id}`, { ...col, subtitle: 'Edited by smoke test' })
   check('edit collection', colEdit.status === 200 && colEdit.data.collection.subtitle === 'Edited by smoke test', colEdit.data)
   await admin.put(`/api/admin/collections/${col.id}`, col)
-  const catDel = await admin.del('/api/admin/categories/cardigans')
+  const catDel = await admin.del('/api/admin/categories/women-knitwear')
   check('category in use cannot be deleted → 409', catDel.status === 409, catDel.data)
   await categoryGridChecks()
+  await departmentChecks()
   const settings = (await admin.get('/api/admin/settings')).data.settings
   const ann = await admin.put('/api/admin/settings', { section: 'announcement', value: { ...settings.announcement, messages: ['Smoke test banner'] } })
   check('save announcement settings', ann.status === 200 && ann.data.value.messages[0] === 'Smoke test banner', ann.data)
@@ -379,14 +380,33 @@ async function waitForHome(ok, tries = 10) {
   return { ok: false, grid: grid ?? 'home page did not return 200' }
 }
 
+async function departmentChecks() {
+  console.log('\nDepartments and their categories')
+  const page = await anon.get('/shop/men/t-shirts')
+  check('a department category has its page at /shop/<department>/<category> → 200', page.status === 200, page.status)
+  for (const [from, to] of [['/shop/men-t-shirts', '/shop/men/t-shirts'], ['/shop/tops', '/shop/men/t-shirts'], ['/shop/cardigans', '/shop/women/knitwear']]) {
+    const r = await anon.get(from)
+    check(`${from} → 308 to ${to}`, r.status === 308 && new URL(r.headers.get('location') ?? '', BASE).pathname === to, { status: r.status, location: r.headers.get('location') })
+  }
+  check('unknown category in a department → 404', (await anon.get('/shop/men/no-such-thing')).status === 404)
+  check('unknown department → 404', (await anon.get('/shop/pets/collars')).status === 404)
+  const unprefixed = await admin.post('/api/admin/categories', { slug: 'smoke-shirts', title: 'Shirts', department: 'men' })
+  check('a department category needs a slug that starts with the department → 422', unprefixed.status === 422, unprefixed.data)
+  const slug = `kids-boys-smoke-${Date.now().toString(36)}`
+  const created = await admin.post('/api/admin/categories', { slug, title: 'Smoke tees', department: 'kids', group: 'Boys', showOnHome: false })
+  check('admin creates a category in a department and group → 201', created.status === 201 && created.data.category?.department === 'kids' && created.data.category?.group === 'Boys', created.data)
+  if (created.status === 201) check('delete the test category', (await admin.del(`/api/admin/categories/${slug}`)).status === 200)
+}
+
 async function categoryGridChecks() {
   console.log('\nAdmin: home page category grid')
   const cats = (await admin.get('/api/admin/categories')).data.categories
-  const original = cats.find((c) => c.slug === 'cardigans')
+  const original = cats.find((c) => c.slug === 'women-knitwear')
   check('categories carry badge and showOnHome', original && typeof original.badge === 'string' && typeof original.showOnHome === 'boolean', original)
+  check('categories carry department, menu group and showInMenu', original?.department === 'women' && original?.group === 'Topwear' && original?.showInMenu === true, original)
   if (!original) return
-  const url = '/api/admin/categories/cardigans'
-  const tile = 'href="/shop/cardigans"'
+  const url = '/api/admin/categories/women-knitwear'
+  const tile = 'href="/shop/women/knitwear"'
   try {
     const withBadge = await admin.put(url, { ...original, badge: '  3XL TO 6XL  ', showOnHome: true })
     check('admin sets a badge (trimmed) → 200', withBadge.status === 200 && withBadge.data.category?.badge === '3XL TO 6XL' && withBadge.data.category?.showOnHome === true, withBadge.data)
@@ -400,10 +420,14 @@ async function categoryGridChecks() {
     check('admin hides a category from the home page → 200', hidden.status === 200 && hidden.data.category?.showOnHome === false, hidden.data)
     const gone = await waitForHome((g) => !g.includes(tile))
     check('hidden category has no tile on the home grid', gone.ok, gone.grid.slice(0, 300))
-    const page = await anon.get('/shop/cardigans')
+    const page = await anon.get('/shop/women/knitwear')
     check('hidden category keeps its own page → 200', page.status === 200, page.status)
     const bare = await admin.put(url, { slug: original.slug, title: original.title, description: original.description, image: original.image, position: original.position })
     check('omitted fields fall back to no badge, shown on home', bare.status === 200 && bare.data.category?.badge === '' && bare.data.category?.showOnHome === true, bare.data)
+    check('…and the department stays what it was created with', bare.data.category?.department === 'women', bare.data)
+    const moved = await admin.put(url, { ...original, department: 'men' })
+    // Refused outright (its slug belongs to the old department) or saved with the department unchanged.
+    check('a category cannot change department', moved.status === 422 || (moved.status === 200 && moved.data.category?.department === 'women'), moved.data)
   } finally {
     const restore = await admin.put(url, original)
     check('restore the category', restore.status === 200 && restore.data.category?.badge === original.badge && restore.data.category?.showOnHome === original.showOnHome, restore.data)

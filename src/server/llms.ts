@@ -7,6 +7,7 @@ import { JOURNAL } from '@/lib/journal'
 import { plain } from '@/lib/accent'
 import { absoluteUrl } from '@/lib/site'
 import type { Product } from '@/types/commerce'
+import { categoryFullTitle, categoryHref } from '@/lib/categories'
 
 /**
  * llms.txt (https://llmstxt.org): a plain Markdown map of the shop for AI assistants and answer
@@ -64,7 +65,7 @@ export async function buildLlmsTxt({ full }: { full: boolean }): Promise<string>
     '',
     link('All pieces', '/shop', `the full catalogue, ${products.length} piece${products.length === 1 ? '' : 's'}`),
     ...departments,
-    ...categories.map((c) => link(c.title, `/shop/${c.slug}`, oneLine(c.description) || undefined)),
+    ...categories.map((c) => link(categoryFullTitle(c), categoryHref(c), oneLine(c.description) || undefined)),
     '',
     '## Pieces',
     '',

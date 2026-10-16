@@ -288,7 +288,15 @@ export const categorySchema = z.object({
   position: z.coerce.number().int().min(0).max(10_000).default(0),
   badge: trimmed(24).default(''),
   showOnHome: z.boolean().default(true),
+  department: z.enum(['', 'men', 'women', 'kids']).default(''),
+  group: trimmed(40).default(''),
+  showInMenu: z.boolean().default(true),
 })
+  // A department's categories live at /shop/<department>/<rest of the slug>, so the slug starts with it.
+  .refine((c) => !c.department || c.slug.startsWith(`${c.department}-`), {
+    message: 'A category in a department needs a slug that starts with the department, e.g. men-shirts.',
+    path: ['slug'],
+  })
 
 export const couponSchema = z
   .object({

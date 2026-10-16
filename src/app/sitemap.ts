@@ -3,6 +3,7 @@ import { getCategories, getCollections, getProducts } from '@/server/catalog'
 import { JOURNAL } from '@/lib/journal'
 import { absoluteUrl } from '@/lib/site'
 import type { Product } from '@/types/commerce'
+import { categoryHref } from '@/lib/categories'
 
 type Entry = MetadataRoute.Sitemap[number]
 
@@ -25,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...departments,
     ...categories.map((c) => {
       const list = products.filter((p) => p.category === c.slug)
-      return page(`/shop/${c.slug}`, 0.7, { lastModified: latest(list), changeFrequency: 'weekly', images: images([c.image]) })
+      return page(categoryHref(c), 0.7, { lastModified: latest(list), changeFrequency: 'weekly', images: images([c.image]) })
     }),
     page('/collections', 0.8, { changeFrequency: 'weekly' }),
     ...collections.map((c) => {

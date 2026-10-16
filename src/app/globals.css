@@ -75,10 +75,9 @@
 
 :root {
   --gutter: clamp(1rem, 2.6vw, 3rem);
-  --nav-h: 76px;
+  --nav-h: 60px;
   --announce-h: 0px;
   --nav-offset: var(--nav-h);
-  --grain-opacity: 0.06;
   color-scheme: light;
 }
 
@@ -92,20 +91,6 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
-}
-
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-.lenis.lenis-stopped {
-  overflow: clip;
 }
 
 body {
@@ -314,24 +299,6 @@ body {
 }
 
 @layer components {
-/* Film grain over the whole site — painted once, composited, never repainted. */
-.grain {
-  position: fixed;
-  inset: -50%;
-  z-index: 90;
-  pointer-events: none;
-  opacity: var(--grain-opacity);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 1.2s steps(6) infinite;
-}
-@keyframes grain {
-  0% { transform: translate(0, 0); }
-  20% { transform: translate(-3%, 2%); }
-  40% { transform: translate(2%, -3%); }
-  60% { transform: translate(-1%, 4%); }
-  80% { transform: translate(3%, 1%); }
-  100% { transform: translate(0, 0); }
-}
 
 /* Knit texture used on panels and placeholders */
 .knit-texture {
@@ -502,20 +469,6 @@ body {
 
 }
 
-/* Hide the native cursor only when the custom cursor is active (fine pointers). */
-html.has-cursor,
-html.has-cursor a,
-html.has-cursor button,
-html.has-cursor [role='button'],
-html.has-cursor label {
-  cursor: none;
-}
-html.has-cursor input,
-html.has-cursor textarea,
-html.has-cursor select {
-  cursor: text;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -525,14 +478,10 @@ html.has-cursor select {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .grain {
-    display: none;
-  }
 }
 
 /* Print: drop chrome, keep content */
 @media print {
-  .grain,
   [data-chrome] {
     display: none !important;
   }

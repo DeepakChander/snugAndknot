@@ -18,6 +18,8 @@ export interface Db extends Queryable {
   /** false when running on the in-memory fallback — writes vanish on restart. */
   persistent: boolean
   tx<T>(fn: (q: Queryable) => Promise<T>): Promise<T>
+  /** Closes the connections (Postgres only). */
+  close?(): Promise<void>
 }
 
 const NUMERIC_OID = 1700
@@ -69,6 +71,9 @@ async function createPostgres(url: string): Promise<Db> {
     },
     async exec(sql) {
       await pool.query(sql)
+    },
+    async close() {
+      await pool.end()
     },
     async tx(fn) {
       const client = await pool.connect()
@@ -215,7 +220,15 @@ export function getDb(): Promise<Db> {
   if (!g.__snugknotDb) {
     g.__snugknotDb = (async () => {
       const url = connectionString()
-      const db = url ? await createPostgres(url) : await createPglite()
+      let db = url ? await createPostgres(url) : await createPglite()
+      // A preview deployment must never migrate a database: it may be the one production uses, and
+      // the change would go live before the pull request is merged. When the code is ahead of the
+      // database, the preview runs on the seeded in-memory fallback instead.
+      if (db.kind === 'postgres' && process.env.VERCEL_ENV === 'preview' && (await currentSchemaVersion(db)) < LATEST_SCHEMA_VERSION) {
+        console.warn('[db] Preview deployment with a database behind this code: using the in-memory demo database, nothing was migrated.')
+        await db.close?.()
+        db = await createPglite()
+      }
       await migrate(db)
       await claimOwnerAccount(db)
       return db
