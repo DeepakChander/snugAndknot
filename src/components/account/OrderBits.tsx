@@ -8,13 +8,13 @@ import { cn, formatDate } from '@/lib/format'
 import type { Order, OrderStatus, ReturnStatus } from '@/types/commerce'
 
 const STATUS_STYLE: Record<string, string> = {
-  placed: 'bg-gold/20 text-gold-deep',
+  placed: 'bg-ink/[0.06] text-ink',
   confirmed: 'bg-sage/20 text-success',
   shipped: 'bg-ink/10 text-ink',
   delivered: 'bg-success/15 text-success',
   cancelled: 'bg-error/10 text-error',
-  pending_payment: 'bg-gold/20 text-gold-deep',
-  pending: 'bg-gold/20 text-gold-deep',
+  pending_payment: 'bg-ink/[0.06] text-ink',
+  pending: 'bg-ink/[0.06] text-ink',
   approved: 'bg-success/15 text-success',
   rejected: 'bg-error/10 text-error',
   received: 'bg-ink/10 text-ink',
@@ -36,14 +36,14 @@ const STEPS: { id: OrderStatus; label: string; key: keyof Order }[] = [
 export function OrderTimeline({ order, tone = 'light' }: { order: Order; tone?: 'light' | 'dark' }) {
   if (order.status === 'cancelled') {
     return (
-      <p className="rounded-2xl bg-error/10 p-4 text-sm text-error">
+      <p className="bg-error/10 p-4 text-sm text-error">
         This order was cancelled{order.cancelledAt ? ` on ${formatDate(order.cancelledAt)}` : ''}.
       </p>
     )
   }
   if (order.status === 'pending_payment') {
     return (
-      <p className="rounded-2xl bg-gold/15 p-4 text-sm text-gold-deep">
+      <p className="bg-bone p-4 text-sm text-ink">
         Waiting for the online payment to be confirmed. The pieces are held for 30 minutes; if it is not paid by then, they go back on sale.
       </p>
     )
@@ -53,7 +53,7 @@ export function OrderTimeline({ order, tone = 'light' }: { order: Order; tone?: 
     <ol className="relative grid grid-cols-4">
       <span className={cn('absolute left-[12.5%] right-[12.5%] top-[11px] h-px', tone === 'light' ? 'bg-ink/10' : 'bg-bone/15')} aria-hidden />
       <motion.span
-        className="absolute left-[12.5%] top-[11px] h-px origin-left bg-gold"
+        className="absolute left-[12.5%] top-[11px] h-px origin-left bg-ink"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: reached / (STEPS.length - 1) }}
         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
@@ -65,7 +65,7 @@ export function OrderTimeline({ order, tone = 'light' }: { order: Order; tone?: 
         const at = order[s.key] as string | null
         return (
           <li key={s.id} className="relative flex flex-col items-center text-center">
-            <span className={cn('relative z-[1] flex h-6 w-6 items-center justify-center rounded-full border transition-colors', done ? 'border-gold bg-gold text-ink' : tone === 'light' ? 'border-ink/20 bg-ivory' : 'border-bone/20 bg-noir')}>
+            <span className={cn('relative z-[1] flex h-6 w-6 items-center justify-center rounded-full border transition-colors', done ? 'border-ink bg-ink text-ink' : tone === 'light' ? 'border-ink/20 bg-ivory' : 'border-bone/20 bg-noir')}>
               {done ? (
                 <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden>
                   <path d="M2.5 6.5 5 9l4.5-5.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" />
@@ -87,9 +87,9 @@ export function OrderLines({ order }: { order: Order }) {
     <ul className="divide-y divide-current/10">
       {order.items.map((it) => (
         <li key={it.id} className="flex items-center gap-4 py-4">
-          <span className="relative h-24 w-[4.5rem] shrink-0 overflow-hidden rounded-xl bg-parchment">{it.image ? <Image src={it.image} alt="" fill sizes="72px" className="object-cover" /> : null}</span>
+          <span className="relative h-24 w-[4.5rem] shrink-0 overflow-hidden bg-parchment">{it.image ? <Image src={it.image} alt="" fill sizes="72px" className="object-cover" /> : null}</span>
           <span className="min-w-0 flex-1">
-            <Link href={`/product/${it.handle}`} className="font-display text-xl leading-tight hover:text-burgundy">
+            <Link href={`/product/${it.handle}`} className="text-[0.95rem] font-medium leading-snug hover:underline">
               {it.title}
             </Link>
             <span className="mt-1 block text-xs opacity-60">

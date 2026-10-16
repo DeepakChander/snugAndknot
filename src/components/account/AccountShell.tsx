@@ -30,10 +30,10 @@ export default function AccountShell({ user, children }: { user: PublicUser; chi
       <div className="container-wide pt-10 md:pt-14">
         <div className="flex flex-wrap items-end justify-between gap-6 border-b border-ink/10 pb-8">
           <div>
-            <p className="text-eyebrow text-burgundy">
+            <p className="text-eyebrow text-stone">
               {TIER_LABEL[user.tier]} member · {user.points.toLocaleString()} points
             </p>
-            <h1 className="mt-3 text-display">{user.name.split(' ')[0]}&rsquo;s atelier</h1>
+            <h1 className="mt-3 text-display">Hello, {user.name.split(' ')[0]}</h1>
           </div>
           <button
             type="button"
@@ -72,8 +72,8 @@ export function AccountGate() {
     <div className="min-h-[80svh] bg-ivory pt-nav text-ink">
       <div className="container-wide grid items-center gap-12 py-20 md:grid-cols-2">
         <div>
-          <p className="text-eyebrow text-burgundy">Your account</p>
-          <h1 className="mt-5 text-display">Sign in to your atelier</h1>
+          <p className="text-eyebrow text-stone">Your account</p>
+          <h1 className="mt-5 text-display">Sign in to your account</h1>
           <p className="mt-6 max-w-md text-lead text-stone">See your orders and returns, keep a wishlist, and collect points on every piece.</p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Button size="lg" arrow onClick={() => openAuthModal('login')}>
@@ -90,7 +90,7 @@ export function AccountGate() {
             </Link>
           </p>
         </div>
-        <div className="relative hidden aspect-[4/5] overflow-hidden rounded-[2rem] md:block">
+        <div className="relative hidden aspect-[4/5] overflow-hidden md:block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/_next/image?url=%2Fimages%2Flookbook%2Fsoft-focus-2.png&w=1080&q=75" alt="" className="h-full w-full object-cover" />
         </div>

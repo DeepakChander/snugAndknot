@@ -16,7 +16,7 @@ export function ShippingView() {
   const { currency: cur } = useCurrency()
   const steps = [
     { title: 'Order placed', body: 'You receive an order number straight away. Keep it to track your parcel.' },
-    { title: 'Prepared by hand', body: 'Each piece is checked, folded and packed in the atelier.' },
+    { title: 'Prepared by hand', body: 'Each piece is checked, folded and packed with care.' },
     { title: 'On its way', body: 'A tracking number appears in your account (or on Track an order) once it ships.' },
     {
       title: 'Delivered',
@@ -153,7 +153,7 @@ export function CareView() {
           <div className="mt-12 flex flex-wrap items-center justify-between gap-6 rounded-[2rem] bg-signal p-10 text-bone [&_:focus-visible]:outline-bone">
             <p className="max-w-lg font-display text-3xl leading-tight">A loose button or a pulled thread? Write to us and we will help.</p>
             <ButtonLink href="/contact" variant="light" arrow>
-              Contact the atelier
+              Contact us
             </ButtonLink>
           </div>
         </div>

@@ -93,7 +93,7 @@ export default function ContactView() {
                   <CheckIcon size={26} />
                 </span>
                 <p className="mt-8 font-display text-5xl leading-none">Thank you, {name.split(' ')[0]}.</p>
-                <p className="mt-5 max-w-sm text-bone">Your message is with the atelier. We will reply to {email}.</p>
+                <p className="mt-5 max-w-sm text-bone">Your message is with us. We will reply to {email}.</p>
                 <Button
                   variant="outline-light"
                   className="mt-10"

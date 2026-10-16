@@ -30,7 +30,7 @@ export default function AuthModal() {
     setBusy(false)
     if (ok) {
       const user = useAuthStore.getState().user
-      addToast(authMode === 'signup' ? `Welcome to the atelier, ${user?.name.split(' ')[0]}. 100 points added.` : `Welcome back, ${user?.name.split(' ')[0]}.`)
+      addToast(authMode === 'signup' ? `Welcome to Snug&Knot, ${user?.name.split(' ')[0]}. 100 points added.` : `Welcome back, ${user?.name.split(' ')[0]}.`)
       setPassword('')
     }
   }
@@ -47,8 +47,8 @@ export default function AuthModal() {
           <Image src="/images/lookbook/quiet-luxury-1.png" alt="" fill sizes="45vw" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-noir/80 via-noir/10 to-transparent" />
           <div className="absolute bottom-8 left-8 right-8 text-bone">
-            <p className="text-eyebrow text-gold-light">Members</p>
-            <p className="mt-3 font-display text-4xl leading-[0.95]">Save your bag, track orders, earn points on every piece.</p>
+            <p className="text-eyebrow text-bone/70">Members</p>
+            <p className="mt-3 text-[1.6rem] font-medium leading-[0.95]">Save your bag, track orders, earn points on every piece.</p>
           </div>
         </div>
 
@@ -57,7 +57,7 @@ export default function AuthModal() {
 
           {authMode === 'forgot-password' ? (
             <div className="pt-6">
-              <h2 className="font-display text-4xl">Forgotten your password?</h2>
+              <h2 className="text-[1.6rem] font-medium">Forgotten your password?</h2>
               <p className="mt-4 text-stone">
                 Email us from the address on your account and we will reset it for you, usually within one working day.
               </p>
@@ -98,7 +98,7 @@ export default function AuthModal() {
                   className="mt-8 space-y-4"
                   noValidate
                 >
-                  <h2 className="font-display text-4xl leading-none">{authMode === 'signup' ? 'Join the atelier' : 'Welcome back'}</h2>
+                  <h2 className="text-[1.6rem] font-medium leading-none">{authMode === 'signup' ? 'Create an account' : 'Welcome back'}</h2>
                   <p className="pb-2 text-sm text-stone">
                     {authMode === 'signup' ? 'Create an account and receive 100 welcome points.' : 'Sign in to see your orders, wishlist and rewards.'}
                   </p>
@@ -132,7 +132,7 @@ export default function AuthModal() {
                     }
                   />
                   {error ? (
-                    <p role="alert" className="rounded-xl bg-error/[0.07] px-4 py-3 text-sm text-error">
+                    <p role="alert" className="bg-error/[0.07] px-4 py-3 text-sm text-error">
                       {error}
                     </p>
                   ) : null}

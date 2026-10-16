@@ -25,7 +25,7 @@ function Panel({ title, action, children, className }: { title: string; action?:
   return (
     <motion.section initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE }} className={cn('rounded-[1.75rem] bg-bone/70 p-6 md:p-8', className)}>
       <div className="mb-6 flex items-baseline justify-between gap-4">
-        <h2 className="font-display text-3xl">{title}</h2>
+        <h2 className="text-[1.25rem] font-medium">{title}</h2>
         {action}
       </div>
       {children}
@@ -36,7 +36,7 @@ function Panel({ title, action, children, className }: { title: string; action?:
 function OrderRow({ order }: { order: Order }) {
   const money = useMoney(order.currency)
   return (
-    <Link href={`/account/orders/${order.id}`} className="group flex flex-wrap items-center gap-4 rounded-2xl border border-ink/10 bg-ivory/60 p-4 transition-colors hover:border-ink/30 md:flex-nowrap">
+    <Link href={`/account/orders/${order.id}`} className="group flex flex-wrap items-center gap-4 border border-ink/10 bg-ivory/60 p-4 transition-colors hover:border-ink/30 md:flex-nowrap">
       <div className="flex -space-x-3">
         {order.items.slice(0, 3).map((it) => (
           <span key={it.id} className="relative h-14 w-11 overflow-hidden rounded-lg bg-parchment ring-2 ring-ivory">
@@ -75,9 +75,9 @@ export function Overview({ user, orders, openReturns }: { user: PublicUser; orde
               ['Open returns', openReturns],
               ['Wishlist', hydrated ? wish.length : 0],
             ].map(([k, v]) => (
-              <div key={k as string} className="rounded-2xl border border-ink/10 p-4">
+              <div key={k as string} className="border border-ink/10 p-4">
                 <dt className="text-eyebrow text-stone">{k}</dt>
-                <dd className="mt-2 font-display text-4xl">{v}</dd>
+                <dd className="mt-2 text-[1.6rem] font-medium">{v}</dd>
               </div>
             ))}
           </dl>
@@ -133,7 +133,7 @@ export function OrderDetail({ order, returnWindowOpen, returns }: { order: Order
           <Link href="/account/orders" className="link-wipe text-sm text-stone">
             ← All orders
           </Link>
-          <h2 className="mt-3 font-display text-4xl">Order {order.orderNumber}</h2>
+          <h2 className="mt-3 text-[1.6rem] font-medium">Order {order.orderNumber}</h2>
           <p className="mt-1 text-sm text-stone">Placed {formatDate(order.placedAt, 'en-US', { dateStyle: 'long' })}</p>
         </div>
         <StatusPill status={order.status} />
@@ -141,7 +141,7 @@ export function OrderDetail({ order, returnWindowOpen, returns }: { order: Order
       <Panel title="Progress">
         <OrderTimeline order={order} />
         {order.trackingNumber ? (
-          <p className="mt-8 rounded-2xl border border-ink/10 p-4 text-sm">
+          <p className="mt-8 border border-ink/10 p-4 text-sm">
             Tracking number <span className="font-mono">{order.trackingNumber}</span>
           </p>
         ) : null}
@@ -156,7 +156,7 @@ export function OrderDetail({ order, returnWindowOpen, returns }: { order: Order
           </Panel>
           <Panel title="Delivery">
             <AddressBlock order={order} />
-            {order.notes ? <p className="mt-4 rounded-xl bg-ivory/70 p-3 text-sm text-stone">“{order.notes}”</p> : null}
+            {order.notes ? <p className="mt-4 bg-ivory/70 p-3 text-sm text-stone">“{order.notes}”</p> : null}
           </Panel>
         </div>
       </div>
@@ -164,7 +164,7 @@ export function OrderDetail({ order, returnWindowOpen, returns }: { order: Order
         <Panel title="Returns for this order">
           <ul className="space-y-2 text-sm">
             {returns.map((r) => (
-              <li key={r.id} className="flex items-center justify-between rounded-xl border border-ink/10 p-3">
+              <li key={r.id} className="flex items-center justify-between border border-ink/10 p-3">
                 <span>{r.items.map((i) => `${i.quantity}× ${i.title}`).join(', ')}</span>
                 <StatusPill status={r.status} />
               </li>
@@ -204,7 +204,7 @@ export function ReturnsList({ returns, eligible }: { returns: ReturnRequest[]; e
         {returns.length ? (
           <ul className="space-y-3">
             {returns.map((r) => (
-              <li key={r.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-ink/10 bg-ivory/60 p-4">
+              <li key={r.id} className="flex flex-wrap items-center gap-4 border border-ink/10 bg-ivory/60 p-4">
                 <div className="min-w-0 flex-1">
                   <p className="font-mono text-sm">{r.orderNumber}</p>
                   <p className="text-xs text-stone">
@@ -282,9 +282,9 @@ export function NewReturn({ orders, initialOrderId }: { orders: Order[]; initial
           <ul className="mt-6 divide-y divide-ink/10">
             {order.items.map((it) => (
               <li key={it.id} className="flex items-center gap-4 py-4">
-                <span className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-parchment">{it.image ? <Image src={it.image} alt="" fill sizes="64px" className="object-cover" /> : null}</span>
+                <span className="relative h-20 w-16 shrink-0 overflow-hidden bg-parchment">{it.image ? <Image src={it.image} alt="" fill sizes="64px" className="object-cover" /> : null}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-display text-xl leading-tight">{it.title}</span>
+                  <span className="block text-[0.95rem] font-medium leading-snug">{it.title}</span>
                   <span className="text-xs text-stone">
                     {[it.size, it.color].filter(Boolean).join(' · ')} · bought {it.quantity} · {money(it.price, { currency: order.currency })}
                   </span>
@@ -307,7 +307,7 @@ export function NewReturn({ orders, initialOrderId }: { orders: Order[]; initial
       <Panel title="Why are you returning it?">
         <div className="grid gap-2 sm:grid-cols-2">
           {REASONS.map((r) => (
-            <label key={r.id} className={cn('flex cursor-pointer items-center gap-3 rounded-2xl border p-4 text-sm', reason === r.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15')}>
+            <label key={r.id} className={cn('flex cursor-pointer items-center gap-3 border p-4 text-sm', reason === r.id ? 'border-ink bg-ink/[0.03]' : 'border-ink/15')}>
               <input type="radio" name="reason" checked={reason === r.id} onChange={() => setReason(r.id)} className="accent-[#5b0e14]" />
               {r.label}
             </label>
@@ -316,7 +316,7 @@ export function NewReturn({ orders, initialOrderId }: { orders: Order[]; initial
         <TextArea label="Anything we should know? (optional)" rows={3} className="mt-6" value={comments} onChange={(e) => setComments(e.target.value)} maxLength={1000} />
       </Panel>
       {error ? (
-        <p role="alert" className="rounded-2xl bg-error/[0.07] p-4 text-sm text-error">
+        <p role="alert" className="bg-error/[0.07] p-4 text-sm text-error">
           {error}
         </p>
       ) : null}
@@ -348,7 +348,7 @@ export function Rewards({ user, orders }: { user: PublicUser; orders: Order[] })
       <div className="grid items-center gap-8 md:grid-cols-[auto_1fr]">
         <MemberCard user={user} />
         <div>
-          <h2 className="font-display text-4xl">How points work</h2>
+          <h2 className="text-[1.6rem] font-medium">How points work</h2>
           <ul className="mt-5 space-y-3 text-stone">
             <li>
               {all.map((c, i) => (
@@ -374,10 +374,10 @@ export function Rewards({ user, orders }: { user: PublicUser; orders: Order[] })
           {TIERS.map((t) => {
             const reached = user.points >= t.min
             return (
-              <li key={t.id} className={cn('rounded-2xl border p-5', user.tier === t.id ? 'border-gold bg-gold/10' : reached ? 'border-ink/20' : 'border-ink/10 opacity-60')}>
-                <p className="font-display text-2xl">{t.name}</p>
+              <li key={t.id} className={cn('rounded-2xl border p-5', user.tier === t.id ? 'border-ink bg-bone' : reached ? 'border-ink/20' : 'border-ink/10 opacity-60')}>
+                <p className="text-[1.05rem] font-medium">{t.name}</p>
                 <p className="mt-1 font-mono text-xs text-stone">{t.min.toLocaleString()}+ points</p>
-                {user.tier === t.id ? <p className="mt-3 text-eyebrow text-gold-deep">Your tier</p> : null}
+                {user.tier === t.id ? <p className="mt-3 text-eyebrow text-ink">Your tier</p> : null}
               </li>
             )
           })}
@@ -416,7 +416,7 @@ export function Wishlist() {
       {!saved ? (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="aspect-[3/4] rounded-[1.25rem] skeleton" />
+            <div key={i} className="aspect-[3/4] skeleton" />
           ))}
         </div>
       ) : saved.length ? (
@@ -529,7 +529,7 @@ export function TrackOrder({ initialNumber }: { initialNumber: string }) {
         <h1 className="mt-5 text-display">Where is my order?</h1>
         <div className="mt-12 grid gap-10 lg:grid-cols-[400px_1fr]">
           <form
-            className="space-y-4 self-start rounded-[1.75rem] bg-bone/70 p-6 md:p-8"
+            className="space-y-4 self-start bg-bone/70 p-6 md:p-8"
             onSubmit={async (e) => {
               e.preventDefault()
               setBusy(true)
@@ -564,9 +564,9 @@ export function TrackOrder({ initialNumber }: { initialNumber: string }) {
             </p>
           </form>
           {order ? (
-            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE }} className="space-y-6 rounded-[1.75rem] bg-bone/70 p-6 md:p-8">
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE }} className="space-y-6 bg-bone/70 p-6 md:p-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="font-display text-3xl">{order.orderNumber}</h2>
+                <h2 className="text-[1.25rem] font-medium">{order.orderNumber}</h2>
                 <StatusPill status={order.status} />
               </div>
               <OrderTimeline order={order} />
@@ -579,7 +579,7 @@ export function TrackOrder({ initialNumber }: { initialNumber: string }) {
               <OrderTotals order={order} />
             </motion.div>
           ) : (
-            <div className="hidden items-center justify-center rounded-[1.75rem] border border-dashed border-ink/15 p-10 text-center text-stone lg:flex">Your order&rsquo;s progress will appear here.</div>
+            <div className="hidden items-center justify-center border border-dashed border-ink/15 p-10 text-center text-stone lg:flex">Your order&rsquo;s progress will appear here.</div>
           )}
         </div>
       </div>

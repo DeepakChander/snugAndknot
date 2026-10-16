@@ -53,7 +53,7 @@ function ReviewCard({ r }: { r: AdminReview }) {
       </div>
       {replying ? (
         <div className="mt-4">
-          <Textarea rows={3} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="A public reply from the atelier" />
+          <Textarea rows={3} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="A public reply from the shop" />
           <div className="mt-2 flex gap-2">
             <Btn size="sm" loading={busy} onClick={async () => (await run('PATCH', `/api/admin/reviews/${r.id}`, { adminReply: reply.trim() || null }, reply.trim() ? 'Reply published.' : 'Reply removed.')) && setReplying(false)}>
               Save reply

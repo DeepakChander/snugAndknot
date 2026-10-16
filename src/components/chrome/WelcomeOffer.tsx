@@ -80,22 +80,22 @@ export default function WelcomeOffer({ code = 'WELCOME10' }: { code?: string }) 
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 30 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className={`fixed ${bottom} left-4 z-[110] w-[min(92vw,380px)] overflow-hidden rounded-[1.75rem] bg-ink p-6 text-bone shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] sm:left-6`}
+          className={`fixed ${bottom} left-4 z-[110] w-[min(92vw,380px)] overflow-hidden bg-ink p-6 text-bone shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] sm:left-6`}
         >
           <button type="button" onClick={dismiss} aria-label="Dismiss offer" className="absolute right-4 top-4 rounded-full p-2 text-bone/50 hover:bg-bone/10 hover:text-bone">
             <XIcon size={14} />
           </button>
-          <p className="text-eyebrow slash text-butter">First order</p>
+          <p className="text-eyebrow text-bone/70">First order</p>
           {subscribed ? (
             <>
-              <p className="mt-3 font-display text-3xl font-semibold leading-tight tracking-[-0.04em]">Your welcome code</p>
+              <p className="mt-3 text-[1.25rem] font-medium font-semibold leading-tight tracking-[-0.04em]">Your welcome code</p>
               <button
                 type="button"
                 onClick={async () => {
                   await navigator.clipboard?.writeText(code).catch(() => {})
                   setCopied(true)
                 }}
-                className="mt-4 flex w-full items-center justify-between rounded-2xl border border-dashed border-butter/50 px-4 py-3 font-mono text-lg tracking-[0.2em] text-butter"
+                className="mt-4 flex w-full items-center justify-between border border-dashed border-bone/40 px-4 py-3 font-mono text-lg tracking-[0.2em] text-ivory"
               >
                 {code}
                 <span className="flex items-center gap-1 text-xs tracking-normal text-bone/60">
@@ -106,8 +106,8 @@ export default function WelcomeOffer({ code = 'WELCOME10' }: { code?: string }) 
             </>
           ) : (
             <>
-              <p className="mt-3 font-display text-3xl font-semibold leading-tight tracking-[-0.04em]">10% off your first piece</p>
-              <p className="mt-2 text-sm text-bone/60">Join the atelier letter and we will show you a welcome code.</p>
+              <p className="mt-3 text-[1.25rem] font-medium font-semibold leading-tight tracking-[-0.04em]">10% off your first piece</p>
+              <p className="mt-2 text-sm text-bone/60">Join our newsletter and we will show you a welcome code.</p>
               <NewsletterForm source="welcome-offer" cta="Reveal code" className="mt-3" onSubscribed={() => setSubscribed(true)} />
             </>
           )}

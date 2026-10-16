@@ -169,7 +169,7 @@ export default function Reviews({
                         </div>
                         {r.adminReply ? (
                           <div className="mt-5 border-l-2 border-ink bg-bone p-4 text-sm">
-                            <p className="text-eyebrow text-burgundy">Reply from the atelier</p>
+                            <p className="text-eyebrow text-stone">Reply from Snug&amp;Knot</p>
                             <p className="mt-2">{r.adminReply}</p>
                           </div>
                         ) : null}
