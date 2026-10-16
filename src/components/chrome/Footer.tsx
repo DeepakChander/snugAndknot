@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { scrollToTop } from '@/lib/motion/lenis'
 import { useSettings } from '@/components/providers/SettingsProvider'
+import { DEPARTMENT_TITLES, openDepartments } from '@/lib/categories'
 import NewsletterForm from './NewsletterForm'
 import CurrencySwitcher from './CurrencySwitcher'
 import { ArrowUp, InstagramIcon, PinterestIcon, TiktokIcon, XIcon } from '@/components/kit/icons'
@@ -11,9 +12,7 @@ const COLUMNS = [
   {
     title: 'Shop',
     links: [
-      { label: 'Women', href: '/shop/women' },
-      { label: 'Men', href: '/shop/men' },
-      { label: 'Kids', href: '/shop/kids' },
+      // The departments are added in front, open ones only.
       { label: 'New in', href: '/shop?sort=newest' },
       { label: 'Collections', href: '/collections' },
     ],
@@ -68,7 +67,7 @@ export default function Footer() {
         </div>
 
         <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-8 lg:pl-10">
-          {COLUMNS.map((col) => (
+          {COLUMNS.map((c) => (c.title === 'Shop' ? { ...c, links: [...openDepartments(store).map((d) => ({ label: DEPARTMENT_TITLES[d], href: `/shop/${d}` })), ...c.links] } : c)).map((col) => (
             <div key={col.title}>
               <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em]">{col.title}</p>
               <ul className="mt-4 space-y-2.5">

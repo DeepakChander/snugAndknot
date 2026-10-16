@@ -13,7 +13,7 @@ import { organizationLd, websiteLd } from '@/lib/seo'
 import { JOURNAL } from '@/lib/journal'
 import { buildWall } from '@/lib/video'
 import type { HomeSections, Product } from '@/types/commerce'
-import { categoryHref, type Department } from '@/lib/categories'
+import { categoryHref, openDepartments, type Department } from '@/lib/categories'
 
 export const metadata: Metadata = { alternates: { canonical: '/', types: { 'application/rss+xml': [{ url: '/journal/feed.xml', title: 'Snug&Knot Journal' }] } } }
 
@@ -33,6 +33,7 @@ export default async function HomePage() {
   ])
   // A setting saved before the switches existed has none: every section shows.
   const on = (k: keyof HomeSections) => settings.homepage.sections?.[k] ?? true
+  const open = openDepartments(settings.store)
 
   const forDept = (d: Department) => products.filter((p) => p.gender === d || (d !== 'kids' && p.gender === 'unisex'))
   const firstImage = (list: Product[]) => list.find((p) => p.images[0])?.images[0].src ?? ''
@@ -43,6 +44,8 @@ export default async function HomePage() {
   const department = (href: string) => /^\/shop\/(men|women|kids)\/?$/.exec(href)?.[1] as Department | undefined
   const heroPanels: HeroPanelView[] = (settings.homepage.heroPanels ?? [])
     .filter((p) => p.label.trim() && p.href)
+    // A panel for a closed department goes with it.
+    .filter((p) => !department(p.href) || open.includes(department(p.href)!))
     .map((p) => {
       const d = department(p.href)
       return { label: p.label, href: p.href, image: p.image || (d ? firstImage(forDept(d)) : '') }
@@ -52,7 +55,7 @@ export default async function HomePage() {
   // "Shop by category": each department's categories that the admin left on the home page and that
   // have an image, in admin order (empty ones included: their page says what is coming).
   const tiles: CategoryTile[] = allCategories
-    .filter((c) => c.department && c.showOnHome && c.image)
+    .filter((c) => c.department && open.includes(c.department as Department) && c.showOnHome && c.image)
     .map((c) => ({ slug: c.slug, href: categoryHref(c), title: c.title, badge: c.badge, image: c.image, department: c.department as Department }))
 
   const newest = [...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 8)

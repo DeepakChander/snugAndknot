@@ -305,6 +305,8 @@ export interface StoreSettings {
   phone: string
   address: { street: string; city: string; state: string; zip: string; country: string }
   social: { instagram: string; pinterest: string; tiktok: string; twitter: string }
+  /** Departments open in the shop. A closed one is gone from the menus, the home page and the shop. */
+  departments: { men: boolean; women: boolean; kids: boolean }
 }
 
 /** An additional currency the shop sells in, with its own prices, shipping and points. */

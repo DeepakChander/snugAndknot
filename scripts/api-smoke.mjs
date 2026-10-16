@@ -396,6 +396,27 @@ async function departmentChecks() {
   const created = await admin.post('/api/admin/categories', { slug, title: 'Smoke tees', department: 'kids', group: 'Boys', showOnHome: false })
   check('admin creates a category in a department and group → 201', created.status === 201 && created.data.category?.department === 'kids' && created.data.category?.group === 'Boys', created.data)
   if (created.status === 201) check('delete the test category', (await admin.del(`/api/admin/categories/${slug}`)).status === 200)
+
+  // Closing a department takes it out of the shop; opening it brings it back.
+  const store = (await admin.get('/api/admin/settings')).data.settings.store
+  const close = await admin.put('/api/admin/settings', { section: 'store', value: { ...store, departments: { men: true, women: true, kids: false } } })
+  check('admin closes the Kids department → 200', close.status === 200 && close.data.value?.departments?.kids === false, close.data)
+  let closed = false
+  for (let i = 0; i < 10 && !closed; i++) {
+    closed = (await anon.get('/shop/kids')).status === 404
+    if (!closed) await new Promise((r) => setTimeout(r, 500))
+  }
+  check('…its page is gone (404)', closed, null)
+  check('…and so are its categories (404)', (await anon.get('/shop/kids/boys-t-shirts')).status === 404)
+  check('…while Men stays open', (await anon.get('/shop/men')).status === 200)
+  const reopen = await admin.put('/api/admin/settings', { section: 'store', value: { ...store, departments: { men: true, women: true, kids: true } } })
+  check('admin opens Kids again → 200', reopen.status === 200 && reopen.data.value?.departments?.kids === true, reopen.data)
+  let back = false
+  for (let i = 0; i < 10 && !back; i++) {
+    back = (await anon.get('/shop/kids')).status === 200
+    if (!back) await new Promise((r) => setTimeout(r, 500))
+  }
+  check('…and its page is back (200)', back, null)
 }
 
 async function categoryGridChecks() {

@@ -5,7 +5,7 @@ import { DEPARTMENTS, loadShop } from '@/server/shop'
 import { getCategory, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { breadcrumbLd, itemListLd, pageMeta } from '@/lib/seo'
-import { categoryHref } from '@/lib/categories'
+import { categoryHref, openDepartments } from '@/lib/categories'
 
 /** "Women's knitwear", "Kids' knitwear". */
 const knitwear = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} knitwear`
@@ -46,6 +46,8 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
   const sp = await searchParams
 
   if (isDepartment(slug)) {
+    // A department the admin closed has no page.
+    if (!openDepartments((await getStoreSettings()).store).includes(slug)) notFound()
     const dept = DEPARTMENTS[slug]
     const data = await loadShop({ gender: slug, activeHref: `/shop/${slug}` }, sp)
     return (

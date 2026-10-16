@@ -5,10 +5,10 @@ import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useUIStore } from '@/stores/ui-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { useNavData } from '@/components/providers/SettingsProvider'
+import { useNavData, useSettings } from '@/components/providers/SettingsProvider'
 import { useDialogBehaviour } from '@/components/kit/Overlay'
 import { cn } from '@/lib/format'
-import { DEPARTMENT_ORDER, DEPARTMENT_TITLES, type Department } from '@/lib/categories'
+import { DEPARTMENT_TITLES, openDepartments, type Department } from '@/lib/categories'
 import CurrencySwitcher from './CurrencySwitcher'
 import { departmentMenu } from './MegaMenu'
 import { ChevronDown, XIcon } from '@/components/kit/icons'
@@ -27,7 +27,10 @@ export default function MobileMenu() {
   const user = useAuthStore((s) => s.user)
   const openAuthModal = useAuthStore((s) => s.openAuthModal)
   const nav = useNavData()
-  const [dept, setDept] = useState<Department>('men')
+  const departments = openDepartments(useSettings().store)
+  const [picked, setPicked] = useState<Department>('men')
+  // The tab shown: the one picked, unless that department has been closed since.
+  const dept = departments.includes(picked) ? picked : departments[0]
   const ref = useRef<HTMLDivElement>(null)
   useDialogBehaviour(isMenuOpen, ref, closeMenu)
 
@@ -35,7 +38,16 @@ export default function MobileMenu() {
     <AnimatePresence>
       {isMenuOpen ? (
         <>
-          <motion.div key="menu-dim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 z-[114] bg-ink/30 lg:hidden" onClick={closeMenu} aria-hidden />
+          <motion.div
+            key="menu-dim"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[114] bg-ink/30 lg:hidden"
+            onClick={closeMenu}
+            aria-hidden
+          />
           <motion.div
             key="menu"
             ref={ref}
@@ -52,13 +64,13 @@ export default function MobileMenu() {
           >
             <div className="flex h-14 shrink-0 items-center justify-between border-b border-ink/10 pl-1 pr-2">
               <div role="tablist" aria-label="Department" className="flex h-full">
-                {DEPARTMENT_ORDER.map((d) => (
+                {departments.map((d) => (
                   <button
                     key={d}
                     type="button"
                     role="tab"
                     aria-selected={dept === d}
-                    onClick={() => setDept(d)}
+                    onClick={() => setPicked(d)}
                     className={cn('relative px-4 text-[0.82rem] font-medium uppercase tracking-[0.08em]', dept === d ? 'text-ink after:absolute after:inset-x-4 after:bottom-0 after:h-0.5 after:bg-ink' : 'text-ink/55')}
                   >
                     {DEPARTMENT_TITLES[d]}
@@ -71,25 +83,27 @@ export default function MobileMenu() {
             </div>
 
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              <nav aria-label={`${DEPARTMENT_TITLES[dept]} categories`} className="px-5 pb-4 pt-2">
-                {departmentMenu(nav, dept).map((g, i) => (
-                  <details key={`${dept}-${g.heading}`} open={i === 0} className="group border-b border-ink/10">
-                    <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-[0.95rem] font-medium [&::-webkit-details-marker]:hidden">
-                      {g.heading}
-                      <ChevronDown size={16} className="text-ink/50 transition-transform group-open:rotate-180" />
-                    </summary>
-                    <ul className="pb-3">
-                      {g.links.map((l) => (
-                        <li key={l.href}>
-                          <Link href={l.href} onClick={closeMenu} className="block py-2 pl-1 text-[0.95rem] text-ink/75">
-                            {l.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ))}
-              </nav>
+              {dept ? (
+                <nav aria-label={`${DEPARTMENT_TITLES[dept]} categories`} className="px-5 pb-4 pt-2">
+                  {departmentMenu(nav, dept).map((g, i) => (
+                    <details key={`${dept}-${g.heading}`} open={i === 0} className="group border-b border-ink/10">
+                      <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-[0.95rem] font-medium [&::-webkit-details-marker]:hidden">
+                        {g.heading}
+                        <ChevronDown size={16} className="text-ink/50 transition-transform group-open:rotate-180" />
+                      </summary>
+                      <ul className="pb-3">
+                        {g.links.map((l) => (
+                          <li key={l.href}>
+                            <Link href={l.href} onClick={closeMenu} className="block py-2 pl-1 text-[0.95rem] text-ink/75">
+                              {l.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ))}
+                </nav>
+              ) : null}
 
               <ul className="border-t border-ink/10 px-5 py-4">
                 {MORE.map((l) => (

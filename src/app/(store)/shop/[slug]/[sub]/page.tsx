@@ -5,7 +5,7 @@ import { DEPARTMENTS, loadShop } from '@/server/shop'
 import { getCategories, getCategory, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { breadcrumbLd, itemListLd, pageMeta } from '@/lib/seo'
-import { categoryFullTitle, categoryHref, isDepartment } from '@/lib/categories'
+import { categoryFullTitle, categoryHref, isDepartment, openDepartments } from '@/lib/categories'
 
 type Props = {
   params: Promise<{ slug: string; sub: string }>
@@ -16,6 +16,8 @@ type Props = {
 async function resolve(params: Props['params']) {
   const { slug, sub } = await params
   if (!isDepartment(slug)) return null
+  // A department the admin closed has no pages.
+  if (!openDepartments((await getStoreSettings()).store).includes(slug)) return null
   const category = await getCategory(`${slug}-${sub}`)
   return category && category.department === slug ? category : null
 }

@@ -25,3 +25,8 @@ export function categoryFullTitle(c: Pick<Category, 'title' | 'department' | 'gr
   if (c.department === 'kids') return c.group ? `${c.group} ${c.title}` : `Kids' ${c.title}`
   return `${DEPARTMENT_TITLES[c.department]}'s ${c.title.toLowerCase()}`
 }
+
+/** The departments open in the shop, in menu order. A setting saved before the switch existed opens all. */
+export function openDepartments(store: { departments?: Partial<Record<Department, boolean>> }): Department[] {
+  return DEPARTMENT_ORDER.filter((d) => store.departments?.[d] ?? true)
+}

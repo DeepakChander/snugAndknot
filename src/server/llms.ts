@@ -7,7 +7,7 @@ import { JOURNAL } from '@/lib/journal'
 import { plain } from '@/lib/accent'
 import { absoluteUrl } from '@/lib/site'
 import type { Product } from '@/types/commerce'
-import { categoryFullTitle, categoryHref } from '@/lib/categories'
+import { categoryFullTitle, categoryHref, openDepartments } from '@/lib/categories'
 
 /**
  * llms.txt (https://llmstxt.org): a plain Markdown map of the shop for AI assistants and answer
@@ -34,7 +34,7 @@ export async function buildLlmsTxt({ full }: { full: boolean }): Promise<string>
     return link(p.title, `/product/${p.handle}`, bits.filter(Boolean).join(' · '))
   }
 
-  const departments = (['women', 'men', 'kids'] as const).flatMap((d) => {
+  const departments = (['women', 'men', 'kids'] as const).filter((d) => openDepartments(store).includes(d)).flatMap((d) => {
     const n = products.filter((p) => p.gender === d || (d !== 'kids' && p.gender === 'unisex')).length
     return n ? [link(DEPARTMENTS[d].title, `/shop/${d}`, `${n} piece${n === 1 ? '' : 's'}. ${DEPARTMENTS[d].description}`)] : []
   })
@@ -65,7 +65,7 @@ export async function buildLlmsTxt({ full }: { full: boolean }): Promise<string>
     '',
     link('All pieces', '/shop', `the full catalogue, ${products.length} piece${products.length === 1 ? '' : 's'}`),
     ...departments,
-    ...categories.map((c) => link(categoryFullTitle(c), categoryHref(c), oneLine(c.description) || undefined)),
+    ...categories.filter((c) => !c.department || openDepartments(store).includes(c.department)).map((c) => link(categoryFullTitle(c), categoryHref(c), oneLine(c.description) || undefined)),
     '',
     '## Pieces',
     '',

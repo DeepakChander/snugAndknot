@@ -11,7 +11,7 @@ import { useWishlistStore } from '@/stores/wishlist-store'
 import { useHydrated } from '@/hooks/use-hydrated'
 import { useSettings } from '@/components/providers/SettingsProvider'
 import { cn } from '@/lib/format'
-import { DEPARTMENT_ORDER, DEPARTMENT_TITLES, type Department } from '@/lib/categories'
+import { DEPARTMENT_TITLES, openDepartments, type Department } from '@/lib/categories'
 import MegaMenu from './MegaMenu'
 import CurrencySwitcher from './CurrencySwitcher'
 import { BagIcon, HeartIcon, SearchIcon, UserIcon } from '@/components/kit/icons'
@@ -155,7 +155,7 @@ export default function Navbar() {
                 <SearchIcon size={20} />
               </button>
               <ul className="-ml-3 hidden items-center lg:flex">
-                {DEPARTMENT_ORDER.map((d) => {
+                {openDepartments(settings.store).map((d) => {
                   const href = `/shop/${d}`
                   const active = isActive(href)
                   return (

@@ -10,7 +10,7 @@ import { Badge, Btn, Card, Empty, Input, PageHeader, Select, Textarea, Toggle, c
 import { ImageField, uploadImage } from './ImagePicker'
 import { ApiError } from '@/lib/api'
 import { cn, formatDate } from '@/lib/format'
-import type { Category, CategoryDepartment, Collection, Coupon } from '@/types/commerce'
+import type { Category, CategoryDepartment, Collection, Coupon, StoreSettings } from '@/types/commerce'
 import { categoryHref } from '@/lib/categories'
 
 const slug = (s: string) =>
@@ -251,7 +251,59 @@ function CategoryRow({ category, isNew, groups, onDone }: { category: Category; 
   )
 }
 
-export function CategoriesAdmin({ categories, counts }: { categories: Category[]; counts: Record<string, number> }) {
+/** One click to show or hide a category in the menu or on the home page. */
+function QuickToggle({ category, field, on, off }: { category: Category; field: 'showInMenu' | 'showOnHome'; on: string; off: string }) {
+  const { run, busy } = useMutate()
+  const value = category[field]
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      aria-pressed={value}
+      onClick={() => run('PUT', `/api/admin/categories/${category.slug}`, { ...category, [field]: !value }, `${category.title}: ${!value ? on.toLowerCase() : off.toLowerCase()}.`)}
+      title={value ? `Click to hide: ${off.toLowerCase()}` : `Click to show: ${on.toLowerCase()}`}
+      className={cn('rounded-full border px-2.5 py-1 text-xs transition-colors disabled:opacity-50', value ? 'border-success/30 bg-success/10 text-success hover:bg-success/20' : 'border-ink/15 text-stone hover:border-ink/40')}
+    >
+      {value ? on : off}
+    </button>
+  )
+}
+
+/** Open or close a whole department: closed, it is gone from the menus, the home page and the shop. */
+function DepartmentSwitches({ store }: { store: StoreSettings }) {
+  const { run, busy } = useMutate()
+  // A setting saved before the switch existed has none: every department is open.
+  const open = store.departments ?? { men: true, women: true, kids: true }
+  return (
+    <Card className="mb-6">
+      <div className="space-y-3 p-5">
+        <p className="text-sm font-medium">Departments in the shop</p>
+        <p className="text-xs text-stone">
+          A closed department disappears from the header, the phone menu, the home page, the footer and the shop filters, and its pages show &ldquo;not found&rdquo;. Its pieces stay in search and Shop all until you hide them too.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(['men', 'women', 'kids'] as const).map((d) => (
+            <button
+              key={d}
+              type="button"
+              disabled={busy}
+              aria-pressed={open[d]}
+              onClick={() =>
+                (open[d] ? confirmAction(`Close ${d === 'men' ? 'Men' : d === 'women' ? 'Women' : 'Kids'}? Shoppers will no longer see it.`) : true) &&
+                run('PUT', '/api/admin/settings', { section: 'store', value: { ...store, departments: { ...open, [d]: !open[d] } } }, `${d === 'men' ? 'Men' : d === 'women' ? 'Women' : 'Kids'} ${open[d] ? 'closed' : 'opened'}.`)
+              }
+              className={cn('rounded-full border px-4 py-1.5 text-sm transition-colors disabled:opacity-50', open[d] ? 'border-success/30 bg-success/10 text-success hover:bg-success/20' : 'border-ink/20 text-stone hover:border-ink/40')}
+            >
+              {d === 'men' ? 'Men' : d === 'women' ? 'Women' : 'Kids'}: {open[d] ? 'open' : 'closed'}
+            </button>
+          ))}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+export function CategoriesAdmin({ categories, counts, store }: { categories: Category[]; counts: Record<string, number>; store: StoreSettings }) {
   const [tab, setTab] = useState<CategoryDepartment>('men')
   const [adding, setAdding] = useState(false)
   const [open, setOpen] = useState<string | null>(null)
@@ -264,9 +316,10 @@ export function CategoriesAdmin({ categories, counts }: { categories: Category[]
     <>
       <PageHeader
         title="Categories"
-        description="The catalogue is organised by department (Men, Women, Kids) and, inside each, by category, grouped under menu headings. Each category has its own page (e.g. /shop/men/shirts). Customers only see categories that have active pieces; a product's department and category are set in the product editor."
+        description="The catalogue is organised by department (Men, Women, Kids) and, inside each, by category, grouped under menu headings. Each category has its own page (e.g. /shop/men/shirts); one with no pieces yet says they are coming, with a notify-me form. Use the switches on each row to show or hide a category in the menu and on the home page. A product's department and category are set in the product editor."
         actions={!adding ? <Btn onClick={() => (setAdding(true), setOpen(null))}>New category</Btn> : undefined}
       />
+      <DepartmentSwitches store={store} />
       <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Department">
         {DEPT_TABS.map((d) => {
           const n = categories.filter((c) => c.department === d.key).length
@@ -308,9 +361,9 @@ export function CategoriesAdmin({ categories, counts }: { categories: Category[]
                     <span className="min-w-[8rem] flex-1 text-sm font-medium">{c.title}</span>
                     <span className="font-mono text-xs text-stone">{categoryHref(c)}</span>
                     <span className="w-24 text-xs text-stone">{counts[c.slug] ?? 0} product(s)</span>
-                    <span className="flex w-40 gap-1.5">
-                      {c.showInMenu ? <Badge tone="good">menu</Badge> : <Badge>not in menu</Badge>}
-                      {c.showOnHome ? <Badge tone="info">home</Badge> : null}
+                    <span className="flex gap-1.5">
+                      <QuickToggle category={c} field="showInMenu" on="In menu" off="Hidden from menu" />
+                      <QuickToggle category={c} field="showOnHome" on="On home page" off="Not on home page" />
                     </span>
                     <Btn size="sm" variant="outline" onClick={() => (setOpen(c.slug), setAdding(false))}>
                       Edit

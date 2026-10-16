@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
       tiktok: 'https://tiktok.com/@snugandknot',
       twitter: 'https://twitter.com/snugandknot',
     },
+    departments: { men: true, women: true, kids: true },
   },
   commerce: {
     currency: 'USD',

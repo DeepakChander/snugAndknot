@@ -432,6 +432,8 @@ export const settingsSchemas = {
       tiktok: httpsUrl,
       twitter: httpsUrl,
     }),
+    // Optional: a save without it keeps every department open (saveSettings fills in defaults).
+    departments: z.object({ men: z.boolean(), women: z.boolean(), kids: z.boolean() }).optional(),
   }),
   commerce: z.object({
     currency: z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO currency code'),
