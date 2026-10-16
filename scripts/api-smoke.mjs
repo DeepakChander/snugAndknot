@@ -616,6 +616,30 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   check('…and the home page leaves the band out', bandGone, null)
   const restoreSections = await admin.put('/api/admin/settings', { section: 'homepage', value: settings.homepage })
   check('restore the home page sections', restoreSections.status === 200, restoreSections.status)
+  // The video wall: an Instagram reel link alone is enough, and each clip belongs to a department.
+  const reel = { id: `ig${stamp}`, url: 'https://www.instagram.com/reel/Deg44SrKwYz/?igsh=abc', poster: '', caption: 'Smoke reel', credit: '@smoke', department: 'men', productIds: [] }
+  const badDept = await admin.put('/api/admin/settings', { section: 'videos', value: { ...settings.videos, enabled: true, items: [{ ...reel, department: 'pets' }] } })
+  check('video with an unknown department refused → 422', badDept.status === 422, badDept.status)
+  const igOnly = await admin.put('/api/admin/settings', { section: 'videos', value: { ...settings.videos, enabled: true, items: [reel] } })
+  check('Instagram reel saved without a poster → 200', igOnly.status === 200 && igOnly.data.value?.items?.[0]?.department === 'men', igOnly.data)
+  const wallOn = async (path) => {
+    for (let i = 0; i < 10; i++) {
+      const html = new TextDecoder().decode((await anon.get(path)).data)
+      if (html.includes('id="video-wall-title"')) return html
+      await new Promise((r) => setTimeout(r, 500))
+    }
+    return ''
+  }
+  const homeWall = await wallOn('/')
+  check('home page shows the video wall with the reel', homeWall.includes('Smoke reel'), null)
+  check('…through Instagram\'s own embed', homeWall.includes('www.instagram.com/p/Deg44SrKwYz/embed/'), null)
+  check('Men page shows the men\'s reel', (await wallOn('/shop/men')).includes('Smoke reel'), null)
+  const womenHtml = new TextDecoder().decode((await anon.get('/shop/women')).data)
+  check('…and the Women page does not', !womenHtml.includes('id="video-wall-title"'), null)
+  const igCsp = (await anon.get('/')).headers.get('content-security-policy') || ''
+  check('pages may frame Instagram embeds (frame-src)', /frame-src[^;]*https:\/\/www\.instagram\.com/.test(igCsp), igCsp)
+  const restoreVideos = await admin.put('/api/admin/settings', { section: 'videos', value: settings.videos })
+  check('restore the video wall', restoreVideos.status === 200, restoreVideos.status)
   const proto = await admin.put('/api/admin/settings', { section: 'announcement', value: { ...settings.announcement, link: '//evil.example/x' } })
   check('protocol-relative link refused → 422', proto.status === 422, proto.status)
   const social = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, social: { ...settings.store.social, instagram: 'http://insecure.example' } } })

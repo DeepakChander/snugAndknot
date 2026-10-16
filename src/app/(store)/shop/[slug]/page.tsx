@@ -6,6 +6,8 @@ import { getCategory, getProducts, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { breadcrumbLd, itemListLd, pageMeta } from '@/lib/seo'
 import { categoryHref, openDepartments } from '@/lib/categories'
+import VideoWall from '@/components/home/VideoWall'
+import { buildWall } from '@/lib/video'
 
 /** "Women's clothing", "Kids' clothing". */
 const clothing = (t: string) => `${t}${t.endsWith('s') ? "'" : "'s"} clothing`
@@ -47,9 +49,12 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
 
   if (isDepartment(slug)) {
     // A department the admin closed has no page.
-    if (!openDepartments((await getStoreSettings()).store).includes(slug)) notFound()
+    const settings = await getStoreSettings()
+    if (!openDepartments(settings.store).includes(slug)) notFound()
     const dept = DEPARTMENTS[slug]
     const data = await loadShop({ gender: slug, activeHref: `/shop/${slug}` }, sp)
+    // The video wall under the department's pieces: only the clips the admin put in this department.
+    const wall = settings.videos.enabled ? buildWall(settings.videos.items, await getProducts({})).filter((v) => v.department === slug) : []
     return (
       <>
         <JsonLd
@@ -69,6 +74,7 @@ export default async function ShopSegmentPage({ params, searchParams }: Props) {
               : undefined
           }
         />
+        {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} /> : null}
       </>
     )
   }

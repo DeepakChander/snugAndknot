@@ -4,9 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { useMoney } from '@/components/providers/SettingsProvider'
-import { InstagramIcon } from '@/components/kit/icons'
-import { Badge, Btn, Card, Empty, Input, PageHeader, Textarea, Toggle, confirmAction } from './ui'
+import { Badge, Btn, Card, Empty, Input, PageHeader, Select, Textarea, Toggle, confirmAction } from './ui'
 import { ImageField } from './ImagePicker'
+import InstagramFrame from '@/components/kit/InstagramFrame'
 import { Counter, SaveBar, Section, useSection } from './SettingsAdmin'
 import { cn } from '@/lib/format'
 import { MAX_WALL_PRODUCTS, MAX_WALL_VIDEOS, detectVideo, youtubeEmbed, youtubePoster, type VideoSource } from '@/lib/video'
@@ -21,14 +21,14 @@ function kindBadge(url: string, source: VideoSource | null) {
   if (!source) return <Badge tone="bad">Not a supported link</Badge>
   if (source.kind === 'file') return <Badge tone="good">Video file · plays inline</Badge>
   if (source.kind === 'youtube') return <Badge tone="info">{source.shorts ? 'YouTube Short' : 'YouTube video'} · plays inline</Badge>
-  return <Badge tone="warn">Instagram · opens on Instagram</Badge>
+  return <Badge tone="info">Instagram · plays on the page</Badge>
 }
 
 /** What the tile will show: the clip itself where it can play, otherwise the poster. */
 function Preview({ source, poster }: { source: VideoSource | null; poster: string }) {
   const still = poster || (source?.kind === 'youtube' ? youtubePoster(source.id) : '')
   return (
-    <div className="relative aspect-[9/16] w-full overflow-hidden rounded-xl bg-noir text-bone ring-1 ring-ink/10">
+    <div className="@container relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-noir text-bone ring-1 ring-ink/10">
       {still ? <Image src={still} alt="" fill sizes="180px" unoptimized={still.startsWith('https://i.ytimg.com/') || still.startsWith('/api/media/')} className="object-cover" /> : null}
       {source?.kind === 'file' ? <video key={source.src} src={source.src} muted loop autoPlay playsInline className="absolute inset-0 h-full w-full object-cover" /> : null}
       {source?.kind === 'youtube' ? (
@@ -41,12 +41,7 @@ function Preview({ source, poster }: { source: VideoSource | null; poster: strin
           className={cn('pointer-events-none absolute top-0 h-full border-0', source.shorts ? 'left-0 w-full' : 'left-1/2 w-[316%] -translate-x-1/2')}
         />
       ) : null}
-      {source?.kind === 'instagram' ? (
-        <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-noir/40 p-3 text-center text-xs">
-          <InstagramIcon size={22} />
-          {still ? null : 'Add a poster: Instagram cannot play here'}
-        </span>
-      ) : null}
+      {source?.kind === 'instagram' && !poster ? <InstagramFrame key={source.code} src={source.embed} reel={!source.href.includes('/p/')} title="" load /> : null}
       {!source ? <span className="absolute inset-0 flex items-center justify-center p-4 text-center text-xs text-bone/60">Paste a link to preview it</span> : null}
     </div>
   )
@@ -170,11 +165,17 @@ function ItemEditor({
             onChange={(ev) => onChange({ url: ev.target.value })}
             placeholder="https://…/clip.mp4, a YouTube or Shorts link, or an Instagram reel"
             className="font-mono text-xs"
-            hint="Video files (.mp4, .webm, .mov) and YouTube play muted on the page. Instagram cannot be played on another site, so its poster shows and opens the post."
+            hint="Paste an Instagram reel or post link (instagram.com/reel/…), a YouTube video or Short, or a video file (.mp4, .webm, .mov). Instagram shows its own cover and plays when opened; files and YouTube play muted on the page. The Instagram post must be public."
           />
+          <Select label="Department" value={item.department ?? ''} error={e('department')} onChange={(ev) => onChange({ department: ev.target.value as VideoWallItem['department'] })} hint="Shown on that department's page and under its tab on the home page. None: only under All on the home page.">
+            <option value="">None</option>
+            <option value="women">Women</option>
+            <option value="men">Men</option>
+            <option value="kids">Kids</option>
+          </Select>
           <ImageField
-            label={source?.kind === 'youtube' ? 'Poster (optional: YouTube’s thumbnail is used otherwise)' : source?.kind === 'instagram' ? 'Poster (required for Instagram)' : 'Poster (shown until the video plays)'}
-            aspect="aspect-[9/16]"
+            label={source?.kind === 'youtube' ? 'Poster (optional: YouTube’s thumbnail is used otherwise)' : source?.kind === 'instagram' ? 'Poster (optional: Instagram’s own cover is used otherwise)' : 'Poster (shown until the video plays)'}
+            aspect="aspect-[4/5]"
             value={item.poster}
             onChange={(v) => onChange({ poster: v })}
           />
@@ -202,10 +203,7 @@ export function VideosAdmin({ initial, products }: { initial: VideoWallSettings;
   const d = s.draft
   const set = (patch: Partial<VideoWallSettings>) => s.setDraft({ ...d, ...patch })
   const setItem = (i: number, patch: Partial<VideoWallItem>) => set({ items: d.items.map((it, j) => (j === i ? { ...it, ...patch } : it)) })
-  const playable = d.items.filter((it) => {
-    const src = detectVideo(it.url)
-    return src && (src.kind !== 'instagram' || it.poster)
-  }).length
+  const playable = d.items.filter((it) => detectVideo(it.url)).length
   const status = !d.enabled ? (
     <Badge>Hidden</Badge>
   ) : playable ? (
@@ -222,7 +220,7 @@ export function VideosAdmin({ initial, products }: { initial: VideoWallSettings;
         title="Videos"
         description={
           <>
-            The shoppable video wall on the home page, after the customer reviews: portrait clips that play muted while on screen and open full screen with the pieces worn in them.{' '}
+            The shoppable video wall: on the home page (with a tab per department) and on the Women, Men and Kids pages (each with its own videos). Each video opens full screen with the pieces worn in it.{' '}
             <Link href="/" target="_blank" className="underline">
               Open the home page ↗
             </Link>
@@ -232,7 +230,7 @@ export function VideosAdmin({ initial, products }: { initial: VideoWallSettings;
       />
       <Card>
         <Section title="Show the section" description="It stays hidden until it is switched on and has at least one video with a supported link.">
-          <Toggle checked={d.enabled} onChange={(v) => set({ enabled: v })} label="Show the video wall on the home page" description={d.enabled && !playable ? 'Add a video below: an empty wall is never shown.' : undefined} />
+          <Toggle checked={d.enabled} onChange={(v) => set({ enabled: v })} label="Show the video wall" description={d.enabled && !playable ? 'Add a video below: an empty wall is never shown.' : undefined} />
         </Section>
         <Section title="Heading and invitation" description="The hashtag, one line inviting customers to share, and the button under it.">
           <Input label="Heading" value={d.heading} maxLength={60} error={s.err.heading} onChange={(e) => set({ heading: e.target.value })} placeholder="#SnugAndKnot" hint={<Counter value={d.heading} max={60} />} />
@@ -249,9 +247,9 @@ export function VideosAdmin({ initial, products }: { initial: VideoWallSettings;
           <h2 className="font-display text-2xl">
             Videos <span className="font-mono text-sm text-stone">({d.items.length} / {MAX_WALL_VIDEOS})</span>
           </h2>
-          <p className="mt-1 text-xs text-stone">Shown in this order: four across on computers, two on phones.</p>
+          <p className="mt-1 text-xs text-stone">Shown in this order: four across on computers, two on phones; the first eight show, then View all.</p>
         </div>
-        <Btn disabled={d.items.length >= MAX_WALL_VIDEOS} onClick={() => set({ items: [...d.items, { id: newId(), url: '', poster: '', caption: '', credit: '', productIds: [] }] })}>
+        <Btn disabled={d.items.length >= MAX_WALL_VIDEOS} onClick={() => set({ items: [...d.items, { id: newId(), url: '', poster: '', caption: '', credit: '', department: '', productIds: [] }] })}>
           Add video
         </Btn>
       </div>
@@ -271,7 +269,7 @@ export function VideosAdmin({ initial, products }: { initial: VideoWallSettings;
           />
         ))}
         {!d.items.length ? (
-          <Empty title="No videos yet">Add a video and paste a link to an .mp4 file, a YouTube video or Short, or an Instagram reel.</Empty>
+          <Empty title="No videos yet">Add a video and paste an Instagram reel link (or a YouTube or .mp4 link), then choose its department.</Empty>
         ) : null}
       </div>
       <SaveBar dirty={s.dirty} busy={s.busy} onSave={s.save} onReset={s.reset} />

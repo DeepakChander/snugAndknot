@@ -403,15 +403,17 @@ export interface SeoSettings {
   ogImage: string
 }
 
-/** One clip on the home page video wall. `url` is a video file, a YouTube link or an Instagram post. */
+/** One clip on the video wall. `url` is a video file, a YouTube link or an Instagram post or reel. */
 export interface VideoWallItem {
   id: string
   url: string
-  /** Still shown before the clip plays (and instead of it for Instagram). Optional for YouTube. */
+  /** Still shown before the clip plays. Optional: YouTube and Instagram show their own cover. */
   poster: string
   caption: string
   /** Who made it, e.g. "@handle". */
   credit: string
+  /** '' for none: then it shows only under All on the home page. */
+  department?: '' | 'men' | 'women' | 'kids'
   productIds: string[]
 }
 

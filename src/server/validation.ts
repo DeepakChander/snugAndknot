@@ -1,6 +1,6 @@
 import 'server-only'
 import { z } from 'zod'
-import { MAX_WALL_PRODUCTS, MAX_WALL_VIDEOS, detectVideo } from '@/lib/video'
+import { MAX_WALL_PRODUCTS, MAX_WALL_VIDEOS, WALL_DEPARTMENTS, detectVideo } from '@/lib/video'
 
 /**
  * Removes characters that are invisible but dangerous in stored text: control characters
@@ -392,15 +392,12 @@ const wallItem = z
     poster: imageUrl.default(''),
     caption: trimmed(200).default(''),
     credit: trimmed(60).default(''),
+    department: z.enum(WALL_DEPARTMENTS).default(''),
     productIds: z
       .array(required(120))
       .max(MAX_WALL_PRODUCTS, `Tag at most ${MAX_WALL_PRODUCTS} pieces in one video`)
       .default([])
       .transform((ids) => [...new Set(ids)]),
-  })
-  .superRefine((v, ctx) => {
-    // Instagram cannot be played inline, so the poster is all that shows.
-    if (detectVideo(v.url)?.kind === 'instagram' && !v.poster) ctx.addIssue({ code: 'custom', path: ['poster'], message: 'Instagram posts need a poster image' })
   })
 export const videoWallSchema = z
   .object({

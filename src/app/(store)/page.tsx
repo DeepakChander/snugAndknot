@@ -79,7 +79,7 @@ export default async function HomePage() {
       {on('newIn') ? <NewIn products={newest} /> : null}
       {feature && featured ? <HomeFeature feature={feature} collection={featured} pieces={featuredPieces} /> : null}
       {on('collections') ? <Collections collections={collections} products={products} /> : null}
-      {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} /> : null}
+      {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} tabs departments={open} /> : null}
       {on('reviews') ? <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} /> : null}
       {on('journal') ? <JournalCards posts={JOURNAL} /> : null}
       {on('promises') ? <Promises /> : null}
