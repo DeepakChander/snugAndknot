@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import FabricGallery from '@/components/product/FabricGallery'
 import ProductInfo from '@/components/product/ProductInfo'
 import Reviews from '@/components/product/Reviews'
-import { FabricStory, RecentlyViewed, Related, StickyBuyBar } from '@/components/product/ProductExtras'
+import { RecentlyViewed, Related, StickyBuyBar } from '@/components/product/ProductExtras'
 import { getProduct, getProducts, getRelated, getReviews, getStoreSettings } from '@/server/catalog'
 import JsonLd from '@/components/seo/JsonLd'
 import { breadcrumbLd, pageMeta, productLd, socialImage } from '@/lib/seo'
@@ -47,20 +47,17 @@ export default async function ProductPage({ params }: Props) {
     ]),
   ]
 
-  const detailImage = product.images[1]?.src ?? product.images[0]?.src ?? ''
-
   return (
     <>
       <JsonLd data={structured} />
       <section className="bg-ivory pb-20 pt-nav text-ink">
-        <div className="container-wide grid gap-10 pt-8 md:pt-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16 xl:gap-24">
+        <div className="container-wide grid gap-8 pt-4 md:pt-8 lg:grid-cols-[1.65fr_1fr] lg:gap-12 xl:gap-16">
           <FabricGallery images={product.images} title={product.title} />
-          <div id="buy-panel" className="lg:pt-6">
+          <div id="buy-panel" className="self-start lg:sticky lg:top-[calc(var(--nav-offset)+1.5rem)]">
             <ProductInfo product={product} summary={summary} />
           </div>
         </div>
       </section>
-      <FabricStory details={product.details} image={detailImage} title={product.title} />
       <Reviews handle={product.handle} productTitle={product.title} initialReviews={reviews} initialSummary={summary} />
       <Related products={related} />
       <RecentlyViewed current={product.handle} />

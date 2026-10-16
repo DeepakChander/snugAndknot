@@ -35,7 +35,7 @@ export default function ClientReviews({ reviews, average, count }: { reviews: Ho
             </span>
           </p>
         </div>
-        <ul className="no-scrollbar -mx-gutter mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0">
+        <ul className="no-scrollbar -mx-[var(--gutter)] mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0">
           {reviews.slice(0, 3).map((r) => (
             <li key={r.id} className="flex w-[82vw] shrink-0 snap-start flex-col border border-ink/10 p-6 sm:w-[60vw] md:w-auto">
               <Stars value={r.rating} size={13} />

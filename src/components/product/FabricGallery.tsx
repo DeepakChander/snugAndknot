@@ -1,100 +1,61 @@
 'use client'
 
 import Image from 'next/image'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { useCallback, useRef, useState } from 'react'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
-import { ArrowLeft, ArrowRight } from '@/components/kit/icons'
 import { cn } from '@/lib/format'
 import type { ProductImage } from '@/types/commerce'
 
 /**
- * Product photographs: crossfade between them with arrows, swipe or the thumbnails, and open any
- * one enlarged to zoom in. Plain photographs on purpose: the fabric should read as it is.
+ * Product photographs. On a desktop every photograph is laid out at once in two columns (the buy
+ * panel stays beside them); on a phone they swipe sideways with a counter. Any photograph opens
+ * enlarged, where a click zooms in where you point.
  */
 export default function FabricGallery({ images, title }: { images: ProductImage[]; title: string }) {
+  const [zoomAt, setZoomAt] = useState<number | null>(null)
   const [index, setIndex] = useState(0)
-  const [zoom, setZoom] = useState(false)
-  const stage = useRef<HTMLDivElement>(null)
-  const touch = useRef<{ x: number; t: number } | null>(null)
+  const strip = useRef<HTMLDivElement>(null)
   const count = images.length
 
-  const go = useCallback((d: number) => setIndex((i) => (i + d + count) % count), [count])
+  // Which photograph the phone strip is on, for the counter.
+  const onScroll = useCallback(() => {
+    const el = strip.current
+    if (el) setIndex(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)))
+  }, [])
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (!stage.current?.matches(':hover') && document.activeElement?.closest('[data-gallery]') == null) return
-      if (e.key === 'ArrowRight') go(1)
-      if (e.key === 'ArrowLeft') go(-1)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [go])
-
-  if (!count) return <div className="aspect-[3/4] rounded-[1.5rem] bg-parchment" />
+  if (!count) return <div className="aspect-[3/4] bg-parchment" />
 
   return (
-    <div data-gallery className="lg:sticky lg:top-[calc(var(--nav-offset)+1rem)]">
-      <div
-        ref={stage}
-        className="group relative aspect-[3/4] overflow-hidden rounded-[1.5rem] bg-parchment"
-        data-cursor="view"
-        data-cursor-label="Zoom"
-        onClick={() => setZoom(true)}
-        onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, t: Date.now() })}
-        onTouchEnd={(e) => {
-          const start = touch.current
-          if (!start) return
-          const dx = e.changedTouches[0].clientX - start.x
-          if (Math.abs(dx) > 40 && Date.now() - start.t < 600) {
-            e.preventDefault()
-            go(dx < 0 ? 1 : -1)
-          }
-        }}
-      >
-        <AnimatePresence initial={false}>
-          <motion.div key={index} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
-            <Image src={images[index].src} alt={images[index].alt || title} fill loading={index === 0 ? 'eager' : undefined} fetchPriority={index === 0 ? 'high' : undefined} sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" />
-          </motion.div>
-        </AnimatePresence>
-
-        {count > 1 ? (
-          <>
-            <div className="absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-between opacity-100 transition-opacity duration-500 md:opacity-0 md:group-hover:opacity-100">
-              <button type="button" onClick={(e) => (e.stopPropagation(), go(-1))} aria-label="Previous image" data-cursor="hover" className="flex h-11 w-11 items-center justify-center rounded-full bg-ivory/80 backdrop-blur hover:bg-ivory">
-                <ArrowLeft size={18} />
-              </button>
-              <button type="button" onClick={(e) => (e.stopPropagation(), go(1))} aria-label="Next image" data-cursor="hover" className="flex h-11 w-11 items-center justify-center rounded-full bg-ivory/80 backdrop-blur hover:bg-ivory">
-                <ArrowRight size={18} />
-              </button>
-            </div>
-            <div className="pointer-events-none absolute bottom-4 left-4 rounded-full bg-ivory/80 px-3 py-1 font-mono text-xs backdrop-blur" aria-live="polite">
-              {String(index + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
-            </div>
-          </>
-        ) : null}
+    <div data-gallery>
+      {/* Desktop: all photographs, two per row (one large when there is a single one). */}
+      <div className={cn('hidden gap-1.5 lg:grid', count > 1 ? 'grid-cols-2' : 'grid-cols-1')}>
+        {images.map((img, i) => (
+          <button key={img.src} type="button" onClick={() => setZoomAt(i)} aria-label={`Enlarge image ${i + 1} of ${count}`} className="relative block aspect-[3/4] cursor-zoom-in overflow-hidden bg-bone">
+            <Image src={img.src} alt={img.alt || title} fill loading={i < 2 ? 'eager' : undefined} fetchPriority={i === 0 ? 'high' : undefined} sizes={count > 1 ? '(min-width:1024px) 30vw' : '(min-width:1024px) 60vw'} className="object-cover" />
+          </button>
+        ))}
       </div>
 
-      {count > 1 ? (
-        <div className="mt-4 flex gap-3" role="tablist" aria-label="Product images">
+      {/* Phone and tablet: swipe sideways. */}
+      <div className="relative lg:hidden">
+        <div ref={strip} onScroll={onScroll} className="no-scrollbar -mx-[var(--gutter)] flex snap-x snap-mandatory overflow-x-auto">
           {images.map((img, i) => (
-            <button
-              key={img.src}
-              type="button"
-              role="tab"
-              aria-selected={i === index}
-              aria-label={`Image ${i + 1}: ${img.alt}`}
-              onClick={() => setIndex(i)}
-              className={cn('relative aspect-[3/4] w-16 overflow-hidden rounded-xl transition-all duration-500 md:w-20', i === index ? 'ring-2 ring-ink ring-offset-2 ring-offset-ivory' : 'opacity-60 hover:opacity-100')}
-            >
-              <Image src={img.src} alt="" fill sizes="80px" className="object-cover" />
+            <button key={img.src} type="button" onClick={() => setZoomAt(i)} aria-label={`Enlarge image ${i + 1} of ${count}`} className="relative aspect-[3/4] w-full shrink-0 snap-start bg-bone">
+              <Image src={img.src} alt={img.alt || title} fill loading={i === 0 ? 'eager' : undefined} fetchPriority={i === 0 ? 'high' : undefined} sizes="100vw" className="object-cover" />
             </button>
           ))}
         </div>
-      ) : null}
+        {count > 1 ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center gap-1.5" aria-hidden>
+            {images.map((img, i) => (
+              <span key={img.src} className={cn('h-1.5 w-1.5 rounded-full transition-colors', i === index ? 'bg-ink' : 'bg-ink/25')} />
+            ))}
+          </div>
+        ) : null}
+      </div>
 
-      <Overlay open={zoom} onClose={() => setZoom(false)} label={`${title} — enlarged`} side="center" className="bg-noir" backdropClassName="bg-noir/90">
-        <ZoomView images={images} index={index} setIndex={setIndex} onClose={() => setZoom(false)} title={title} />
+      <Overlay open={zoomAt !== null} onClose={() => setZoomAt(null)} label={`${title}, enlarged`} side="center" className="bg-ivory" backdropClassName="bg-ivory/95">
+        {zoomAt !== null ? <ZoomView images={images} index={zoomAt} setIndex={setZoomAt} onClose={() => setZoomAt(null)} title={title} /> : null}
       </Overlay>
     </div>
   )
@@ -105,7 +66,7 @@ function ZoomView({ images, index, setIndex, onClose, title }: { images: Product
   const [zoomed, setZoomed] = useState(false)
   return (
     <div className="relative h-[86dvh]">
-      <CloseButton onClick={onClose} className="absolute right-4 top-4 z-10 text-bone" />
+      <CloseButton onClick={onClose} className="absolute right-4 top-4 z-10 text-ink" />
       <div
         className="relative h-full w-full cursor-zoom-in overflow-hidden"
         onClick={() => setZoomed((z) => !z)}
@@ -126,7 +87,7 @@ function ZoomView({ images, index, setIndex, onClose, title }: { images: Product
       {images.length > 1 ? (
         <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
           {images.map((img, i) => (
-            <button key={img.src} type="button" onClick={() => setIndex(i)} aria-label={`Show image ${i + 1}`} className={cn('h-1.5 rounded-full transition-all', i === index ? 'w-8 bg-gold' : 'w-3 bg-bone/30')} />
+            <button key={img.src} type="button" onClick={() => setIndex(i)} aria-label={`Show image ${i + 1}`} className={cn('h-1.5 rounded-full transition-all', i === index ? 'w-8 bg-ink' : 'w-3 bg-ink/25')} />
           ))}
         </div>
       ) : null}
