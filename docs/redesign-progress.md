@@ -25,6 +25,7 @@ git diff origin/main premium-site --stat        # everything the redesign change
 | 8 | Account | `p8-account` | Done |
 | 9 | Info pages (about, contact, FAQ, policies, journal, lookbook, collections, 404) | `p9-info` | Done |
 | 10 | Premium polish: serif headings, hero photographs and campaign mode, campaign band, dark footer | `p10-polish` | Done |
+| 11 | Video wall: Instagram links play on the site; Men / Women / Kids videos on each department page | `p11-video-wall` | Done |
 
 ## Phase 1 · Header and categories
 
@@ -115,6 +116,16 @@ git diff origin/main premium-site --stat        # everything the redesign change
 - The hero now opens on the generated campaign photograph, with the Women, Men and Kids photographs
   as a row of tiles under it (`public/images/hero/`). Removing the campaign photograph in the admin
   brings back the three panels side by side.
+
+## Phase 11 · Video wall
+
+- Paste an Instagram reel or post link in Admin → Videos and it shows on the site through
+  Instagram's own embed: its cover in the tile, playing in the full-screen viewer beside the tagged
+  pieces. No poster is needed (one can still be uploaded). The post must be public.
+- Each video has a department. The Women, Men and Kids pages show only their own videos under the
+  pieces; the home page shows them all with All / Women / Men / Kids tabs.
+- The look follows the reference gallery: centred hashtag heading, invitation and button, square
+  4:5 tiles with a "View products" count and the Instagram mark, the first eight then View all.
 
 ## Before going live
 
