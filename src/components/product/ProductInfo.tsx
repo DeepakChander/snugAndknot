@@ -15,7 +15,7 @@ import { AccordionItem } from '@/components/kit/Accordion'
 import Overlay, { CloseButton } from '@/components/kit/Overlay'
 import { WishlistButton } from '@/components/store/ProductCard'
 import { QtyStepper } from '@/components/chrome/CartDrawer'
-import { ReturnIcon, RulerIcon, TruckIcon, NeedleIcon } from '@/components/kit/icons'
+import { PackageIcon, ReturnIcon, RulerIcon, ShieldIcon, TruckIcon } from '@/components/kit/icons'
 import SizeGuideTable from './SizeGuideTable'
 import { api, ApiError } from '@/lib/api'
 import { cn, discountPercent } from '@/lib/format'
@@ -221,9 +221,16 @@ export default function ProductInfo({ product, summary }: { product: Product; su
         <li className="flex items-center gap-3">
           <ReturnIcon size={18} className="text-ink" /> {commerce.returnWindowDays}-day returns from your account.
         </li>
-        <li className="flex items-center gap-3">
-          <NeedleIcon size={18} className="text-ink" /> Finished by hand in small batches.
-        </li>
+        {commerce.deliveryEstimate?.trim() ? (
+          <li className="flex items-center gap-3">
+            <PackageIcon size={18} className="text-ink" /> Delivery in {commerce.deliveryEstimate.trim()}.
+          </li>
+        ) : null}
+        {commerce.onlinePaymentsEnabled ? (
+          <li className="flex items-center gap-3">
+            <ShieldIcon size={18} className="text-ink" /> Secure payment with Razorpay: UPI, cards, net banking.
+          </li>
+        ) : null}
       </ul>
 
       <div className="mt-8">

@@ -61,12 +61,9 @@ export default function Footer() {
     { href: store.social.tiktok, label: 'TikTok', Icon: TiktokIcon },
     { href: store.social.twitter, label: 'X', Icon: XIcon },
   ].filter((s) => s.href)
-  const pay = [
-    commerce.onlinePaymentsEnabled ? 'UPI' : null,
-    commerce.onlinePaymentsEnabled ? 'Cards' : null,
-    commerce.onlinePaymentsEnabled ? 'Net banking' : null,
-    commerce.codEnabled ? 'Cash on delivery' : null,
-  ].filter((p): p is string => !!p)
+  // The ways checkout takes payment right now: Razorpay's methods while it is live, cash on delivery while it is on.
+  const pay = [...(commerce.onlinePaymentsEnabled ? ['UPI', 'Visa', 'Mastercard', 'RuPay', 'Net banking', 'Wallets'] : []), ...(commerce.codEnabled ? ['Cash on delivery'] : [])]
+  const marketplaces = (store.marketplaces ?? []).filter((m) => m.name && m.url)
   const columns = COLUMNS.map((c) => (c.title === 'Shop' ? { ...c, links: [...openDepartments(store).map((d) => ({ label: DEPARTMENT_TITLES[d], href: `/shop/${d}` })), ...c.links] } : c))
 
   return (
@@ -146,6 +143,23 @@ export default function Footer() {
           ) : null}
         </div>
       </div>
+
+      {/* Where else the shop sells, from Admin → Settings → Store → Marketplaces. */}
+      {marketplaces.length ? (
+        <div className="container-wide border-t border-ivory/10 py-8">
+          <p className="text-center text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ivory/50">Also shop us on</p>
+          <ul className="mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+            {marketplaces.map((m) => (
+              <li key={m.url}>
+                <a href={m.url} target="_blank" rel="noopener noreferrer" className="text-[1.15rem] font-semibold tracking-[-0.01em] text-ivory/70 transition-colors hover:text-ivory">
+                  {m.name}
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       {/* The name, set large and still */}
       <div aria-hidden className="container-wide select-none overflow-hidden">

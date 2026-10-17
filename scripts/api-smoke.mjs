@@ -644,6 +644,21 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   check('protocol-relative link refused → 422', proto.status === 422, proto.status)
   const social = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, social: { ...settings.store.social, instagram: 'http://insecure.example' } } })
   check('non-https social link refused → 422', social.status === 422, social.status)
+  const market = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, marketplaces: [{ name: 'Myntra', url: 'http://myntra.example' }] } })
+  check('marketplace link that is not https refused → 422', market.status === 422, market.status)
+  const marketOk = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, marketplaces: [{ name: 'Myntra', url: 'https://www.myntra.com/snugandknot' }] } })
+  check('marketplace saved → 200', marketOk.status === 200 && marketOk.data.value?.marketplaces?.[0]?.name === 'Myntra', marketOk.data)
+  let footerMarket = false
+  for (let i = 0; i < 10 && !footerMarket; i++) {
+    footerMarket = new TextDecoder().decode((await anon.get('/')).data).includes('Also shop us on')
+    if (!footerMarket) await new Promise((r) => setTimeout(r, 500))
+  }
+  check('…and the footer shows the Also shop us on row', footerMarket, null)
+  await admin.put('/api/admin/settings', { section: 'store', value: settings.store })
+  const badRefund = await admin.put('/api/admin/settings', { section: 'commerce', value: { ...settings.commerce, refundDays: 0 } })
+  check('refund days below 1 refused → 422', badRefund.status === 422, badRefund.status)
+  const shipHtml = new TextDecoder().decode((await anon.get('/shipping-returns')).data)
+  check('shipping page states the delivery time and the refund terms', shipHtml.includes('3–7 working days') && shipHtml.includes('working days') && shipHtml.includes('Who pays for return shipping?'), null)
   const cols = (await admin.get('/api/admin/collections')).data.collections
   for (const bad of ['//evil.example/x.png', 'https://evil.example/x.png', '/\\evil.example/x.png']) {
     const r = await admin.put(`/api/admin/collections/${cols[0].id}`, { ...cols[0], image: bad })

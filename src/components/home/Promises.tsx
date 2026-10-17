@@ -1,7 +1,7 @@
 'use client'
 
 import { useMoney, useSettings, useCurrency } from '@/components/providers/SettingsProvider'
-import { NeedleIcon, ReturnIcon, ShieldIcon, TruckIcon } from '@/components/kit/icons'
+import { PackageIcon, ReturnIcon, ShieldIcon, TruckIcon } from '@/components/kit/icons'
 
 /** Service promises in a quiet strip; every figure comes from the store settings, so they stay true. */
 export default function Promises() {
@@ -15,10 +15,12 @@ export default function Promises() {
       body: `Standard delivery ${money(cur.standardShippingRate)} below that, express ${money(cur.expressShippingRate)}.`,
       money: true,
     },
-    { Icon: ReturnIcon, title: `${commerce.returnWindowDays}-day returns`, body: 'Start a return from your account once your order arrives.' },
-    { Icon: NeedleIcon, title: 'Hand-finished', body: 'Buttons, seams and labels finished by hand in small batches.' },
+    { Icon: ReturnIcon, title: `${commerce.returnWindowDays}-day returns`, body: `Start a return from your account. Refunds within ${commerce.refundDays || 7} working days.` },
+    commerce.deliveryEstimate?.trim()
+      ? { Icon: PackageIcon, title: `Delivery in ${commerce.deliveryEstimate.trim()}`, body: 'Tracked from dispatch to your door, in your account.' }
+      : { Icon: PackageIcon, title: 'Tracked delivery', body: 'Follow every order from your account, or with your order number.' },
     commerce.onlinePaymentsEnabled
-      ? { Icon: ShieldIcon, title: 'Secure checkout', body: commerce.codEnabled ? 'Pay online through Razorpay, or pay when your parcel arrives.' : 'Pay online through Razorpay. Card details never reach this site.' }
+      ? { Icon: ShieldIcon, title: 'Secure checkout', body: commerce.codEnabled ? 'Pay online through Razorpay (UPI, cards, net banking), or in cash on delivery.' : 'Pay online through Razorpay. Card details never reach this site.' }
       : commerce.codEnabled
         ? { Icon: ShieldIcon, title: 'Pay on delivery', body: 'Pay when your parcel arrives — no card details needed online.' }
         : { Icon: ShieldIcon, title: 'Track every order', body: 'Follow each order from your account, or with your order number and email.' },

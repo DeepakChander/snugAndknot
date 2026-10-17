@@ -9,6 +9,7 @@ import { AccordionItem } from '@/components/kit/Accordion'
 import SizeGuideTable from '@/components/product/SizeGuideTable'
 import { useMoney, useSettings, useCurrency } from '@/components/providers/SettingsProvider'
 import { PackageIcon, ReturnIcon, TruckIcon } from '@/components/kit/icons'
+import { deliveryText, paymentText, refundText, returnShippingText } from '@/lib/policy'
 
 export function ShippingView() {
   const { commerce, store } = useSettings()
@@ -16,20 +17,18 @@ export function ShippingView() {
   const { currency: cur } = useCurrency()
   const steps = [
     { title: 'Order placed', body: 'You receive an order number straight away. Keep it to track your parcel.' },
-    { title: 'Prepared by hand', body: 'Each piece is checked, folded and packed with care.' },
+    { title: 'Checked and packed', body: 'Each piece is checked, folded and packed with care.' },
     { title: 'On its way', body: 'A tracking number appears in your account (or on Track an order) once it ships.' },
     {
       title: 'Delivered',
-      body: commerce.codEnabled
-        ? commerce.onlinePaymentsEnabled
-          ? 'If you chose pay on delivery, pay the courier now. Your return window opens.'
-          : 'Pay the courier on delivery. Your return window opens.'
-        : 'Your return window opens.',
+      body: commerce.deliveryEstimate?.trim() ? `Usually ${commerce.deliveryEstimate.trim()} after you order. Your return window opens.` : 'Your return window opens.',
     },
   ]
+  const delivery = deliveryText(commerce)
+  const payment = paymentText(commerce)
   return (
     <>
-      <PageHero eyebrow="Customer care" title="Shipping & *returns*" intro="How your order reaches you, and how to send a piece back if it is not quite right." image="/images/blog/wardrobe-essentials.png" />
+      <PageHero eyebrow="Customer care" title="Shipping & *returns*" intro={[delivery, 'How your order reaches you, and how to send a piece back if it is not quite right.'].filter(Boolean).join(' ')} image="/images/blog/wardrobe-essentials.png" />
       <section className="bg-ivory pb-24 text-ink" aria-label="Shipping rates">
         <div className="container-wide">
           <RevealGroup className="grid gap-4 md:grid-cols-3">
@@ -49,7 +48,7 @@ export function ShippingView() {
               <ReturnIcon size={26} className="text-ink" />
               <p className="mt-8 text-eyebrow text-stone">Returns</p>
               <p className="mt-2 text-[2rem] font-medium leading-none">{commerce.returnWindowDays} days</p>
-              <p className="mt-3 text-sm text-stone">From delivery, for unworn pieces in their original condition.</p>
+              <p className="mt-3 text-sm text-stone">From delivery, for unworn pieces in their original condition. Refunds within {commerce.refundDays || 7} working days.</p>
             </RevealItem>
           </RevealGroup>
 
@@ -72,7 +71,9 @@ export function ShippingView() {
           <div className="mt-24 grid gap-12 lg:grid-cols-2">
             <div>
               <h2 className="text-headline">Returning a piece</h2>
-              <p className="mt-5 max-w-md text-stone">Pieces must be unworn, unwashed and in their original condition, with any tags still attached.</p>
+              <p className="mt-5 max-w-md text-stone">Pieces must be unworn, unwashed and in their original condition, with any tags still attached, and the return started within {commerce.returnWindowDays} days of delivery.</p>
+              <p className="mt-3 max-w-md text-stone">{returnShippingText(commerce)}</p>
+              {payment ? <p className="mt-3 max-w-md text-stone">{payment}</p> : null}
               <ButtonLink href="/account/orders" className="mt-8" arrow>
                 Start a return
               </ButtonLink>
@@ -82,7 +83,10 @@ export function ShippingView() {
                 <p>Sign in, open the order and choose Start a return. Select the pieces and tell us why. We will reply with the next steps. Ordered as a guest? Email {store.email} with your order number.</p>
               </AccordionItem>
               <AccordionItem title="When is my refund issued?">
-                <p>Once we receive and check the returned pieces we confirm the refund amount and contact you to arrange it.</p>
+                <p>{refundText(commerce)}</p>
+              </AccordionItem>
+              <AccordionItem title="Who pays for return shipping?">
+                <p>{returnShippingText(commerce)}</p>
               </AccordionItem>
               <AccordionItem title="Can I exchange for another size?">
                 <p>Request a return for the original size and place a new order for the size you need — that way you are not waiting for the return to arrive.</p>
@@ -105,16 +109,16 @@ export function ShippingView() {
 }
 
 const FIBRES = [
-  { name: 'Merino wool', image: '/images/collection-home/Material-Intimacy.png', steps: ['Hand wash cold with a wool detergent.', 'Never wring — press the water out in a towel.', 'Dry flat in its natural shape, away from heat.'], note: 'Merino breathes and resists odour, so it needs washing less than you think.' },
-  { name: 'Cotton & cashmere', image: '/images/products/women/terracotta-textured-cardigan-2.jpg', steps: ['Gentle cycle, cold water, inside out.', 'Reshape while damp.', 'Dry flat; steam rather than iron.'], note: 'Cashmere softens with every gentle wash.' },
-  { name: 'Cotton & silk', image: '/images/products/men/navy-tan-colorblock-tee-2.jpg', steps: ['Cold, gentle wash with similar colours.', 'Avoid tumble drying to keep the sheen.', 'Cool iron on the reverse if needed.'], note: 'Silk gives the knit its soft lustre — keep it out of strong sun when drying.' },
+  { name: 'Knitwear', image: '/images/categories/women-knitwear.webp', steps: ['Hand wash or use the wool cycle, cold, with a gentle detergent.', 'Never wring: press the water out in a towel.', 'Dry flat in its natural shape, away from direct heat.'], note: 'Knits need washing less often than you think: airing them out between wears goes a long way.' },
+  { name: 'Shirts, T-shirts & polos', image: '/images/categories/men-t-shirts.webp', steps: ['Wash cold or warm, inside out, with similar colours.', 'Shake out and hang to dry; tumble dry low only if the label allows.', 'Iron on the reverse while slightly damp for a crisp finish.'], note: 'Turning prints and dark colours inside out keeps them looking new for longer.' },
+  { name: 'Denim, trousers & cargos', image: '/images/categories/men-jeans.webp', steps: ['Wash inside out, cold, with the zip and buttons done up.', 'Wash dark denim on its own for the first few washes.', 'Hang to dry to keep the shape and avoid shrinking.'], note: 'Denim softens and fits better with wear: wash it only when it needs it.' },
 ]
 
 export function CareView() {
   return (
     <>
-      <PageHero eyebrow="Care guide" title="Caring for *knitwear*" intro="Treat a good knit well and it will remember your shape for years. A few gentle habits make all the difference." image="/images/lookbook/soft-focus-2.png" />
-      <section className="bg-ivory pb-24 text-ink" aria-label="By fibre">
+      <PageHero eyebrow="Care guide" title="Caring for your *clothes*" intro="A few simple habits keep every piece looking good for longer. Always check the care label first: it has the final word." image="/images/lookbook/soft-focus-2.png" />
+      <section className="bg-ivory pb-24 text-ink" aria-label="By type">
         <div className="container-wide space-y-6">
           {FIBRES.map((f, i) => (
             <Reveal key={f.name} delay={0.05 * i}>
@@ -140,9 +144,9 @@ export function CareView() {
           ))}
           <div className="grid gap-4 pt-12 md:grid-cols-3">
             {[
-              ['Fold, never hang', 'Hangers stretch shoulders. Fold knits and store them flat.'],
-              ['Rest between wears', 'A day off lets the fibres recover their shape.'],
-              ['Mind the pills', 'A little pilling is natural; remove it gently with a knit comb.'],
+              ['Fold knits, hang shirts', 'Hangers stretch the shoulders of knitwear; shirts and trousers keep their shape on them.'],
+              ['Less heat', 'Cooler washes and air drying save colour and stop shrinking.'],
+              ['Mind the pills', 'A little pilling on knits is natural; remove it gently with a fabric comb.'],
             ].map(([t, b]) => (
               <div key={t} className="border border-ink/10 p-7">
                 <p className="text-[1.05rem] font-medium">{t}</p>

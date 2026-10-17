@@ -439,6 +439,10 @@ export const settingsSchemas = {
     }),
     // Optional: a save without it keeps every department open (saveSettings fills in defaults).
     departments: z.object({ men: z.boolean(), women: z.boolean(), kids: z.boolean() }).optional(),
+    marketplaces: z
+      .array(z.object({ name: required(40, 'Marketplace name'), url: httpsUrl.refine((v) => v !== '', 'Use a full https:// address') }))
+      .max(8, 'At most 8 marketplaces')
+      .optional(),
   }),
   commerce: z.object({
     currency: z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/, 'Use a 3-letter ISO currency code'),
@@ -454,6 +458,9 @@ export const settingsSchemas = {
     expressShippingRate: nonNegative,
     taxRate: z.coerce.number().finite().min(0).max(50),
     returnWindowDays: z.coerce.number().int().min(0).max(365),
+    deliveryEstimate: trimmed(60).optional(),
+    refundDays: z.coerce.number().int().min(1).max(60).optional(),
+    freeReturns: z.boolean().optional(),
     pointsPerDollar: z.coerce.number().finite().min(0).max(100),
     codEnabled: z.boolean(),
     onlinePaymentsEnabled: z.boolean().default(false),

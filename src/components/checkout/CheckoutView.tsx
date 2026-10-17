@@ -18,7 +18,7 @@ import { cn } from '@/lib/format'
 import { payWithRazorpay, type CheckoutPayment } from '@/lib/razorpay-checkout'
 import type { Address, Order, PaymentMethod, ShippingMethod } from '@/types/commerce'
 
-const COUNTRIES = ['United States', 'Canada', 'United Kingdom', 'Ireland', 'India', 'Australia', 'New Zealand', 'Germany', 'France', 'Italy', 'Spain', 'Netherlands', 'Sweden', 'Denmark', 'Norway', 'Switzerland', 'Japan', 'Singapore', 'United Arab Emirates']
+const COUNTRIES = ['India', 'United States', 'Canada', 'United Kingdom', 'Ireland', 'Australia', 'New Zealand', 'Germany', 'France', 'Italy', 'Spain', 'Netherlands', 'Sweden', 'Denmark', 'Norway', 'Switzerland', 'Japan', 'Singapore', 'United Arab Emirates']
 const DRAFT_KEY = 'sk-checkout-draft'
 export const LAST_ORDER_KEY = 'sk-last-order'
 
@@ -59,7 +59,7 @@ export default function CheckoutView() {
     city: '',
     state: '',
     postalCode: '',
-    country: store.address.country || 'United States',
+    country: store.address.country || 'India',
     phone: '',
     notes: '',
     shippingMethod: 'standard',
@@ -291,7 +291,7 @@ export default function CheckoutView() {
               <div className="grid gap-3" role="radiogroup" aria-label="Shipping method">
                 {(
                   [
-                    { id: 'standard', title: 'Standard delivery', price: standardFree ? 0 : cur.standardShippingRate, note: cur.freeShippingThreshold > 0 ? `Free over ${money(cur.freeShippingThreshold)}` : undefined },
+                    { id: 'standard', title: 'Standard delivery', price: standardFree ? 0 : cur.standardShippingRate, note: [commerce.deliveryEstimate?.trim(), cur.freeShippingThreshold > 0 ? `Free over ${money(cur.freeShippingThreshold)}` : ''].filter(Boolean).join(' · ') || undefined },
                     { id: 'express', title: 'Express delivery', price: cur.expressShippingRate, note: 'Priority dispatch' },
                   ] as const
                 ).map((m) => (
@@ -314,7 +314,7 @@ export default function CheckoutView() {
                   {(
                     [
                       { id: 'razorpay', title: 'Pay online', note: 'Card and other methods through Razorpay. Your card details go straight to Razorpay; we never see them.', show: true },
-                      { id: 'cod', title: 'Pay on delivery', note: 'Pay the courier when your parcel arrives.', show: commerce.codEnabled },
+                      { id: 'cod', title: 'Pay on delivery', note: 'Pay in cash when your parcel arrives, at no extra charge.', show: commerce.codEnabled },
                     ] as const
                   )
                     .filter((m) => m.show)

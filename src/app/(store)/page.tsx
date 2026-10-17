@@ -60,11 +60,19 @@ export default async function HomePage() {
   const featured = feature?.enabled ? collections.find((c) => c.handle === feature.collectionHandle && (feature.image || c.image)) : undefined
   const featuredPieces = featured ? featured.productIds.map((id) => products.find((p) => p.id === id)).filter((p): p is Product => !!p) : []
 
-  // "Shop by category": each department's categories that the admin left on the home page and that
-  // have an image, in admin order (empty ones included: their page says what is coming).
+  // "Shop by category": each department's categories that the admin left on the home page, in admin
+  // order (empty ones included: their page says what is coming). One without a photograph yet shows
+  // as its name; a Kids category is named with its group ("Boys T-shirts").
   const tiles: CategoryTile[] = allCategories
-    .filter((c) => c.department && open.includes(c.department as Department) && c.showOnHome && c.image)
-    .map((c) => ({ slug: c.slug, href: categoryHref(c), title: c.title, badge: c.badge, image: c.image, department: c.department as Department }))
+    .filter((c) => c.department && open.includes(c.department as Department) && c.showOnHome)
+    .map((c) => ({
+      slug: c.slug,
+      href: categoryHref(c),
+      title: c.department === 'kids' && c.group ? `${c.group} ${c.title}` : c.title,
+      badge: c.badge,
+      image: c.image,
+      department: c.department as Department,
+    }))
 
   const newest = [...products].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, 8)
 

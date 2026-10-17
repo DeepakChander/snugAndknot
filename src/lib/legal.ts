@@ -1,4 +1,5 @@
 import type { SiteSettings } from '@/types/commerce'
+import { deliveryText, refundText, returnShippingText } from '@/lib/policy'
 
 export interface LegalSection {
   id: string
@@ -108,9 +109,9 @@ export function termsSections({ store, commerce }: Pick<SiteSettings, 'store' | 
       body: [
         `Prices are shown in ${commerce.currency} and may change. We may refuse or cancel an order — for example because of a pricing error, suspected fraud or limited stock — and will let you know if we do.`,
         commerce.onlinePaymentsEnabled
-          ? `Online payments are taken through Razorpay when you place the order; your order is confirmed once the payment is.${commerce.codEnabled ? ' You can also choose to pay the courier on delivery.' : ''}`
+          ? `Online payments are taken through Razorpay when you place the order; your order is confirmed once the payment is.${commerce.codEnabled ? ' You can also choose to pay in cash on delivery, at no extra charge.' : ''}`
           : commerce.codEnabled
-            ? 'Orders are currently paid on delivery: you pay the courier when your parcel arrives.'
+            ? 'Orders are currently paid in cash on delivery, at no extra charge.'
             : 'Payment options are shown at checkout.',
         commerce.taxRate > 0 ? `Tax is charged at ${commerce.taxRate}% where applicable.` : 'Any applicable taxes are shown at checkout.',
       ],
@@ -118,7 +119,11 @@ export function termsSections({ store, commerce }: Pick<SiteSettings, 'store' | 
     {
       id: 'shipping',
       title: 'Shipping and returns',
-      body: [`Our shipping and returns policy is part of these terms. Returns are accepted within ${commerce.returnWindowDays} days of delivery. We are not responsible for delays caused by carriers, customs or events outside our control.`],
+      body: [
+        `Our shipping and returns policy is part of these terms. ${deliveryText(commerce)} Returns are accepted within ${commerce.returnWindowDays} days of delivery.`.replace(/\s+/g, ' '),
+        `${refundText(commerce)} ${returnShippingText(commerce)}`,
+        'We are not responsible for delays caused by carriers, customs or events outside our control.',
+      ],
     },
     { id: 'ip', title: 'Intellectual property', body: [`Everything on this site — text, photography, designs, logos and software — belongs to ${store.name} or its licensors. Please do not copy or reuse it without our written permission.`] },
     { id: 'prohibited', title: 'Acceptable use', body: ['Do not use the site to break the law, impersonate anyone, upload harmful code, scrape it without permission or interfere with how it works.'] },

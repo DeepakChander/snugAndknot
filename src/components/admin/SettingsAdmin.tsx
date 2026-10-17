@@ -96,6 +96,28 @@ function StoreForm({ initial }: { initial: SiteSettings['store'] }) {
           </div>
           <Input label="Country" value={d.address.country} error={s.err['address.country']} onChange={(e) => addr('country', e.target.value)} />
         </Section>
+        <Section title="Marketplaces" description="Where else you sell, such as Myntra, Amazon, Flipkart, Ajio, Nykaa or FirstCry. Each shows as a link in the footer's “Also shop us on” row; with none, the row is hidden. Add only the stores you actually sell on.">
+          <div className="space-y-3">
+            {(d.marketplaces ?? []).map((m, i) => {
+              const setM = (patch: Partial<typeof m>) => set({ marketplaces: (d.marketplaces ?? []).map((x, j) => (j === i ? { ...x, ...patch } : x)) })
+              return (
+                <div key={i} className="grid gap-3 sm:grid-cols-[12rem_1fr_auto] sm:items-end">
+                  <Input label="Name" value={m.name} error={s.err[`marketplaces.${i}.name`]} onChange={(e) => setM({ name: e.target.value })} placeholder="Myntra" />
+                  <Input label="Link to your store there" value={m.url} error={s.err[`marketplaces.${i}.url`]} onChange={(e) => setM({ url: e.target.value })} placeholder="https://www.myntra.com/…" />
+                  <Btn size="sm" variant="ghost" className="text-error" onClick={() => set({ marketplaces: (d.marketplaces ?? []).filter((_, j) => j !== i) })}>
+                    Remove
+                  </Btn>
+                </div>
+              )
+            })}
+            {(d.marketplaces ?? []).length < 8 ? (
+              <Btn size="sm" variant="outline" onClick={() => set({ marketplaces: [...(d.marketplaces ?? []), { name: '', url: '' }] })}>
+                Add a marketplace
+              </Btn>
+            ) : null}
+            {s.err.marketplaces ? <p className="text-xs text-error">{s.err.marketplaces}</p> : null}
+          </div>
+        </Section>
         <Section title="Social links" description="Leave a field empty to hide that icon.">
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label="Instagram" value={d.social.instagram} error={s.err['social.instagram']} onChange={(e) => social('instagram', e.target.value)} placeholder="https://instagram.com/…" />
@@ -311,11 +333,16 @@ function CommerceForm({ initial, payments }: { initial: SiteSettings['commerce']
         <Section title="Tax" description="A single percentage applied to the discounted subtotal at checkout.">
           <Input label="Tax rate (%)" type="number" min={0} max={50} step="0.001" value={d.taxRate} error={s.err.taxRate} onChange={(e) => set({ taxRate: num(e.target.value) })} wrapClassName="max-w-xs" />
         </Section>
-        <Section title="Returns & rewards" description="Customers can request a return within this many days of delivery. Members earn points on every order.">
+        <Section title="Delivery" description="Shown on product pages, at checkout, on the shipping page and in the FAQ. Leave it empty to say nothing about delivery time.">
+          <Input label="Delivery time" value={d.deliveryEstimate ?? ''} maxLength={60} error={s.err.deliveryEstimate} onChange={(e) => set({ deliveryEstimate: e.target.value })} placeholder="3–7 working days" wrapClassName="max-w-sm" />
+        </Section>
+        <Section title="Returns & rewards" description="Customers can request a return within this many days of delivery. The refund terms below are written into the shipping page, the FAQ and the terms. Members earn points on every order.">
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label="Return window (days)" type="number" min={0} max={365} value={d.returnWindowDays} error={s.err.returnWindowDays} onChange={(e) => set({ returnWindowDays: Math.trunc(num(e.target.value)) })} />
+            <Input label="Refund issued within (working days)" type="number" min={1} max={60} value={d.refundDays ?? 7} error={s.err.refundDays} onChange={(e) => set({ refundDays: Math.trunc(num(e.target.value)) })} hint="After the return reaches you and passes its check." />
             <Input label="Points earned per 1 spent" type="number" min={0} max={100} step="0.1" value={d.pointsPerDollar} error={s.err.pointsPerDollar} onChange={(e) => set({ pointsPerDollar: num(e.target.value) })} />
           </div>
+          <Toggle checked={d.freeReturns ?? false} onChange={(v) => set({ freeReturns: v })} label="Free return shipping on every return" description={d.freeReturns ? 'You cover return shipping for every return.' : 'You cover it only when a piece arrives damaged, faulty or wrong; otherwise the customer sends it back at their cost.'} />
         </Section>
         <Section
           title="Payment"
