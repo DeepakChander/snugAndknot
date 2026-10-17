@@ -9,6 +9,23 @@ import CurrencySwitcher from './CurrencySwitcher'
 import MarketplaceStrip from './MarketplaceStrip'
 import { ArrowUp, InstagramIcon, MailIcon, PhoneIcon, PinterestIcon, TiktokIcon, XIcon } from '@/components/kit/icons'
 
+/**
+ * What Razorpay checkout takes: cards (Visa, Mastercard, RuPay), UPI (Google Pay, PhonePe, Paytm and
+ * the rest), net banking and wallets. Marks from Simple Icons (CC0, public/images/payments); UPI,
+ * RuPay, net banking and wallets have none there, so their names show.
+ */
+const PAY_ONLINE: { label: string; logo?: string }[] = [
+  { label: 'Visa', logo: '/images/payments/visa.svg' },
+  { label: 'Mastercard', logo: '/images/payments/mastercard.svg' },
+  { label: 'RuPay' },
+  { label: 'UPI' },
+  { label: 'Google Pay', logo: '/images/payments/googlepay.svg' },
+  { label: 'PhonePe', logo: '/images/payments/phonepe.svg' },
+  { label: 'Paytm', logo: '/images/payments/paytm.svg' },
+  { label: 'Net banking' },
+  { label: 'Wallets' },
+]
+
 const COLUMNS = [
   {
     title: 'Shop',
@@ -63,7 +80,11 @@ export default function Footer() {
     { href: store.social.twitter, label: 'X', Icon: XIcon },
   ].filter((s) => s.href)
   // The ways checkout takes payment right now: Razorpay's methods while it is live, cash on delivery while it is on.
-  const pay = [...(commerce.onlinePaymentsEnabled ? ['UPI', 'Visa', 'Mastercard', 'RuPay', 'Net banking', 'Wallets'] : []), ...(commerce.codEnabled ? ['Cash on delivery'] : [])]
+  // A brand's own mark where there is one (public/images/payments), else its name.
+  const pay: { label: string; logo?: string }[] = [
+    ...(commerce.onlinePaymentsEnabled ? PAY_ONLINE : []),
+    ...(commerce.codEnabled ? [{ label: 'Cash on delivery' }] : []),
+  ]
   const columns = COLUMNS.map((c) => (c.title === 'Shop' ? { ...c, links: [...openDepartments(store).map((d) => ({ label: DEPARTMENT_TITLES[d], href: `/shop/${d}` })), ...c.links] } : c))
 
   return (
@@ -135,12 +156,26 @@ export default function Footer() {
                 <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ivory/50">We accept</p>
                 <ul className="mt-4 flex flex-wrap gap-2">
                   {pay.map((p) => (
-                    <li key={p} className="border border-ivory/20 px-2.5 py-1 text-[0.72rem] text-ivory/80">
-                      {p}
+                    <li key={p.label} className="flex h-9 items-center rounded-[3px] bg-white px-2.5 text-[0.7rem] font-semibold text-ink" title={p.label}>
+                      {p.logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- a tiny SVG, nothing to optimise
+                        <img src={p.logo} alt={p.label} width={24} height={24} className="h-6 w-6" />
+                      ) : (
+                        p.label
+                      )}
                     </li>
                   ))}
                 </ul>
-                {commerce.onlinePaymentsEnabled ? <p className="mt-3 text-[0.72rem] text-ivory/45">Online payments are processed securely by Razorpay.</p> : null}
+                {commerce.onlinePaymentsEnabled ? (
+                  <p className="mt-3 flex items-center gap-2 text-[0.72rem] text-ivory/50">
+                    Payments secured by
+                    <span className="inline-flex h-6 items-center rounded-[3px] bg-white px-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- a tiny SVG, nothing to optimise */}
+                      <img src="/images/payments/razorpay.svg" alt="Razorpay" width={16} height={16} className="h-3.5 w-auto" />
+                      <span className="ml-1 text-[0.7rem] font-semibold text-[#0C2451]">Razorpay</span>
+                    </span>
+                  </p>
+                ) : null}
               </div>
             ) : null}
           </div>
