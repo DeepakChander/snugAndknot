@@ -120,6 +120,9 @@ export interface Collection {
 export type ReviewStatus = 'pending' | 'approved' | 'rejected'
 export type ReviewFit = 'small' | 'true' | 'large'
 
+/** Where a review came from: written on the site, or real feedback the owner received elsewhere. */
+export type ReviewSource = 'site' | 'whatsapp' | 'instagram' | 'marketplace' | 'email' | 'in-person'
+
 export interface Review {
   id: string
   productId: string
@@ -132,6 +135,8 @@ export interface Review {
   fit: ReviewFit | null
   verified: boolean
   status: ReviewStatus
+  /** 'site' unless the owner added it from WhatsApp, Instagram and so on (then never verified). */
+  source: ReviewSource
   helpful: number
   adminReply: string | null
   createdAt: string

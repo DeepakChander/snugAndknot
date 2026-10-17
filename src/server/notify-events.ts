@@ -413,6 +413,17 @@ export const reviewSubmitted = safely('reviewSubmitted', async (review: Review, 
   })
 })
 
+export const reviewReceived = safely('reviewReceived', async (review: Review, by: string) => {
+  const p = await productTitle(review.productId)
+  await notify({
+    type: 'review.received',
+    subject: `Review added from ${review.source} on ${p.title}`,
+    intro: `${by} added ${review.author}'s ${review.rating}-star review, received via ${review.source}. It is live now.`,
+    sections: [{ fields: [['Piece', p.title], ['Rating', `${review.rating} / 5`], ['Source', review.source], ['Added by', by]] }, { title: review.title || 'Review', text: review.body }],
+    action: { label: 'See reviews', path: '/admin/reviews' },
+  })
+})
+
 export const reviewUpdated = safely('reviewUpdated', async (before: Review, after: Review, by: string) => {
   const p = await productTitle(after.productId)
   if (before.status !== after.status) {

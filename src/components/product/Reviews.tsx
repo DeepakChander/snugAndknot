@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { SOURCE_LABEL } from '@/lib/review-source'
 import { AnimatePresence, motion } from 'motion/react'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/kit/Button'
@@ -160,11 +161,12 @@ export default function Reviews({
                           <Stars value={r.rating} size={14} />
                           <span className="text-xs text-stone">{formatDate(r.createdAt)}</span>
                         </div>
-                        <h3 className="mt-4 text-[1.05rem] font-medium">{r.title}</h3>
+                        {r.title ? <h3 className="mt-4 text-[1.05rem] font-medium">{r.title}</h3> : null}
                         <p className="mt-3 max-w-prose leading-relaxed text-stone">{r.body}</p>
                         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                           <span className="font-medium">{r.author}</span>
                           {r.verified ? <span className="rounded-full bg-success/10 px-2.5 py-0.5 text-xs text-success">Verified buyer</span> : null}
+                          {r.source && r.source !== 'site' ? <span className="text-xs text-stone">{`Shared ${SOURCE_LABEL[r.source]}`}</span> : null}
                           {r.fit ? <span className="text-xs text-stone">Fit: {r.fit === 'true' ? 'true to size' : r.fit === 'small' ? 'runs small' : 'runs large'}</span> : null}
                         </div>
                         {r.adminReply ? (

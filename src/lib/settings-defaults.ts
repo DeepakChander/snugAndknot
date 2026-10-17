@@ -70,9 +70,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
       'Everyday clothing for men, women and kids that is easy to wear and made to last: well-cut basics and seasonal pieces, chosen with *care*.',
   },
   seo: {
-    title: 'Snug&Knot — Everyday Clothing for Men, Women & Kids',
+    title: 'Snug & Knot | Premium Fashion for Men, Women & Kids',
     description:
-      'Trendy, comfortable, premium everyday clothing for men, women and kids: shirts, T-shirts, knitwear, jeans, dresses and more, with 30-day returns.',
+      'Discover Snug & Knot — thoughtfully designed fashion for men, women and kids. Experience modern style, everyday comfort and quality craftsmanship. Designed by us. Made by us.',
     // 1200×630, the size link previews expect: three of the real pieces side by side.
     ogImage: '/images/og/snugandknot.jpg',
   },

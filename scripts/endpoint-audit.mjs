@@ -285,6 +285,7 @@ const ADMIN_ENDPOINTS = [
   ['GET', '/api/admin/returns', '/api/admin/returns'],
   ['PATCH', '/api/admin/returns/[id]', `/api/admin/returns/${MISSING}`],
   ['GET', '/api/admin/reviews', '/api/admin/reviews'],
+  ['POST', '/api/admin/reviews', '/api/admin/reviews'],
   ['PATCH', '/api/admin/reviews/[id]', `/api/admin/reviews/${MISSING}`],
   ['DELETE', '/api/admin/reviews/[id]', `/api/admin/reviews/${MISSING}`],
   ['GET', '/api/admin/settings', '/api/admin/settings'],
@@ -935,6 +936,15 @@ async function adminOperations() {
   expect(VP, 'admin', 'unknown id', await admin.patch(`/api/admin/reviews/${MISSING}`, { status: 'approved' }), 404)
   expect(VP, 'admin', 'invalid status', await admin.patch(`/api/admin/reviews/${ctx.review?.id}`, { status: 'great' }), 422)
   expect(VP, 'admin', 'text/plain body', await admin.patch(`/api/admin/reviews/${ctx.review?.id}`, JSON.stringify({ status: 'approved' })), 415)
+  const VR = 'POST /api/admin/reviews'
+  const got = { productId: ctx.product.id, author: 'Audit R.', rating: 4, title: '', body: 'Real feedback the owner received on WhatsApp.', source: 'whatsapp', receivedOn: null }
+  const rec = await admin.post('/api/admin/reviews', { ...got, consent: true })
+  expect(VR, 'admin', 'add a received review', rec, 201, rec.data?.review?.verified === false && rec.data?.review?.status === 'approved' && rec.data?.review?.source === 'whatsapp')
+  expect(VR, 'admin', 'without the customer\'s agreement', await admin.post('/api/admin/reviews', got), 422)
+  expect(VR, 'admin', 'unknown source', await admin.post('/api/admin/reviews', { ...got, source: 'site', consent: true }), 422)
+  expect(VR, 'admin', 'unknown piece', await admin.post('/api/admin/reviews', { ...got, productId: MISSING, consent: true }), 422)
+  expect(VR, 'admin', 'text/plain body', await admin.post('/api/admin/reviews', JSON.stringify({ ...got, consent: true })), 415)
+  if (rec.data?.review?.id) await admin.del(`/api/admin/reviews/${rec.data.review.id}`)
   const VD = 'DELETE /api/admin/reviews/[id]'
   expect(VD, 'admin', 'delete', await admin.del(`/api/admin/reviews/${ctx.review2?.id}`), 200)
   expect(VD, 'admin', 'unknown id', await admin.del(`/api/admin/reviews/${ctx.review2?.id}`), 404)

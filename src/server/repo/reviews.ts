@@ -1,6 +1,6 @@
 import 'server-only'
 import { query, type Row } from '@/server/db/client'
-import type { RatingSummary, Review, ReviewFit, ReviewStatus } from '@/types/commerce'
+import type { RatingSummary, Review, ReviewFit, ReviewSource, ReviewStatus } from '@/types/commerce'
 import { iso, newId, num } from './util'
 
 function mapReview(r: Row): Review {
@@ -14,6 +14,7 @@ function mapReview(r: Row): Review {
     fit: (r.fit ?? null) as ReviewFit | null,
     verified: !!r.verified,
     status: r.status as ReviewStatus,
+    source: ((r.source as ReviewSource | undefined) ?? 'site'),
     helpful: Math.trunc(num(r.helpful)),
     adminReply: r.admin_reply ?? null,
     createdAt: iso(r.created_at),
@@ -83,6 +84,30 @@ export async function createReview(input: {
       newId('rev'), input.productId, input.userId, input.author, input.rating, input.title, input.body,
       input.fit, input.verified, input.status,
     ]
+  )
+  return mapReview(rows[0])
+}
+
+/**
+ * Real feedback the owner received off the site (a WhatsApp message, an Instagram comment, a
+ * marketplace review …), added in Admin → Reviews with the customer's agreement. Published at once,
+ * never verified (the database refuses a verified one that is not from the site), dated the day the
+ * customer sent it (at midday UTC, so the day reads the same in India and abroad).
+ */
+export async function createReceivedReview(input: {
+  productId: string
+  author: string
+  rating: number
+  title: string
+  body: string
+  fit: ReviewFit | null
+  source: Exclude<ReviewSource, 'site'>
+  receivedOn: string | null
+}): Promise<Review> {
+  const rows = await query(
+    `INSERT INTO reviews (id, product_id, user_id, author, rating, title, body, fit, verified, status, source, created_at)
+     VALUES ($1, $2, NULL, $3, $4, $5, $6, $7, false, 'approved', $8, coalesce(($9::date + time '12:00') AT TIME ZONE 'UTC', now())) RETURNING *`,
+    [newId('rev'), input.productId, input.author, input.rating, input.title, input.body, input.fit, input.source, input.receivedOn]
   )
   return mapReview(rows[0])
 }

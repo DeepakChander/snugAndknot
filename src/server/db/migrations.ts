@@ -626,6 +626,33 @@ UPDATE settings SET value = jsonb_set(value, '{expressShippingRate}', '99'::json
  WHERE key = 'commerce' AND value->>'currency' = 'INR' AND (value->>'expressShippingRate')::numeric = 1699;
 `,
   },
+  {
+    version: 18,
+    name: 'review-source',
+    // Where a review came from. 'site' is one written on a product page (verified only for a
+    // delivered order from that account); the others are real feedback the owner received
+    // elsewhere and added in Admin → Reviews with the customer's agreement, shown as "via WhatsApp"
+    // and the like, never with the verified-buyer badge.
+    sql: `
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'site';
+ALTER TABLE reviews DROP CONSTRAINT IF EXISTS reviews_source_check;
+ALTER TABLE reviews ADD CONSTRAINT reviews_source_check CHECK (source IN ('site', 'whatsapp', 'instagram', 'marketplace', 'email', 'in-person'));
+ALTER TABLE reviews DROP CONSTRAINT IF EXISTS reviews_received_unverified_check;
+ALTER TABLE reviews ADD CONSTRAINT reviews_received_unverified_check CHECK (source = 'site' OR verified = false);
+`,
+  },
+  {
+    version: 19,
+    name: 'seo-premium-fashion',
+    // The owner's own wording for the search result (title and description), in place of the line
+    // version 16 set, wherever that line is still unchanged.
+    sql: `
+UPDATE settings SET value = jsonb_set(value, '{title}', to_jsonb('Snug & Knot | Premium Fashion for Men, Women & Kids'::text)), updated_at = now()
+ WHERE key = 'seo' AND value->>'title' IN ('Snug&Knot — Everyday Clothing for Men, Women & Kids', 'Snug&Knot — Luxury Knitwear, Hand-Finished');
+UPDATE settings SET value = jsonb_set(value, '{description}', to_jsonb('Discover Snug & Knot — thoughtfully designed fashion for men, women and kids. Experience modern style, everyday comfort and quality craftsmanship. Designed by us. Made by us.'::text)), updated_at = now()
+ WHERE key = 'seo' AND value->>'description' IN ('Trendy, comfortable, premium everyday clothing for men, women and kids: shirts, T-shirts, knitwear, jeans, dresses and more, with 30-day returns.', 'Hand-finished knitwear in merino, cashmere blends and long-staple cotton: cardigans and knit tees made in small runs to be worn for years.');
+`,
+  },
 ]
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version
