@@ -371,6 +371,26 @@ export const orderPatchSchema = z.object({
   adminNotes: trimmed(2000).nullable().optional(),
 })
 
+/** A review the owner received off the site (Admin → Reviews → Add a review you received). */
+export const receivedReviewSchema = z.object({
+  productId: required(120, 'Piece'),
+  author: required(60, 'Name'),
+  rating: z.coerce.number().int().min(1, 'Choose 1 to 5 stars').max(5, 'Choose 1 to 5 stars'),
+  title: trimmed(120).default(''),
+  body: text().trim().min(10, 'Paste what the customer said (at least 10 characters)').max(2000),
+  fit: z.enum(['small', 'true', 'large']).nullable().default(null),
+  source: z.enum(['whatsapp', 'instagram', 'marketplace', 'email', 'in-person'], { message: 'Choose where the review came from' }),
+  receivedOn: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Use a date like 2026-10-17')
+    .refine((d) => !Number.isNaN(Date.parse(d)) && Date.parse(d) <= Date.now(), 'The date cannot be in the future')
+    .nullable()
+    .default(null),
+  // Showing a customer's words needs their agreement.
+  consent: z.literal(true, { message: 'Confirm the customer agreed to have this shown' }),
+})
+
 export const reviewPatchSchema = z.object({
   status: z.enum(['pending', 'approved', 'rejected']).optional(),
   adminReply: trimmed(2000).nullable().optional(),

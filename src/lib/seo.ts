@@ -143,7 +143,11 @@ export function productLd(product: Product, summary: RatingSummary, reviews: Rev
     seller: { '@id': ORG_ID },
     hasMerchantReturnPolicy: returnPolicy,
   }
-  const approved = reviews.filter((r) => r.status === 'approved').slice(0, 5)
+  // Search engines take reviews collected on the site only: ones the owner added from WhatsApp,
+  // Instagram and the like show on the page but stay out of the markup and its rating.
+  const onSite = reviews.filter((r) => r.status === 'approved' && (r.source ?? 'site') === 'site')
+  const approved = onSite.slice(0, 5)
+  const rated = onSite.length === summary.count ? summary : { count: onSite.length, average: onSite.length ? onSite.reduce((n, r) => n + r.rating, 0) / onSite.length : 0 }
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -162,9 +166,9 @@ export function productLd(product: Product, summary: RatingSummary, reviews: Rev
         ? { '@type': 'Offer', price: low, ...offerCommon }
         : { '@type': 'AggregateOffer', lowPrice: low, highPrice: high, offerCount: product.variants.length, ...offerCommon },
     // Only real, approved reviews — never a placeholder rating.
-    ...(summary.count > 0
+    ...(rated.count > 0
       ? {
-          aggregateRating: { '@type': 'AggregateRating', ratingValue: Number(summary.average.toFixed(2)), reviewCount: summary.count, bestRating: 5, worstRating: 1 },
+          aggregateRating: { '@type': 'AggregateRating', ratingValue: Number(rated.average.toFixed(2)), reviewCount: rated.count, bestRating: 5, worstRating: 1 },
           review: approved.map((r) => ({
             '@type': 'Review',
             author: { '@type': 'Person', name: r.author },

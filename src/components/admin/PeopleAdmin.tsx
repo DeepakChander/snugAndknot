@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useMoney } from '@/components/providers/SettingsProvider'
 import { Stars } from '@/components/kit/Stars'
-import { Badge, Btn, Card, Empty, PageHeader, STATUS_TONE, Textarea, confirmAction, useMutate } from './ui'
+import { Badge, Btn, Card, Empty, Input, PageHeader, Select, STATUS_TONE, Textarea, Toggle, confirmAction, useMutate } from './ui'
 import { cn, formatDate, TIER_LABEL } from '@/lib/format'
-import type { ReviewStatus } from '@/types/commerce'
+import type { ReviewSource, ReviewStatus } from '@/types/commerce'
+import { SOURCE_LABEL } from '@/lib/review-source'
 
 type AdminReview = {
   id: string
@@ -20,6 +21,7 @@ type AdminReview = {
   fit: string | null
   verified: boolean
   status: ReviewStatus
+  source: ReviewSource
   helpful: number
   adminReply: string | null
   createdAt: string
@@ -37,6 +39,7 @@ function ReviewCard({ r }: { r: AdminReview }) {
             <Stars value={r.rating} size={14} />
             <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>
             {r.verified ? <Badge tone="good">verified buyer</Badge> : null}
+            {r.source !== 'site' ? <Badge tone="info">received {SOURCE_LABEL[r.source]}</Badge> : null}
           </div>
           <p className="mt-2 font-medium">{r.title}</p>
           <p className="mt-1 max-w-3xl whitespace-pre-line text-sm text-ink/80">{r.body}</p>
@@ -86,7 +89,92 @@ function ReviewCard({ r }: { r: AdminReview }) {
   )
 }
 
-export function ReviewsAdmin({ reviews, moderation }: { reviews: AdminReview[]; moderation: 'manual' | 'auto' }) {
+const today = () => new Date().toISOString().slice(0, 10)
+
+/**
+ * Add a review you received: real feedback a customer gave off the site (a WhatsApp message, an
+ * Instagram comment, a marketplace review), shown with where it came from and never as a verified
+ * buyer. Needs the customer's agreement before it can be saved.
+ */
+function AddReceivedReview({ products }: { products: { id: string; title: string }[] }) {
+  const { run, busy, fieldErrors } = useMutate()
+  const blank = { productId: products[0]?.id ?? '', author: '', rating: 5, title: '', body: '', fit: '' as '' | 'small' | 'true' | 'large', source: 'whatsapp' as Exclude<ReviewSource, 'site'>, receivedOn: today(), consent: false }
+  const [d, setD] = useState(blank)
+  const [open, setOpen] = useState(false)
+  const set = (patch: Partial<typeof d>) => setD({ ...d, ...patch })
+  const save = async () => {
+    const res = await run('POST', '/api/admin/reviews', { ...d, fit: d.fit || null, receivedOn: d.receivedOn || null }, 'Review added: it is live on the store')
+    if (res) {
+      setD(blank)
+      setOpen(false)
+    }
+  }
+  if (!open) {
+    return (
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-ink/20 p-4">
+        <p className="text-sm text-stone">Got kind words on WhatsApp, Instagram or a marketplace? Add them here with the customer&apos;s agreement.</p>
+        <Btn onClick={() => setOpen(true)} disabled={!products.length}>
+          Add a review you received
+        </Btn>
+      </div>
+    )
+  }
+  return (
+    <Card title="Add a review you received" className="mb-6">
+      <div className="space-y-4">
+        <p className="text-sm text-stone">
+          Use the customer&apos;s own words, as they sent them. It goes live straight away, marked with where it came from (for example &ldquo;via WhatsApp&rdquo;), and never shows the Verified buyer badge, which is only for
+          orders delivered through the site.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Select label="Piece" value={d.productId} error={fieldErrors.productId} onChange={(e) => set({ productId: e.target.value })}>
+            {products.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.title}
+              </option>
+            ))}
+          </Select>
+          <Input label="Customer's name" value={d.author} maxLength={60} error={fieldErrors.author} onChange={(e) => set({ author: e.target.value })} placeholder="Priya S." hint="First name and an initial is enough." />
+          <Select label="Stars" value={String(d.rating)} error={fieldErrors.rating} onChange={(e) => set({ rating: Number(e.target.value) })}>
+            {[5, 4, 3, 2, 1].map((n) => (
+              <option key={n} value={n}>
+                {'★'.repeat(n)}
+                {'☆'.repeat(5 - n)} ({n})
+              </option>
+            ))}
+          </Select>
+          <Select label="Where it came from" value={d.source} error={fieldErrors.source} onChange={(e) => set({ source: e.target.value as typeof d.source })}>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="instagram">Instagram</option>
+            <option value="marketplace">A marketplace (Amazon, Myntra …)</option>
+            <option value="email">Email</option>
+            <option value="in-person">In person</option>
+          </Select>
+          <Input label="Date they sent it" type="date" max={today()} value={d.receivedOn} error={fieldErrors.receivedOn} onChange={(e) => set({ receivedOn: e.target.value })} />
+          <Select label="Fit (optional)" value={d.fit} onChange={(e) => set({ fit: e.target.value as typeof d.fit })}>
+            <option value="">Not mentioned</option>
+            <option value="small">Runs small</option>
+            <option value="true">True to size</option>
+            <option value="large">Runs large</option>
+          </Select>
+        </div>
+        <Input label="Title (optional)" value={d.title} maxLength={120} error={fieldErrors.title} onChange={(e) => set({ title: e.target.value })} placeholder="Perfect fit" />
+        <Textarea label="What they said" rows={4} value={d.body} error={fieldErrors.body} onChange={(e) => set({ body: e.target.value })} placeholder="Paste the customer's message" />
+        <Toggle checked={d.consent} onChange={(v) => set({ consent: v })} label="The customer agreed to have this shown on the store" description={fieldErrors.consent ?? 'Ask them first, for example in the same WhatsApp chat.'} />
+        <div className="flex flex-wrap gap-2">
+          <Btn onClick={save} loading={busy} disabled={!d.consent || !d.author.trim() || d.body.trim().length < 10}>
+            Add the review
+          </Btn>
+          <Btn variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Btn>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+export function ReviewsAdmin({ reviews, moderation, products = [] }: { reviews: AdminReview[]; moderation: 'manual' | 'auto'; products?: { id: string; title: string }[] }) {
   const [tab, setTab] = useState<ReviewStatus | 'all'>(reviews.some((r) => r.status === 'pending') ? 'pending' : 'all')
   const rows = reviews.filter((r) => tab === 'all' || r.status === tab)
   const count = (s: ReviewStatus | 'all') => (s === 'all' ? reviews.length : reviews.filter((r) => r.status === s).length)
@@ -103,6 +191,7 @@ export function ReviewsAdmin({ reviews, moderation }: { reviews: AdminReview[]; 
           </>
         }
       />
+      <AddReceivedReview products={products} />
       <div className="mb-4 flex w-fit rounded-full border border-ink/10 bg-white/70 p-1">
         {(['pending', 'approved', 'rejected', 'all'] as const).map((s) => (
           <button key={s} type="button" onClick={() => setTab(s)} className={cn('rounded-full px-3.5 py-1.5 text-sm capitalize', tab === s ? 'bg-ink text-ivory' : 'text-ink/70 hover:text-ink')}>
@@ -117,7 +206,7 @@ export function ReviewsAdmin({ reviews, moderation }: { reviews: AdminReview[]; 
           ))}
         </div>
       ) : (
-        <Empty title={tab === 'pending' ? 'Nothing waiting' : 'No reviews here'}>Reviews written by signed-in customers appear here.</Empty>
+        <Empty title={tab === 'pending' ? 'Nothing waiting' : 'No reviews here'}>Reviews written by signed-in customers appear here, and the ones you add from WhatsApp, Instagram and the rest.</Empty>
       )}
     </>
   )

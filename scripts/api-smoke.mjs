@@ -209,6 +209,28 @@ async function main() {
   check('product card rating reflects approved reviews', ratedProduct.reviewCount === afterRating.summary.count && ratedProduct.rating === afterRating.summary.average, { card: [ratedProduct.rating, ratedProduct.reviewCount], summary: afterRating.summary })
   const helpful = await anon.post(`/api/reviews/${review.data.review?.id}/helpful`)
   check('mark review helpful', helpful.status === 200 && helpful.data.helpful === 1, helpful.data)
+  // A real review the owner received elsewhere: needs the customer's agreement, is live at once,
+  // says where it came from and is never verified.
+  const received = { productId: cardigan.id, author: 'Priya S.', rating: 5, title: '', body: 'Loved the cardigan, the fit is perfect and it is so soft.', source: 'whatsapp', receivedOn: '2026-10-01' }
+  const noConsent = await admin.post('/api/admin/reviews', received)
+  check('received review without the customer\'s agreement refused → 422', noConsent.status === 422 && !!noConsent.data.fields?.consent, noConsent.data)
+  const anonAdd = await anon.post('/api/admin/reviews', { ...received, consent: true })
+  check('only an admin can add a received review', anonAdd.status === 401 || anonAdd.status === 403, anonAdd.status)
+  const added = await admin.post('/api/admin/reviews', { ...received, consent: true })
+  check('received review added → 201, approved, unverified, from WhatsApp', added.status === 201 && added.data.review?.status === 'approved' && added.data.review?.verified === false && added.data.review?.source === 'whatsapp' && added.data.review?.createdAt?.startsWith('2026-10-01'), added.data)
+  const withReceived = (await anon.get(`/api/products/${cardigan.handle}/reviews`)).data
+  check('…and it is public on the piece', withReceived.reviews.some((r) => r.id === added.data.review?.id && r.source === 'whatsapp'), null)
+  let pageHtml = ''
+  for (let i = 0; i < 10 && !pageHtml.includes('Shared via WhatsApp'); i++) {
+    pageHtml = new TextDecoder().decode((await anon.get(`/product/${cardigan.handle}`)).data)
+    if (!pageHtml.includes('Shared via WhatsApp')) await new Promise((r) => setTimeout(r, 500))
+  }
+  check('…labelled Shared via WhatsApp on the product page', pageHtml.includes('Shared via WhatsApp'), null)
+  const ld = [...pageHtml.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]).join(' ')
+  check('…and kept out of the search-engine review markup', ld.length > 0 && !ld.includes('Loved the cardigan'), null)
+  const futureDate = await admin.post('/api/admin/reviews', { ...received, consent: true, receivedOn: '2999-01-01' })
+  check('received review dated in the future refused → 422', futureDate.status === 422, futureDate.status)
+  if (added.data.review?.id) await admin.del(`/api/admin/reviews/${added.data.review.id}`)
 
   console.log('\nAdmin: products')
   const full = (await admin.get(`/api/admin/products/${cardigan.id}`)).data.product
