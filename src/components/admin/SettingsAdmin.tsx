@@ -96,26 +96,40 @@ function StoreForm({ initial }: { initial: SiteSettings['store'] }) {
           </div>
           <Input label="Country" value={d.address.country} error={s.err['address.country']} onChange={(e) => addr('country', e.target.value)} />
         </Section>
-        <Section title="Marketplaces" description="Where else you sell, such as Myntra, Amazon, Flipkart, Ajio, Nykaa or FirstCry. Each shows as a link in the footer's “Also shop us on” row; with none, the row is hidden. Add only the stores you actually sell on.">
+        <Section
+          title="Marketplaces"
+          description="Where else you sell, such as Myntra, Amazon, Flipkart, AJIO, Nykaa or FirstCry. Each shows as its logo in the white “Also shop us on” band above the footer, linking to your store there; from five, the row drifts slowly on a loop. With none, the band is hidden. Add only the stores you actually sell on, with the official logo or “available on” badge from your seller account."
+        >
           <div className="space-y-3">
             {(d.marketplaces ?? []).map((m, i) => {
               const setM = (patch: Partial<typeof m>) => set({ marketplaces: (d.marketplaces ?? []).map((x, j) => (j === i ? { ...x, ...patch } : x)) })
               return (
-                <div key={i} className="grid gap-3 sm:grid-cols-[12rem_1fr_auto] sm:items-end">
-                  <Input label="Name" value={m.name} error={s.err[`marketplaces.${i}.name`]} onChange={(e) => setM({ name: e.target.value })} placeholder="Myntra" />
-                  <Input label="Link to your store there" value={m.url} error={s.err[`marketplaces.${i}.url`]} onChange={(e) => setM({ url: e.target.value })} placeholder="https://www.myntra.com/…" />
-                  <Btn size="sm" variant="ghost" className="text-error" onClick={() => set({ marketplaces: (d.marketplaces ?? []).filter((_, j) => j !== i) })}>
-                    Remove
-                  </Btn>
+                <div key={i} className="grid gap-4 rounded-xl border border-ink/10 p-4 lg:grid-cols-[1fr_14rem]">
+                  <div className="space-y-3">
+                    <div className="grid gap-3 sm:grid-cols-[12rem_1fr]">
+                      <Input label="Name" list="marketplace-names" value={m.name} error={s.err[`marketplaces.${i}.name`]} onChange={(e) => setM({ name: e.target.value })} placeholder="Myntra" />
+                      <Input label="Link to your store there" value={m.url} error={s.err[`marketplaces.${i}.url`]} onChange={(e) => setM({ url: e.target.value })} placeholder="https://www.myntra.com/…" />
+                    </div>
+                    <p className="text-xs text-stone">The logo shows in its own colours on white: a transparent PNG or SVG, wide rather than tall, works best. Without one, the name shows.</p>
+                    <Btn size="sm" variant="ghost" className="text-error" onClick={() => set({ marketplaces: (d.marketplaces ?? []).filter((_, j) => j !== i) })}>
+                      Remove
+                    </Btn>
+                  </div>
+                  <ImageField label="Logo" aspect="aspect-[3/1]" value={m.logo ?? ''} onChange={(v) => setM({ logo: v })} />
                 </div>
               )
             })}
             {(d.marketplaces ?? []).length < 8 ? (
-              <Btn size="sm" variant="outline" onClick={() => set({ marketplaces: [...(d.marketplaces ?? []), { name: '', url: '' }] })}>
+              <Btn size="sm" variant="outline" onClick={() => set({ marketplaces: [...(d.marketplaces ?? []), { name: '', url: '', logo: '' }] })}>
                 Add a marketplace
               </Btn>
             ) : null}
             {s.err.marketplaces ? <p className="text-xs text-error">{s.err.marketplaces}</p> : null}
+            <datalist id="marketplace-names">
+              {['Amazon', 'Flipkart', 'Myntra', 'AJIO', 'Nykaa Fashion', 'FirstCry', 'Meesho', 'Tata CLiQ'].map((n) => (
+                <option key={n} value={n} />
+              ))}
+            </datalist>
           </div>
         </Section>
         <Section title="Social links" description="Leave a field empty to hide that icon.">

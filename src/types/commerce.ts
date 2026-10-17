@@ -315,6 +315,8 @@ export interface StoreSettings {
 export interface Marketplace {
   name: string
   url: string
+  /** The marketplace's logo, uploaded by the owner (its official "available on" artwork). Empty: the name. */
+  logo: string
 }
 
 /** An additional currency the shop sells in, with its own prices, shipping and points. */

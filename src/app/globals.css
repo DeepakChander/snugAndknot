@@ -425,6 +425,25 @@ body {
   }
 }
 
+/* ─────────────────────────── Marketplace strip ─────────────────────────── */
+
+/* The row of marketplace logos drifts left on a loop (the list is drawn twice, so -50% is seamless),
+   pauses under the pointer or keyboard focus, and stays still for reduced motion. */
+@keyframes sk-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sk-marquee {
+    animation: sk-marquee var(--marquee-duration, 40s) linear infinite;
+  }
+  .sk-marquee-wrap:hover .sk-marquee,
+  .sk-marquee-wrap:focus-within .sk-marquee {
+    animation-play-state: paused;
+  }
+}
+
 /* ─────────────────────────── Entrance ─────────────────────────── */
 
 /* The one calm entrance: copy rises a few pixels as the page opens. */
