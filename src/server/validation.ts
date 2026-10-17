@@ -560,4 +560,12 @@ export const settingsSchemas = {
     ogImage: imageUrl,
   }),
   videos: videoWallSchema,
+  showcase: z.object({
+    enabled: z.boolean(),
+    // Long and random enough not to be guessed: the admin makes it with "New link".
+    token: z
+      .string()
+      .trim()
+      .refine((t) => t === '' || /^[A-Za-z0-9_-]{24,64}$/.test(t), 'Use "New link" to make the link'),
+  }),
 } as const

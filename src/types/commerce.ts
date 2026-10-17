@@ -457,6 +457,17 @@ export interface SiteSettings {
   homepage: HomepageSettings
   seo: SeoSettings
   videos: VideoWallSettings
+  showcase: ShowcaseSettings
+}
+
+/**
+ * The private client showcase: a secret link that shows the home page with sample reviews, each
+ * tagged Sample, for a design preview. Never sent to the storefront (the link's token stays here).
+ */
+export interface ShowcaseSettings {
+  enabled: boolean
+  /** The secret in the link (?showcase=…). Empty: no link yet. */
+  token: string
 }
 
 export type SettingsKey = keyof SiteSettings

@@ -4,6 +4,7 @@ import NewIn from '@/components/home/NewIn'
 import Collections from '@/components/home/Collections'
 import HomeFeature from '@/components/home/HomeFeature'
 import ClientReviews from '@/components/home/ClientReviews'
+import ShowcaseReviews from '@/components/home/ShowcaseReviews'
 import VideoWall from '@/components/home/VideoWall'
 import JournalCards from '@/components/home/JournalCards'
 import Promises from '@/components/home/Promises'
@@ -88,7 +89,8 @@ export default async function HomePage() {
       {feature && featured ? <HomeFeature feature={feature} collection={featured} pieces={featuredPieces} /> : null}
       {on('collections') ? <Collections collections={collections} products={products} /> : null}
       {wall.length ? <VideoWall heading={settings.videos.heading} intro={settings.videos.intro} ctaLabel={settings.videos.ctaLabel} ctaHref={settings.videos.ctaHref} items={wall} tabs departments={open} /> : null}
-      {on('reviews') ? <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} /> : null}
+      {/* With no real reviews yet, the private client showcase link can preview the section with sample ones. */}
+      {on('reviews') ? latest.reviews.length ? <ClientReviews reviews={latest.reviews} average={latest.average} count={latest.count} /> : <ShowcaseReviews /> : null}
       {on('journal') ? <JournalCards posts={JOURNAL} /> : null}
       {on('promises') ? <Promises /> : null}
     </>

@@ -19,16 +19,17 @@ export interface HomeReview {
 
 /**
  * Customer reviews: the average and count, then the latest reviews as cards side by side (a row you
- * swipe on a phone). Real, approved reviews only; the section does not render without them.
+ * swipe on a phone). Real, approved reviews only; the section does not render without them. With
+ * `sample` (the private client showcase only) it shows sample reviews, each card tagged Sample.
  */
-export default function ClientReviews({ reviews, average, count }: { reviews: HomeReview[]; average: number; count: number }) {
+export default function ClientReviews({ reviews, average, count, sample = false }: { reviews: HomeReview[]; average: number; count: number; sample?: boolean }) {
   if (!reviews.length) return null
   return (
     <section aria-labelledby="reviews-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
       <div className="container-wide">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-eyebrow text-stone">Reviews</p>
+            <p className="text-eyebrow text-stone">{sample ? 'Reviews · design preview with sample reviews' : 'Reviews'}</p>
             <h2 id="reviews-title" className="mt-3 text-headline">
               What customers <em>say</em>
             </h2>
@@ -44,7 +45,10 @@ export default function ClientReviews({ reviews, average, count }: { reviews: Ho
         <ul className="no-scrollbar -mx-[var(--gutter)] mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0">
           {reviews.slice(0, 3).map((r) => (
             <li key={r.id} className="flex w-[82vw] shrink-0 snap-start flex-col border border-ink/10 p-6 sm:w-[60vw] md:w-auto">
-              <Stars value={r.rating} size={13} />
+              <div className="flex items-center justify-between gap-3">
+                <Stars value={r.rating} size={13} />
+                {sample ? <span className="bg-ink/[0.06] px-2 py-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-stone">Sample</span> : null}
+              </div>
               {r.title ? <p className="mt-4 text-[1rem] font-medium leading-snug">{r.title}</p> : null}
               <p className="mt-2 line-clamp-5 flex-1 text-[0.9rem] leading-relaxed text-ink/75">{r.body}</p>
               <p className="mt-5 text-[0.78rem] text-stone">
