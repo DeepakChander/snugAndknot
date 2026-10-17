@@ -424,6 +424,11 @@ export const settingsSchemas = {
     description: trimmed(500),
     email: emailSchema,
     phone: trimmed(40),
+    // wa.me needs the full international number: 8 to 15 digits with the country code.
+    whatsapp: trimmed(24)
+      .refine((v) => v === '' || /^\+?[\d\s().-]+$/.test(v), 'Use digits, with the country code (e.g. +91 93557 04093)')
+      .refine((v) => v === '' || (v.replace(/\D/g, '').length >= 8 && v.replace(/\D/g, '').length <= 15), 'Use the full number with the country code (e.g. +91 93557 04093)')
+      .optional(),
     address: z.object({
       street: trimmed(160),
       city: trimmed(80),

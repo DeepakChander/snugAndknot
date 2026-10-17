@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     description: 'Trendy, comfortable, premium everyday clothing for men, women and kids.',
     email: 'support@snugandknot.com',
     phone: '+91-9355704093',
+    whatsapp: '+91-9355704093',
     address: { street: '', city: '', state: '', zip: '', country: 'India' },
     social: {
       instagram: 'https://instagram.com/snugandknot',

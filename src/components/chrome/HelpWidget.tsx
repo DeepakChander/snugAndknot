@@ -6,10 +6,52 @@ import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useUIStore } from '@/stores/ui-store'
 import { useSettings } from '@/components/providers/SettingsProvider'
-import { HelpIcon, MailIcon, PackageIcon, PhoneIcon, ReturnIcon, RulerIcon, XIcon } from '@/components/kit/icons'
+import { ChatPhoneIcon, HelpIcon, MailIcon, PackageIcon, PhoneIcon, ReturnIcon, RulerIcon, XIcon } from '@/components/kit/icons'
 
-/** Honest help hub: quick links and real contact details (no fake "live chat"). */
+/**
+ * The floating button at the bottom right. With a WhatsApp number in Admin → Settings → Store it opens
+ * a WhatsApp chat with the shop, the message already naming the page the shopper is on; without one
+ * it is the help hub: quick links and real contact details (no fake "live chat").
+ */
 export default function HelpWidget() {
+  const { store } = useSettings()
+  const digits = (store.whatsapp ?? '').replace(/\D/g, '')
+  return digits.length >= 8 ? <WhatsAppButton digits={digits} storeName={store.name} /> : <HelpHub />
+}
+
+function WhatsAppButton({ digits, storeName }: { digits: string; storeName: string }) {
+  const pathname = usePathname()
+  // Built on tap, so the message names the page the shopper is actually on.
+  const open = () => {
+    const text = `Hi ${storeName}! I have a question about this page: ${window.location.origin}${pathname}`
+    window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer')
+  }
+  return (
+    <div data-chrome className="group fixed bottom-5 right-4 z-[110] flex items-center gap-3 sm:right-6">
+      <span className="pointer-events-none hidden translate-x-2 bg-ink px-3 py-2 text-[0.75rem] font-medium text-ivory opacity-0 shadow-lg transition duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:block">
+        Chat with us on WhatsApp
+      </span>
+      <a
+        href={`https://wa.me/${digits}`}
+        onClick={(e) => {
+          e.preventDefault()
+          open()
+        }}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with us on WhatsApp (opens WhatsApp)"
+        className="relative flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_14px_40px_-12px_rgba(0,0,0,0.55)] transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+        style={{ width: 56, height: 56 }}
+      >
+        {/* A soft ring that pulses a few times when the page opens, then rests. */}
+        <span aria-hidden className="absolute inset-0 rounded-full bg-[#25D366] motion-safe:animate-[ping_2s_cubic-bezier(0,0,0.2,1)_3]" />
+        <ChatPhoneIcon size={28} className="relative" />
+      </a>
+    </div>
+  )
+}
+
+function HelpHub() {
   const { isHelpOpen, setHelpOpen } = useUIStore()
   const { store, commerce } = useSettings()
   const pathname = usePathname()

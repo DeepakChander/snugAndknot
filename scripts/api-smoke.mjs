@@ -655,6 +655,10 @@ async function securityChecks({ placed, guest, cardigan, settings }) {
   }
   check('…and the footer shows the Also shop us on row', footerMarket, null)
   await admin.put('/api/admin/settings', { section: 'store', value: settings.store })
+  const badWa = await admin.put('/api/admin/settings', { section: 'store', value: { ...settings.store, whatsapp: '12345' } })
+  check('WhatsApp number without a country code refused → 422', badWa.status === 422, badWa.status)
+  const homeWa = new TextDecoder().decode((await anon.get('/')).data)
+  check('home page has the WhatsApp button for the store number', /wa\.me\/\d{8,15}/.test(homeWa), null)
   const badRefund = await admin.put('/api/admin/settings', { section: 'commerce', value: { ...settings.commerce, refundDays: 0 } })
   check('refund days below 1 refused → 422', badRefund.status === 422, badRefund.status)
   const shipHtml = new TextDecoder().decode((await anon.get('/shipping-returns')).data)

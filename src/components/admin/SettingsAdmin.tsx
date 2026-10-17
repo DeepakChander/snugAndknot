@@ -86,6 +86,16 @@ function StoreForm({ initial }: { initial: SiteSettings['store'] }) {
             <Input label="Email" type="email" value={d.email} error={s.err.email} onChange={(e) => set({ email: e.target.value })} />
             <Input label="Phone (optional)" type="tel" value={d.phone} error={s.err.phone} onChange={(e) => set({ phone: e.target.value })} />
           </div>
+          <Input
+            label="WhatsApp number"
+            type="tel"
+            value={d.whatsapp ?? ''}
+            error={s.err.whatsapp}
+            onChange={(e) => set({ whatsapp: e.target.value })}
+            placeholder="+91 93557 04093"
+            hint="With the country code. Shoppers tap the green button at the bottom right to message you on WhatsApp; leave it empty to show the help menu there instead."
+            wrapClassName="max-w-sm"
+          />
         </Section>
         <Section title="Address" description="Your studio or business address.">
           <Input label="Street" value={d.address.street} error={s.err['address.street']} onChange={(e) => addr('street', e.target.value)} />
