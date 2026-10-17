@@ -7,11 +7,11 @@ import type { SiteSettings } from '@/types/commerce'
 export const DEFAULT_SETTINGS: SiteSettings = {
   store: {
     name: 'Snug&Knot',
-    tagline: 'Hand-finished knitwear, made in small runs.',
-    description: 'Knitwear in merino, cashmere blends and long-staple cotton — made in small runs and finished by hand.',
+    tagline: 'Everyday clothing for men, women and kids.',
+    description: 'Trendy, comfortable, premium everyday clothing for men, women and kids.',
     email: 'support@snugandknot.com',
     phone: '+91-9355704093',
-    address: { street: '142 Mercer Street', city: 'New York', state: 'NY', zip: '10012', country: 'United States' },
+    address: { street: '', city: '', state: '', zip: '', country: 'India' },
     social: {
       instagram: 'https://instagram.com/snugandknot',
       pinterest: 'https://pinterest.com/snugandknot',
@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
       twitter: 'https://twitter.com/snugandknot',
     },
     departments: { men: true, women: true, kids: true },
+    marketplaces: [],
   },
   commerce: {
     currency: 'USD',
@@ -28,6 +29,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     expressShippingRate: 18,
     taxRate: 0,
     returnWindowDays: 30,
+    deliveryEstimate: '3–7 working days',
+    refundDays: 7,
+    freeReturns: false,
     pointsPerDollar: 1,
     codEnabled: true,
     onlinePaymentsEnabled: false,
@@ -37,7 +41,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     enabled: true,
     messages: [
       'Free shipping on orders over {free-shipping}',
-      'Hand-finished in small batches',
+      'Delivery in 3–7 working days',
       '30-day returns on unworn pieces',
     ],
     link: '/shop',
@@ -62,12 +66,12 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     secondaryCtaLabel: 'See the collections',
     secondaryCtaHref: '/collections',
     manifesto:
-      'We make a short list of knitwear and make it properly: natural fibres, small runs, and every piece *finished by hand* before it is folded and sent to you.',
+      'Everyday clothing for men, women and kids that is easy to wear and made to last: well-cut basics and seasonal pieces, chosen with *care*.',
   },
   seo: {
-    title: 'Snug&Knot — Luxury Knitwear, Hand-Finished',
+    title: 'Snug&Knot — Everyday Clothing for Men, Women & Kids',
     description:
-      'Hand-finished knitwear in merino, cashmere blends and long-staple cotton: cardigans and knit tees made in small runs to be worn for years.',
+      'Trendy, comfortable, premium everyday clothing for men, women and kids: shirts, T-shirts, knitwear, jeans, dresses and more, with 30-day returns.',
     // 1200×630, the size link previews expect: three of the real pieces side by side.
     ogImage: '/images/og/snugandknot.jpg',
   },

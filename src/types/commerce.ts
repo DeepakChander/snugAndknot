@@ -307,6 +307,14 @@ export interface StoreSettings {
   social: { instagram: string; pinterest: string; tiktok: string; twitter: string }
   /** Departments open in the shop. A closed one is gone from the menus, the home page and the shop. */
   departments: { men: boolean; women: boolean; kids: boolean }
+  /** Where else the shop sells (Myntra, Amazon …): the footer's "Also on" row. Empty: no row. */
+  marketplaces: Marketplace[]
+}
+
+/** The shop's own store on a marketplace. */
+export interface Marketplace {
+  name: string
+  url: string
 }
 
 /** An additional currency the shop sells in, with its own prices, shipping and points. */
@@ -331,6 +339,12 @@ export interface CommerceSettings {
   /** Percent, e.g. 8.875 */
   taxRate: number
   returnWindowDays: number
+  /** How long delivery takes, as shoppers read it ("3–7 working days"). Empty: not stated. */
+  deliveryEstimate: string
+  /** Working days from a return passing its check to the refund being issued. */
+  refundDays: number
+  /** Return shipping is on the shop for every return (otherwise only for damaged, faulty or wrong items). */
+  freeReturns: boolean
   pointsPerDollar: number
   codEnabled: boolean
   /**

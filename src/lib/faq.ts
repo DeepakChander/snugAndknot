@@ -1,4 +1,5 @@
 import { formatMoney } from './format'
+import { deliveryText, refundText, returnShippingText } from '@/lib/policy'
 import type { SiteSettings } from '@/types/commerce'
 
 export interface FaqGroup {
@@ -39,15 +40,16 @@ export function faqGroups({ commerce, store, reviews }: Pick<SiteSettings, 'comm
               : `Standard shipping is ${m(commerce.standardShippingRate)} and express shipping is ${m(commerce.expressShippingRate)}.`,
         },
         { q: 'How can I track my order?', a: 'Signed-in customers can follow every order from their account. Guests can use the Track an order page with their order number and email. Tracking numbers appear there once your parcel ships.' },
+        ...(commerce.deliveryEstimate?.trim() ? [{ q: 'How long does delivery take?', a: deliveryText(commerce) }] : []),
         { q: 'Where do you ship?', a: `Ask us at ${store.email} before ordering if you are unsure whether we deliver to your address.` },
       ],
     },
     {
       name: 'Pieces & sizing',
       items: [
-        { q: 'What are your knits made from?', a: 'Each product page lists the exact fibres — merino wool, cotton–cashmere blends, long-staple cotton with silk — along with fit and care notes.' },
+        { q: 'What are your clothes made from?', a: 'Each product page lists the exact fabric, along with fit and care notes.' },
         { q: 'How do I find my size?', a: 'Every product page has a size guide with body measurements, and reviews show whether customers found a piece small, true to size or large.' },
-        { q: 'How do I care for my knitwear?', a: 'Most of our pieces prefer a cold hand wash and drying flat. Our care guide covers each fibre in detail.' },
+        { q: 'How do I care for my clothes?', a: 'Follow the care label on each piece. Our care guide covers washing, drying and storing in detail.' },
         { q: 'A size is sold out — will it come back?', a: 'Leave your email on the product page and we will let you know when it is back.' },
       ],
     },
@@ -56,7 +58,8 @@ export function faqGroups({ commerce, store, reviews }: Pick<SiteSettings, 'comm
       items: [
         { q: 'What is your return policy?', a: `You can return unworn pieces in their original condition within ${commerce.returnWindowDays} days of delivery.` },
         { q: 'How do I start a return?', a: 'Sign in, open the order and choose Start a return, then pick the pieces and the reason. Checked out as a guest? Email us with your order number.' },
-        { q: 'When will I get my refund?', a: 'We confirm the refund once we have received and checked the returned pieces, and we will contact you to arrange it.' },
+        { q: 'When will I get my refund?', a: refundText(commerce) },
+        { q: 'Who pays for return shipping?', a: returnShippingText(commerce) },
       ],
     },
     {
