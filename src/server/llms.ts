@@ -90,7 +90,7 @@ export async function buildLlmsTxt({ full }: { full: boolean }): Promise<string>
     '',
     '## About',
     '',
-    link('Our story', '/about', 'how and why the pieces are made'),
+    link('About us', '/about', 'who Snug & Knot is and how the pieces are made'),
     link('Lookbook', '/lookbook', 'knitwear photographed in four chapters, each listing the pieces from the shop'),
     '',
     '## Optional',

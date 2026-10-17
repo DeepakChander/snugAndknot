@@ -50,7 +50,7 @@ const COLUMNS = [
   {
     title: 'About',
     links: [
-      { label: 'Our story', href: '/about' },
+      { label: 'About us', href: '/about' },
       { label: 'Journal', href: '/journal' },
       { label: 'Lookbook', href: '/lookbook' },
     ],

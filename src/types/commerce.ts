@@ -303,6 +303,8 @@ export interface StoreSettings {
   description: string
   email: string
   phone: string
+  /** The number shoppers can message on WhatsApp (the floating button). Empty: the help menu shows instead. */
+  whatsapp: string
   address: { street: string; city: string; state: string; zip: string; country: string }
   social: { instagram: string; pinterest: string; tiktok: string; twitter: string }
   /** Departments open in the shop. A closed one is gone from the menus, the home page and the shop. */
