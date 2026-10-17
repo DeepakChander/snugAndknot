@@ -3,9 +3,16 @@
  * a transaction (see ./client.ts). Never edit a shipped migration — append a new one.
  *
  * The SQL here is plain PostgreSQL 16 and also runs on PGlite (the zero-config
- * fallback used when DATABASE_URL is not set).
+ * fallback used when DATABASE_URL is not set). A migration may also have a `run` step for data
+ * work that SQL alone cannot do; it runs after the SQL, in the same transaction.
  */
-export const MIGRATIONS: { version: number; name: string; sql: string }[] = [
+
+import type { Queryable } from './client'
+
+/** A data step a migration runs after its SQL, inside the same transaction. */
+type MigrationStep = (q: Queryable) => Promise<void>
+
+export const MIGRATIONS: { version: number; name: string; sql: string; run?: MigrationStep }[] = [
   {
     version: 1,
     name: 'initial-commerce-schema',
@@ -532,6 +539,56 @@ UPDATE settings SET value = jsonb_set(value, '{messages}', (
   )), updated_at = now()
  WHERE key = 'announcement' AND jsonb_typeof(value->'messages') = 'array' AND value->'messages' ? 'Free shipping on orders over $150';
 `,
+  },
+  {
+    version: 16,
+    name: 'everyday-clothing-inr',
+    // The shop is everyday clothing for men, women and kids, sold in India. The words it shipped
+    // with (luxury knitwear, merino, cashmere, hand-finished) move to that line wherever they still
+    // read exactly as shipped, and the placeholder New York address goes (it made search engines and
+    // the checkout treat the shop as American). Then, in `run`: prices move from USD to INR, and
+    // cash on delivery gives way to Razorpay where Razorpay is connected.
+    sql: `
+UPDATE settings SET value = jsonb_set(value, '{title}', to_jsonb('Snug&Knot — Everyday Clothing for Men, Women & Kids'::text)), updated_at = now()
+ WHERE key = 'seo' AND value->>'title' = 'Snug&Knot — Luxury Knitwear, Hand-Finished';
+UPDATE settings SET value = jsonb_set(value, '{description}', to_jsonb('Trendy, comfortable, premium everyday clothing for men, women and kids: shirts, T-shirts, knitwear, jeans, dresses and more, with 30-day returns.'::text)), updated_at = now()
+ WHERE key = 'seo' AND value->>'description' = 'Hand-finished knitwear in merino, cashmere blends and long-staple cotton: cardigans and knit tees made in small runs to be worn for years.';
+UPDATE settings SET value = jsonb_set(value, '{tagline}', to_jsonb('Everyday clothing for men, women and kids.'::text)), updated_at = now()
+ WHERE key = 'store' AND value->>'tagline' = 'Hand-finished knitwear, made in small runs.';
+UPDATE settings SET value = jsonb_set(value, '{description}', to_jsonb('Trendy, comfortable, premium everyday clothing for men, women and kids.'::text)), updated_at = now()
+ WHERE key = 'store' AND value->>'description' = 'Knitwear in merino, cashmere blends and long-staple cotton — made in small runs and finished by hand.';
+UPDATE settings SET value = jsonb_set(value, '{address}', '{"street": "", "city": "", "state": "", "zip": "", "country": "India"}'::jsonb), updated_at = now()
+ WHERE key = 'store' AND value->'address'->>'street' = '142 Mercer Street' AND value->'address'->>'city' = 'New York';
+UPDATE settings SET value = jsonb_set(value, '{manifesto}', to_jsonb('Everyday clothing for men, women and kids that is easy to wear and made to last: well-cut basics and seasonal pieces, chosen with *care*.'::text)), updated_at = now()
+ WHERE key = 'homepage' AND value->>'manifesto' = 'We make a short list of knitwear and make it properly: natural fibres, small runs, and every piece *finished by hand* before it is folded and sent to you.';
+UPDATE settings SET value = jsonb_set(value, '{messages}', (
+    SELECT coalesce(jsonb_agg(CASE WHEN m = 'Hand-finished in small batches' THEN 'Delivery in 3–7 working days' ELSE m END ORDER BY n), '[]'::jsonb)
+      FROM jsonb_array_elements_text(value->'messages') WITH ORDINALITY AS t (m, n)
+  )), updated_at = now()
+ WHERE key = 'announcement' AND jsonb_typeof(value->'messages') = 'array' AND value->'messages' ? 'Hand-finished in small batches';
+`,
+    run: async (q) => {
+      // A brand-new database is seeded after the migrations, with nothing to convert yet.
+      const [{ n }] = await q.query<{ n: string }>('SELECT count(*)::text AS n FROM products')
+      if (Number(n) === 0) return
+      // Prices: USD → INR at ₹96 to the dollar, rounded to prices ending in 99, exactly as Admin →
+      // Settings → Change the main currency does (USD stays on as a second currency). A shop already
+      // in INR, or in anything but USD, is left alone. No commerce row means the default, USD.
+      const [row] = await q.query<{ value: { currency?: string } }>(`SELECT value FROM settings WHERE key = 'commerce'`)
+      if ((row?.value?.currency ?? 'USD').toUpperCase() === 'USD') {
+        const { switchCurrencyIn } = await import('@/server/currency-switch')
+        await switchCurrencyIn(q, { code: 'INR', rate: 96, rounding: 'ninety-nine' })
+      }
+      // Payment: online through Razorpay. Cash on delivery is switched off only where Razorpay is
+      // connected, so a shop without the keys can still take orders (it stays an admin switch).
+      const { razorpayConfig } = await import('@/server/razorpay')
+      const patch = razorpayConfig() ? { onlinePaymentsEnabled: true, codEnabled: false } : { onlinePaymentsEnabled: true }
+      await q.query(
+        `INSERT INTO settings (key, value, updated_at) VALUES ('commerce', $1::jsonb, now())
+         ON CONFLICT (key) DO UPDATE SET value = settings.value || EXCLUDED.value, updated_at = now()`,
+        [JSON.stringify(patch)]
+      )
+    },
   },
 ]
 

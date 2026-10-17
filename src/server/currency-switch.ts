@@ -67,7 +67,8 @@ export function switchCommerce(commerce: CommerceSettings, input: SwitchInput): 
   }
 }
 
-async function switchIn(q: Queryable, input: SwitchInput): Promise<SwitchResult> {
+/** The switch inside a transaction the caller already holds (a migration's, see db/migrations.ts). */
+export async function switchCurrencyIn(q: Queryable, input: SwitchInput): Promise<SwitchResult> {
   const [row] = await q.query<{ value: unknown }>(`SELECT value FROM settings WHERE key = 'commerce' FOR UPDATE`)
   const commerce = mergeSettings(DEFAULT_SETTINGS.commerce, row?.value)
   const from = commerce.currency.toUpperCase()
@@ -128,5 +129,5 @@ async function switchIn(q: Queryable, input: SwitchInput): Promise<SwitchResult>
 }
 
 export function switchBaseCurrency(input: SwitchInput): Promise<SwitchResult> {
-  return tx((q) => switchIn(q, input))
+  return tx((q) => switchCurrencyIn(q, input))
 }

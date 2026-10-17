@@ -188,6 +188,7 @@ async function migrate(db: Db) {
     for (const m of MIGRATIONS) {
       if (applied.has(m.version)) continue
       await q.exec(m.sql)
+      if (m.run) await m.run(q)
       await q.query('INSERT INTO schema_migrations (version, name) VALUES ($1, $2)', [m.version, m.name])
     }
     // Seed exactly once — when the schema is first created. Deleting every product
