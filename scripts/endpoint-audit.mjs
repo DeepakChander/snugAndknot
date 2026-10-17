@@ -1025,6 +1025,20 @@ async function adminSettingsAndMisc() {
   const after = (await admin.get('/api/admin/settings')).data?.settings
   check(SP, 'admin', 'settings unchanged after the refused writes', JSON.stringify(after) === JSON.stringify(settings), 'settings differ')
 
+  // The private client showcase: sample reviews only through the secret link, a plain 404 otherwise.
+  const SW = 'GET /api/showcase'
+  const showcaseToken = `audit${stamp}`.padEnd(32, 'x')
+  expect(SW, 'anon', 'no token', await anon.get('/api/showcase'), 404)
+  expect(SP, 'admin', 'showcase token too short to be secret', await admin.put('/api/admin/settings', { section: 'showcase', value: { enabled: true, token: 'short' } }), 422)
+  expect(SP, 'admin', 'switch the showcase on', await admin.put('/api/admin/settings', { section: 'showcase', value: { enabled: true, token: showcaseToken } }), 200)
+  const sw = await anon.get(`/api/showcase?token=${showcaseToken}`)
+  expect(SW, 'anon', 'with the link: sample reviews, not cacheable', sw, 200, sw.data?.reviews?.length > 0 && sw.data.reviews.every((r) => r.verified === false) && sw.headers.get('cache-control') === 'no-store')
+  expect(SW, 'anon', 'wrong token', await anon.get(`/api/showcase?token=${showcaseToken.slice(0, -1)}y`), 404)
+  expect(SW, 'customer', 'customer without the link', await shopper.get('/api/showcase?token=nope'), 404)
+  await admin.put('/api/admin/settings', { section: 'showcase', value: { enabled: false, token: showcaseToken } })
+  expect(SW, 'anon', 'switched off: the link stops working', await anon.get(`/api/showcase?token=${showcaseToken}`), 404)
+  await admin.put('/api/admin/settings', { section: 'showcase', value: settings.showcase ?? { enabled: false, token: '' } })
+
   const ST = 'GET /api/admin/stats'
   const st = await admin.get('/api/admin/stats')
   expect(ST, 'admin', 'dashboard stats + database kind', st, 200, typeof st.data?.stats?.orders === 'number' && typeof st.data?.database?.kind === 'string')

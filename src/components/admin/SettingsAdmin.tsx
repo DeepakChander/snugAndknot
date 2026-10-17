@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { Btn, Card, Input, PageHeader, Select, Textarea, Toggle, useMutate } from './ui'
 import { ImageField } from './ImagePicker'
@@ -603,6 +603,71 @@ function HomepageForm({ initial, collections }: { initial: SiteSettings['homepag
   )
 }
 
+const noSubscribe = () => () => {}
+
+/** A long random secret for the showcase link (URL-safe). */
+function newShowcaseToken() {
+  const bytes = new Uint8Array(24)
+  crypto.getRandomValues(bytes)
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+/**
+ * The private client showcase: a secret link that shows the home page with sample reviews (each
+ * tagged Sample) for a design preview, while the shop has no real reviews. Saves on every change.
+ */
+function ShowcaseForm({ initial }: { initial: SiteSettings['showcase'] }) {
+  const { run, busy } = useMutate()
+  const [d, setD] = useState(initial)
+  const [copied, setCopied] = useState(false)
+  const save = async (next: SiteSettings['showcase'], msg: string) => {
+    const res = await run<{ value: SiteSettings['showcase'] }>('PUT', '/api/admin/settings', { section: 'showcase', value: next }, msg)
+    if (res) setD(res.value)
+  }
+  // The site's own address, read in the browser (empty while the page is drawn on the server).
+  const origin = useSyncExternalStore(noSubscribe, () => window.location.origin, () => '')
+  const link = d.token && origin ? `${origin}/?showcase=${d.token}` : ''
+  return (
+    <Card className="mt-6">
+      <Section
+        title="Client showcase"
+        description="A private link that shows the home page with sample reviews, each marked Sample, so you can show someone how the reviews section will look. Only people with the link see it; shoppers and search engines never do. It only applies while the shop has no real reviews."
+      >
+        <Toggle
+          checked={d.enabled}
+          disabled={busy || !d.token}
+          onChange={(v) => save({ ...d, enabled: v }, v ? 'Showcase link is on' : 'Showcase link is off')}
+          label="Showcase link works"
+          description={d.token ? (d.enabled ? 'Anyone with the link sees the sample reviews.' : 'Off: the link shows the normal home page.') : 'Make a link first.'}
+        />
+        {link ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <code className="min-w-0 flex-1 truncate rounded-lg bg-ink/[0.04] px-3 py-2 text-xs">{link}</code>
+            <Btn
+              size="sm"
+              variant="outline"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(link)
+                  setCopied(true)
+                  window.setTimeout(() => setCopied(false), 2000)
+                } catch {}
+              }}
+            >
+              {copied ? 'Copied' : 'Copy link'}
+            </Btn>
+          </div>
+        ) : null}
+        <div>
+          <Btn size="sm" variant={d.token ? 'ghost' : 'primary'} loading={busy} onClick={() => save({ enabled: true, token: newShowcaseToken() }, d.token ? 'New link made: the old one no longer works' : 'Showcase link made')}>
+            {d.token ? 'New link (the old one stops working)' : 'Make a link'}
+          </Btn>
+        </div>
+      </Section>
+    </Card>
+  )
+}
+
 function SeoForm({ initial }: { initial: SiteSettings['seo'] }) {
   const s = useSection('seo', initial)
   const d = s.draft
@@ -658,7 +723,12 @@ export function SettingsAdmin({ settings, tab, payments, collections = [] }: { s
         {current.key === 'commerce' ? <CommerceForm key={settings.commerce.currency} initial={settings.commerce} payments={payments} /> : null}
         {current.key === 'announcement' ? <AnnouncementForm initial={settings.announcement} /> : null}
         {current.key === 'reviews' ? <ReviewsForm initial={settings.reviews} /> : null}
-        {current.key === 'homepage' ? <HomepageForm initial={settings.homepage} collections={collections} /> : null}
+        {current.key === 'homepage' ? (
+          <>
+            <HomepageForm initial={settings.homepage} collections={collections} />
+            <ShowcaseForm initial={settings.showcase} />
+          </>
+        ) : null}
         {current.key === 'seo' ? <SeoForm initial={settings.seo} /> : null}
       </div>
     </>
