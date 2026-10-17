@@ -17,7 +17,7 @@ const MORE = [
   { label: 'Collections', href: '/collections' },
   { label: 'Lookbook', href: '/lookbook' },
   { label: 'Journal', href: '/journal' },
-  { label: 'Our story', href: '/about' },
+  { label: 'About us', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ]
 
