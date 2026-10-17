@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useUIStore } from '@/stores/ui-store'
 import { useSettings } from '@/components/providers/SettingsProvider'
-import { ChatPhoneIcon, HelpIcon, MailIcon, PackageIcon, PhoneIcon, ReturnIcon, RulerIcon, XIcon } from '@/components/kit/icons'
+import { HelpIcon, MailIcon, PackageIcon, PhoneIcon, ReturnIcon, RulerIcon, XIcon } from '@/components/kit/icons'
 
 /**
  * The floating button at the bottom right. With a WhatsApp number in Admin → Settings → Store it opens
@@ -45,7 +45,9 @@ function WhatsAppButton({ digits, storeName }: { digits: string; storeName: stri
       >
         {/* A soft ring that pulses a few times when the page opens, then rests. */}
         <span aria-hidden className="absolute inset-0 rounded-full bg-[#25D366] motion-safe:animate-[ping_2s_cubic-bezier(0,0,0.2,1)_3]" />
-        <ChatPhoneIcon size={28} className="relative" />
+        {/* WhatsApp's own mark (Simple Icons, CC0; public/images/social). */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- a tiny SVG, nothing to optimise */}
+        <img src="/images/social/whatsapp.svg" alt="" width={28} height={28} className="relative h-7 w-7" />
       </a>
     </div>
   )

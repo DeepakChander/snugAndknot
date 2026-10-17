@@ -116,13 +116,6 @@ export const PhoneIcon = (p: P) => (
     <path d="M6.5 3.5h3l1.5 4-2 1.3a10.5 10.5 0 0 0 6.2 6.2l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z" />
   </Svg>
 )
-/** A chat bubble with a handset: the "message us" mark of the floating WhatsApp button. */
-export const ChatPhoneIcon = (p: P) => (
-  <Svg strokeWidth={1.7} {...p}>
-    <path d="M12 3.2a8.8 8.8 0 0 0-7.6 13.2L3.2 20.8l4.5-1.2A8.8 8.8 0 1 0 12 3.2z" />
-    <path transform="translate(6.9 6.9) scale(0.43)" fill="currentColor" stroke="none" d="M6.5 3.5h3l1.5 4-2 1.3a10.5 10.5 0 0 0 6.2 6.2l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2z" />
-  </Svg>
-)
 export const PinIcon = (p: P) => (
   <Svg {...p}>
     <path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" />

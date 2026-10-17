@@ -595,7 +595,8 @@ UPDATE settings SET value = jsonb_set(value, '{messages}', (
     name: 'inr-price-points',
     // Version 16 converted the dollar prices at 96 to the rupee (a tee came to ₹12,399). The pieces
     // get their own Indian price points instead (T-shirts ₹2,999, cardigans ₹3,999), with no "was"
-    // price: the converted ones were never real rupee prices. Delivery and the coupons follow. Each
+    // price: the converted ones were never real rupee prices. Delivery (free from ₹999, standard ₹49,
+    // express ₹99) and the coupons follow. Each
     // amount changes only while it still holds the converted value, so an amount set in the admin
     // stays; a shop that never ran the conversion (still in dollars) is untouched.
     sql: `
@@ -617,11 +618,11 @@ UPDATE variants SET price = v.price, compare_at_price = NULL
  WHERE variants.product_id = v.product_id AND variants.price = v.was AND EXISTS (SELECT 1 FROM settings c WHERE c.key = 'commerce' AND c.value->>'currency' = 'INR');
 UPDATE coupons SET value = 500, min_purchase = 4999 WHERE code = 'KNOTFREE' AND type = 'fixed' AND value = 1399 AND min_purchase = 9599 AND EXISTS (SELECT 1 FROM settings c WHERE c.key = 'commerce' AND c.value->>'currency' = 'INR');
 UPDATE coupons SET min_purchase = 5999 WHERE code = 'SNUG20' AND min_purchase = 14399 AND EXISTS (SELECT 1 FROM settings c WHERE c.key = 'commerce' AND c.value->>'currency' = 'INR');
-UPDATE settings SET value = jsonb_set(value, '{freeShippingThreshold}', '1999'::jsonb), updated_at = now()
+UPDATE settings SET value = jsonb_set(value, '{freeShippingThreshold}', '999'::jsonb), updated_at = now()
  WHERE key = 'commerce' AND value->>'currency' = 'INR' AND (value->>'freeShippingThreshold')::numeric = 14399;
-UPDATE settings SET value = jsonb_set(value, '{standardShippingRate}', '99'::jsonb), updated_at = now()
+UPDATE settings SET value = jsonb_set(value, '{standardShippingRate}', '49'::jsonb), updated_at = now()
  WHERE key = 'commerce' AND value->>'currency' = 'INR' AND (value->>'standardShippingRate')::numeric = 799;
-UPDATE settings SET value = jsonb_set(value, '{expressShippingRate}', '199'::jsonb), updated_at = now()
+UPDATE settings SET value = jsonb_set(value, '{expressShippingRate}', '99'::jsonb), updated_at = now()
  WHERE key = 'commerce' AND value->>'currency' = 'INR' AND (value->>'expressShippingRate')::numeric = 1699;
 `,
   },
