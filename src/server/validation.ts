@@ -440,7 +440,7 @@ export const settingsSchemas = {
     // Optional: a save without it keeps every department open (saveSettings fills in defaults).
     departments: z.object({ men: z.boolean(), women: z.boolean(), kids: z.boolean() }).optional(),
     marketplaces: z
-      .array(z.object({ name: required(40, 'Marketplace name'), url: httpsUrl.refine((v) => v !== '', 'Use a full https:// address') }))
+      .array(z.object({ name: required(40, 'Marketplace name'), url: httpsUrl.refine((v) => v !== '', 'Use a full https:// address'), logo: imageUrl.default('') }))
       .max(8, 'At most 8 marketplaces')
       .optional(),
   }),
