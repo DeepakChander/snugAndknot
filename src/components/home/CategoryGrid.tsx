@@ -18,20 +18,22 @@ export interface CategoryTile {
 /**
  * "Shop by category": every department's categories as photograph tiles, the name under each, with
  * an All tab (first, and open by default) and a tab per department. Fed by the categories marked
- * "Show on home page" in the admin that have an image, in admin order; a department with none has
- * no tab, and the section is left out when no department has any.
+ * "Show on home page" in the admin, in admin order; one without a photograph yet is a tile with its
+ * name. A department with none has no tab, and the section is left out when no department has any.
  */
 export default function CategoryGrid({ tiles }: { tiles: CategoryTile[] }) {
   const departments = (['women', 'men', 'kids'] as const).filter((d) => tiles.some((t) => t.department === d))
   const [dept, setDept] = useState<Department | 'all'>('all')
   if (!departments.length) return null
-  const active = dept !== 'all' && departments.includes(dept) ? dept : 'all'
+  // All holds only photographs: with none anywhere it is not offered.
+  const withPhotos = tiles.some((t) => t.image)
+  const active = dept !== 'all' && departments.includes(dept) ? dept : withPhotos ? 'all' : departments[0]
   // Under All the departments take turns (Women, Men, Kids, Women …), each in admin order, so the
-  // first row is not one department alone.
-  const byDept = departments.map((d) => tiles.filter((t) => t.department === d))
+  // first row is not one department alone; only categories with a photograph go there.
+  const byDept = departments.map((d) => tiles.filter((t) => t.department === d && t.image))
   const mixed = Array.from({ length: Math.max(...byDept.map((l) => l.length)) }, (_, i) => byDept.map((l) => l[i]).filter((t): t is CategoryTile => !!t)).flat()
   const shown = active === 'all' ? mixed : tiles.filter((t) => t.department === active)
-  const tabs = ['all', ...departments] as const
+  const tabs = withPhotos ? (['all', ...departments] as const) : departments
 
   return (
     <section aria-labelledby="category-grid-title" className="bg-ivory py-[clamp(3.5rem,7vw,6rem)] text-ink">
@@ -71,17 +73,25 @@ export default function CategoryGrid({ tiles }: { tiles: CategoryTile[] }) {
             <li key={t.slug}>
               <Link href={t.href} className="group block">
                 <span className="relative block aspect-[4/5] overflow-hidden bg-bone">
-                  <Image
-                    src={t.image}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
-                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
-                    unoptimized={t.image.startsWith('/api/media/')}
-                  />
+                  {t.image ? (
+                    <Image
+                      src={t.image}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
+                      className="object-cover transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
+                      unoptimized={t.image.startsWith('/api/media/')}
+                    />
+                  ) : (
+                    // No photograph yet (Admin → Categories → Image): the name, set large.
+                    <span className="absolute inset-0 flex flex-col justify-between bg-parchment p-4 transition-colors duration-500 group-hover:bg-bone md:p-5">
+                      <span className="text-[0.66rem] font-medium uppercase tracking-[0.16em] text-stone">{DEPARTMENT_TITLES[t.department]}</span>
+                      <span className="font-serif text-[clamp(1.5rem,2.4vw,2.2rem)] leading-[1.02] text-ink group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">{t.title}</span>
+                    </span>
+                  )}
                   {t.badge ? <span className="absolute left-2.5 top-2.5 bg-ivory px-2 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-ink">{t.badge}</span> : null}
                 </span>
-                <span className="mt-3 block text-[0.86rem] font-medium group-hover:underline group-hover:underline-offset-4">{t.title}</span>
+                {t.image ? <span className="mt-3 block text-[0.86rem] font-medium group-hover:underline group-hover:underline-offset-4">{t.title}</span> : null}
                 {/* Under All, "Shirts" could be Men's or Women's: the department says which. */}
                 {active === 'all' && departments.length > 1 ? <span className="mt-0.5 block text-[0.72rem] uppercase tracking-[0.12em] text-stone">{DEPARTMENT_TITLES[t.department]}</span> : null}
               </Link>
